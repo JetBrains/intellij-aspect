@@ -91,6 +91,12 @@ message DartIdeInfo {
   repeated ArtifactLocation sources = 1;
 }
 
+message JavaToolchainInfo {
+  string source_version = 1;
+  string target_version = 2;
+  string java_home = 3;
+}
+
 message JvmOutputs {
   repeated ArtifactLocation binary_jars = 1;
   repeated ArtifactLocation interface_jars = 2;
@@ -173,5 +179,7 @@ message TargetIdeInfo {
   JsIdeInfo js_ide_info = 150;
   TsIdeInfo ts_ide_info = 160;
   DartIdeInfo dart_ide_info = 170;
+
   JavaIdeInfo java_ide_info = 180;
+  JavaToolchainInfo java_toolchain_ide_info = 181;
 }

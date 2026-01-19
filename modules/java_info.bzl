@@ -1,8 +1,17 @@
 load("@rules_java//java:defs.bzl", "JavaInfo")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
+load("//common:dependencies.bzl", "intellij_deps")
 load("//common:make_variables.bzl", "expand_make_variables")
+load(":java_toolchain_info.bzl", "JAVA_TOOLCHAIN_TYPE", "intellij_java_toolchain_info_aspect")
 load(":provider.bzl", "intellij_provider")
+
+COMPILE_TIME_DEPS = [
+    "jars",
+    "_java_toolchain",
+    "_jvm",
+    "runtime_jdk",
+]
 
 def _get_jvm_outputs(target, ctx):
     if hasattr(target[JavaInfo], "java_outputs"):
@@ -67,9 +76,19 @@ def _aspect_impl(target, ctx):
             generated_sources = [s for s in all_sources if not s.is_source],
             jvm_target_info = _get_jvm_info(target, ctx),
         ),
+        dependencies = {
+            intellij_deps.COMPILE_TIME: intellij_deps.collect(
+                ctx,
+                attributes = COMPILE_TIME_DEPS,
+                toolchain_types = [JAVA_TOOLCHAIN_TYPE],
+            ),
+        },
+        toolchains = intellij_deps.find_toolchains(ctx, JAVA_TOOLCHAIN_TYPE),
     )]
 
 intellij_java_info_aspect = intellij_common.aspect(
     implementation = _aspect_impl,
     provides = [intellij_provider.JavaInfo],
+    requires = [intellij_java_toolchain_info_aspect],
+    toolchains_aspects = [str(JAVA_TOOLCHAIN_TYPE)],
 )

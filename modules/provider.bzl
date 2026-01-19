@@ -12,12 +12,12 @@ def _intellij_module_provider():
 
 _IntelliJCcInfo = _intellij_module_provider()
 _IntelliJPyInfo = _intellij_module_provider()
-_IntellijJavaInfo = _intellij_module_provider()
+_IntelliJJavaInfo = _intellij_module_provider()
 
 _MODULE_PROVIDERS = {
     "c_ide_info": _IntelliJCcInfo,
     "py_ide_info": _IntelliJPyInfo,
-    "java_ide_info": _IntellijJavaInfo,
+    "java_ide_info": _IntelliJJavaInfo,
 }
 
 def _intellij_toolchain_provider():
@@ -32,10 +32,12 @@ def _intellij_toolchain_provider():
 
 _IntelliJCcToolchainInfo = _intellij_toolchain_provider()
 _IntelliJXcodeToolchainInfo = _intellij_toolchain_provider()
+_IntelliJJavaToolchainInfo = _intellij_toolchain_provider()
 
 _TOOLCHAIN_PROVIDERS = [
     _IntelliJCcToolchainInfo,
     _IntelliJXcodeToolchainInfo,
+    _IntelliJJavaToolchainInfo,
 ]
 
 def _has_module_provider(target):
@@ -79,7 +81,8 @@ intellij_provider = struct(
     CcInfo = _IntelliJCcInfo,
     CcToolchainInfo = _IntelliJCcToolchainInfo,
     XcodeToolchainInfo = _IntelliJXcodeToolchainInfo,
-    JavaInfo = _IntellijJavaInfo,
+    JavaInfo = _IntelliJJavaInfo,
+    JavaToolchainInfo = _IntelliJJavaToolchainInfo,
     PyInfo = _IntelliJPyInfo,
     MODULE_MAP = _MODULE_PROVIDERS,
     TOOLCHAINS = _TOOLCHAIN_PROVIDERS,

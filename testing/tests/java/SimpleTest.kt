@@ -26,12 +26,17 @@ class SimpleTest {
         assertThat(target.javaIdeInfo.sourcesList[0].relativePath).isEqualTo("Main.java")
 
         // Dependencies are reported correctly
-        assertThat(target.depsList.size).isEqualTo(1)
-        assertThat(target.depsList[0].target.label).isEqualTo("//lib:util")
+        assertThat(target.depsList.map { it.target.label }).contains("//lib:util")
 
         // JVM-info is reported correctly
         val jvmInfo = target.javaIdeInfo.jvmTargetInfo
         assertThat(jvmInfo.mainClass).isEqualTo("com.intellij.aspect.testing.fixtures.java.simple.Main")
+
+        // The toolchain dependency is reported
+        val toolchains = target.depsList.map { aspect.findTarget(it.target.label) }.filter { it.hasJavaToolchainIdeInfo() }
+        assertThat(toolchains).isNotEmpty()
+        assertThat(toolchains.first().javaToolchainIdeInfo.sourceVersion).isEqualTo("21")
+        assertThat(toolchains.first().javaToolchainIdeInfo.javaHome).isNotEmpty()
     }
 
     @Test
@@ -55,5 +60,10 @@ class SimpleTest {
         assertThat(jvmInfo.jars.jdepsList.size).isAtMost(1)
         assertThat(jvmInfo.hasApiGeneratingPlugins).isFalse()
 
+        // The toolchain dependency is reported
+        val toolchains = target.depsList.map { aspect.findTarget(it.target.label) }.filter { it.hasJavaToolchainIdeInfo() }
+        assertThat(toolchains).isNotEmpty()
+        assertThat(toolchains.first().javaToolchainIdeInfo.sourceVersion).isEqualTo("21")
+        assertThat(toolchains.first().javaToolchainIdeInfo.javaHome).isNotEmpty()
     }
 }
