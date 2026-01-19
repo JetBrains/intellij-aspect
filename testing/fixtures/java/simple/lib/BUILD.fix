@@ -3,5 +3,6 @@ load("@rules_java//java:java_library.bzl", "java_library")
 java_library(
   name = "util",
   srcs = ["Util.java"],
+  javacopts = ["-Xep:ReturnValueIgnored:WARN"],
   visibility = ["//visibility:public"],
 )

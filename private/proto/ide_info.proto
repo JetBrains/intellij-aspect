@@ -91,9 +91,26 @@ message DartIdeInfo {
   repeated ArtifactLocation sources = 1;
 }
 
+message JvmOutputs {
+  repeated ArtifactLocation binary_jars = 1;
+  repeated ArtifactLocation interface_jars = 2;
+  repeated ArtifactLocation source_jars = 3;
+  repeated ArtifactLocation jdeps = 4;
+}
+
+message JvmTargetInfo {
+  JvmOutputs jars = 1;
+  repeated string javac_opts = 6;
+  repeated string jvm_flags = 7;
+  string main_class = 8;
+  repeated string args = 9;
+  bool has_api_generating_plugins = 12;
+}
+
 message JavaIdeInfo {
   repeated ArtifactLocation sources = 1;
   repeated ArtifactLocation generated_sources = 2;
+  JvmTargetInfo jvm_target_info = 3;
 }
 
 message CToolchainIdeInfo {
