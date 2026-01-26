@@ -5,6 +5,8 @@ load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("//private:bazel_rules.bzl", "bazel_module")
 load(":config.bzl", "test_config")
 
+package(default_testonly = 1)
+
 proto_library(
     name = "builder_proto",
     srcs = ["builder.proto"],

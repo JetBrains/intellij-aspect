@@ -1,5 +1,10 @@
 load("//testing/rules:defs.bzl", "test_config", "test_fixture", "test_matrix")
 
+package(
+    default_testonly = 1,
+    default_visibility = ["//testing/tests:__subpackages__"],
+)
+
 test_config(
     name = "base",
     aspects = [
@@ -47,7 +52,6 @@ test_fixture(
         ":matrix",
     ],
     targets = ["//:main"],
-    visibility = ["//testing/tests:__subpackages__"],
 )
 
 test_fixture(
@@ -58,7 +62,6 @@ test_fixture(
         "//:main",
         "//:foo_bar",
     ],
-    visibility = ["//testing/tests:__subpackages__"],
 )
 
 test_fixture(
@@ -66,7 +69,6 @@ test_fixture(
     srcs = glob(["builtin/**"]),
     configs = [":matrix"],
     targets = ["//:main"],
-    visibility = ["//testing/tests:__subpackages__"],
 )
 
 test_fixture(
@@ -74,5 +76,4 @@ test_fixture(
     srcs = glob(["tool/**"]),
     configs = [":bazel9"],
     targets = ["//:tool"],
-    visibility = ["//testing/tests:__subpackages__"],
 )

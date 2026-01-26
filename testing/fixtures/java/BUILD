@@ -1,5 +1,10 @@
 load("//testing/rules:defs.bzl", "test_config", "test_fixture", "test_matrix")
 
+package(
+    default_testonly = 1,
+    default_visibility = ["//testing/tests:__subpackages__"],
+)
+
 test_config(
     name = "base",
     aspects = [
@@ -29,5 +34,4 @@ test_fixture(
     srcs = glob(["simple/**"]),
     configs = [":matrix"],
     targets = ["//:main"],
-    visibility = ["//testing/tests:__subpackages__"],
 )
