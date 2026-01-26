@@ -11,7 +11,7 @@ test_config(
         "@intellij_aspect//modules:py_info.bzl%intellij_py_info_aspect",
         "@intellij_aspect//intellij:aspect.bzl%intellij_info_aspect",
     ],
-    bazel = "@registry_bazel//:8_4_2",
+    bazel = "@registry_bazel//:8_5_1",
     modules = ["//testing/rules:aspect_module"],
 )
 
@@ -20,7 +20,7 @@ test_matrix(
     base = ":base",
     bazel = [
         "@registry_bazel//:7_7_0",
-        "@registry_bazel//:8_4_2",
+        "@registry_bazel//:8_5_1",
     ],
     modules = [
         "@registry_rules_python//:1_4_0",

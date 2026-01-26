@@ -31,8 +31,8 @@ registry = use_extension("//private:extension.bzl", "registry")
 registry.install(
     bazel = [
         "7.7.0",
-        "8.4.2",
-        "9.0.0rc6",
+        "8.5.1",
+        "9.0.0",
     ],
     rules_cc = [
         "0.1.1",

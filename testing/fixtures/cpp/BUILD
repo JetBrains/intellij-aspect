@@ -12,7 +12,7 @@ test_config(
         "@intellij_aspect//modules:cc_info.bzl%intellij_cc_info_aspect",
         "@intellij_aspect//intellij:aspect.bzl%intellij_info_aspect",
     ],
-    bazel = "@registry_bazel//:8_4_2",
+    bazel = "@registry_bazel//:8_5_1",
     modules = ["//testing/rules:aspect_module"],
 )
 
@@ -21,7 +21,7 @@ test_matrix(
     base = ":base",
     bazel = [
         "@registry_bazel//:7_7_0",
-        "@registry_bazel//:8_4_2",
+        "@registry_bazel//:8_5_1",
     ],
     modules = [
         "@registry_rules_cc//:0_1_1",
@@ -37,7 +37,7 @@ test_config(
         "@intellij_aspect//modules:cc_info.bzl%intellij_cc_info_aspect",
         "@intellij_aspect//intellij:aspect.bzl%intellij_info_aspect",
     ],
-    bazel = "@registry_bazel//:9_0_0rc6",
+    bazel = "@registry_bazel//:9_0_0",
     modules = [
         "//testing/rules:aspect_module",
         "@registry_rules_cc//:0_2_14",
