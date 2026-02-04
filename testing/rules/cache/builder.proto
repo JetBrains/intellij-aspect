@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+import "testing/rules/lib/action.proto";
+
+option java_outer_classname = "BuilderProto";
+option java_package = "com.intellij.aspect.testing.rules.cache";
+
+message BuilderInput {
+  string output_archive = 1;
+  string project_archive = 2;
+  repeated TestConfig configs = 3;
+}

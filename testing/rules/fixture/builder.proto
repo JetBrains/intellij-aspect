@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+import "private/proto/ide_info.proto";
+import "testing/rules/lib/action.proto";
+
+option java_outer_classname = "BuilderProto";
+option java_package = "com.intellij.aspect.testing.rules.fixture";
+
+message BuilderInput {
+  string output_proto = 1;
+  string project_archive = 2;
+  string cache_archive = 3;
+  string aspect_archive = 4;
+
+  TestConfig config = 5;
+  repeated string targets = 6;
+}
+
+message BuilderOutput {
+  TestConfig config = 1;
+  repeated TargetIdeInfo targets = 2;
+}

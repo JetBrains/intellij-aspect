@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.intellij.aspect.testing.rules
+package com.intellij.aspect.testing.rules.lib
 
 fun isMacOS(): Boolean = System.getProperty("os.name").lowercase().contains("mac")
 

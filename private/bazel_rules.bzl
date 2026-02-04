@@ -5,14 +5,6 @@ BazelBinary = provider(
         "executable": "File - Bazel executable used for running builds.",
     },
 )
-BazelModule = provider(
-    doc = "Module archive metadata used by fixtures.",
-    fields = {
-        "name": "str - Module name.",
-        "version": "str - Module version string.",
-        "archive": "File - Compressed module archive (.tar.gz).",
-    },
-)
 
 def _bazel_binary_impl(ctx):
     return [
@@ -34,27 +26,4 @@ bazel_binary = rule(
         ),
     },
     provides = [BazelBinary],
-)
-
-def _bazel_module_impl(ctx):
-    return [
-        BazelModule(
-            name = ctx.attr.module_name,
-            version = ctx.attr.version,
-            archive = ctx.file.archive,
-        ),
-        DefaultInfo(files = depset([ctx.file.archive])),
-    ]
-
-bazel_module = rule(
-    implementation = _bazel_module_impl,
-    attrs = {
-        "module_name": attr.string(mandatory = True),
-        "version": attr.string(mandatory = True),
-        "archive": attr.label(
-            allow_single_file = [".tar.gz"],
-            mandatory = True,
-        ),
-    },
-    provides = [BazelModule],
 )

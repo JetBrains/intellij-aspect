@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.intellij.aspect.testing.rules
+package com.intellij.aspect.testing.rules.fixture
 
 import com.google.devtools.build.runfiles.Runfiles
 import com.google.devtools.intellij.ideinfo.IdeInfo.*
-import com.intellij.aspect.testing.rules.BuilderProto.BuilderOutput
+import com.intellij.aspect.testing.rules.fixture.BuilderProto.BuilderOutput
+import com.intellij.aspect.testing.rules.lib.ActionLibProto.TestConfig
 import org.junit.AssumptionViolatedException
 import org.junit.rules.ExternalResource
 import org.junit.runner.Description
@@ -45,8 +46,7 @@ class AspectFixture : ExternalResource() {
           try {
             base.evaluate()
           } catch (e: AssertionError) {
-            val configuration = (listOf("bazel:${output.bazelVersion}") + output.modulesList).joinToString(separator = ", ")
-            throw AssertionError("test failed in configuration: [$configuration]", e)
+            throw AssertionError("test failed in configuration: [${configString(output.config)}]", e)
           } catch (_: AssumptionViolatedException) {
             continue
           }
@@ -96,7 +96,7 @@ class AspectFixture : ExternalResource() {
   }
 
   fun bazelVersion(min: Int? = null, max: Int? = null): Boolean {
-    val (major, _, _) = output.bazelVersion.split(".")
+    val (major, _, _) = output.config.bazel.version.split(".")
     if (min != null && min > major.toInt()) return false
     if (max != null && max < major.toInt()) return false
 
@@ -156,4 +156,14 @@ private fun matchAspectIds(key: TargetKey, fractionalAspectIds: List<String>): B
   }
 
   return false
+}
+
+/**
+ * Returns a string representation of the test configuration.
+ */
+private fun configString(config: TestConfig): String {
+  return buildMap {
+    put("bazel", config.bazel.version)
+    config.modulesList.forEach { put(it.name, it.version) }
+  }.entries.joinToString(separator = ", ") { "${it.key}:${it.value}" }
 }

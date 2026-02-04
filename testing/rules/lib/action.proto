@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+option java_outer_classname = "ActionLibProto";
+option java_package = "com.intellij.aspect.testing.rules.lib";
+
+message BazelModule {
+  string name = 1;
+  string version = 2;
+}
+
+message BazelBinary {
+  string version = 1;
+  string executable = 2;
+}
+
+message TestConfig {
+  BazelBinary bazel = 1;
+  repeated BazelModule modules = 2;
+  repeated string aspects = 3;
+}

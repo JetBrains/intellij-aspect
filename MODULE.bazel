@@ -1,6 +1,6 @@
 module(name = "intellij_aspect")
 
-bazel_dep(name = "rules_python", version="1.8.2")
+bazel_dep(name = "rules_python", version = "1.8.2")
 bazel_dep(name = "bazel_skylib", version = "1.9.0")
 bazel_dep(name = "rules_pkg", version = "1.2.0")
 bazel_dep(name = "protobuf", version = "33.4")
@@ -28,25 +28,9 @@ maven.install(
 use_repo(maven, "maven")
 
 registry = use_extension("//private:extension.bzl", "registry")
-registry.install(
-    bazel = [
-        "7.7.0",
-        "8.5.1",
-        "9.0.0",
-    ],
-    rules_cc = [
-        "0.1.1",
-        "0.2.9",
-        "0.2.14",
-    ],
-    rules_java = [
-        "8.16.1",
-        "9.3.0",
-    ],
-    rules_python = [
-        "1.4.0",
-        "1.6.3",
-        "1.7.0",
-    ],
-)
-use_repo(registry, "registry_bazel", "registry_rules_cc", "registry_rules_java", "registry_rules_python")
+registry.bazel(versions = [
+    "7.7.0",
+    "8.5.1",
+    "9.0.0",
+])
+use_repo(registry, "registry_bazel")
