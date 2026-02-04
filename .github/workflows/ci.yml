@@ -14,13 +14,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Remove Android SDK environment variables
-      run: |
-        echo "ANDROID_HOME=" >> $GITHUB_ENV
-        echo "ANDROID_SDK_ROOT=" >> $GITHUB_ENV
-        echo "ANDROID_NDK_HOME=" >> $GITHUB_ENV
-        echo "ANDROID_NDK_ROOT=" >> $GITHUB_ENV
-
     - name: Setup Bazel
       uses: bazel-contrib/setup-bazel@0.18.0
       with:

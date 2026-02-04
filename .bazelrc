@@ -1,1 +1,7 @@
 build --@protobuf//bazel/toolchains:prefer_prebuilt_protoc
+
+# workaround for rules_android issue since CI defines these environment variables
+common --repo_env=ANDROID_HOME=""
+common --repo_env=ANDROID_SDK_ROOT=""
+common --repo_env=ANDROID_NDK_HOME=""
+common --repo_env=ANDROID_NDK_ROOT=""
