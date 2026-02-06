@@ -37,12 +37,13 @@ def _test_fixture_impl(ctx):
             project_archive = ctx.file.project.path,
             cache_archive = ctx.file.repo_cache.path,
             aspect_archive = ctx.file._aspect.path,
+            bcr_archive = ctx.file._bcr.path,
             config = serialize_test_config(config),
             targets = ctx.attr.targets,
         ))
 
         ctx.actions.run(
-            inputs = [ctx.file.project, ctx.file.repo_cache, ctx.file._aspect, config.bazel.executable],
+            inputs = [ctx.file.project, ctx.file.repo_cache, ctx.file._aspect, ctx.file._bcr, config.bazel.executable],
             outputs = [output],
             executable = ctx.executable._builder,
             arguments = [input],
@@ -76,6 +77,10 @@ test_fixture = rule(
         "_aspect": attr.label(
             allow_single_file = [".zip"],
             default = Label("//:archive_test"),
+        ),
+        "_bcr": attr.label(
+            allow_single_file = [".zip"],
+            default = Label("@registry_bcr//:bcr.zip"),
         ),
         "_builder": attr.label(
             cfg = "exec",

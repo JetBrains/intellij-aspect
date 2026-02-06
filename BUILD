@@ -7,6 +7,8 @@ BCR_NAME = "intellij_aspect"
 
 BCR_VERSION = "0.0.1"
 
+exports_files(["MODULE.bazel.bcr"])
+
 pkg_files(
     name = "bcr_module",
     srcs = ["MODULE.bazel.bcr"],

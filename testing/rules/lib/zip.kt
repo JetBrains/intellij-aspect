@@ -33,12 +33,12 @@ fun zip(srcDirectory: Path, outFile: Path) {
  * Custom ZIP to preserve a file's executbale flag when compressed with [zip].
  */
 @Throws(IOException::class)
-fun unzip(srcFile: Path, outDirectory: Path) {
+fun unzip(srcFile: Path, outDirectory: Path, stripPrefix: Int = 0) {
   ZipInputStream(Files.newInputStream(srcFile)).use { src ->
     for (entry in generateSequence { src.nextEntry }) {
       if (entry.isDirectory) continue
 
-      val path = outDirectory.resolve(entry.name)
+      val path = outDirectory.resolve(Path.of(entry.name).stripPrefix(stripPrefix))
       Files.createDirectories(path.parent)
       Files.newOutputStream(path, StandardOpenOption.CREATE).use(src::transferTo)
 
@@ -47,6 +47,10 @@ fun unzip(srcFile: Path, outDirectory: Path) {
       }
     }
   }
+}
+
+private fun Path.stripPrefix(prefix: Int): Path {
+  return subpath(prefix, nameCount)
 }
 
 private fun createEntry(base: Path, file: Path): ZipEntry {

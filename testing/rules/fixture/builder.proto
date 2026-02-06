@@ -11,9 +11,10 @@ message BuilderInput {
   string project_archive = 2;
   string cache_archive = 3;
   string aspect_archive = 4;
+  string bcr_archive = 5;
 
-  TestConfig config = 5;
-  repeated string targets = 6;
+  TestConfig config = 6;
+  repeated string targets = 7;
 }
 
 message BuilderOutput {

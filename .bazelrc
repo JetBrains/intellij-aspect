@@ -1,5 +1,8 @@
 build --@protobuf//bazel/toolchains:prefer_prebuilt_protoc
 
+# disalow netwrok access by default to make sure our bazel caches work as intended
+build --sandbox_default_allow_network=false
+
 # workaround for rules_android issue since CI defines these environment variables
 common --repo_env=ANDROID_HOME=""
 common --repo_env=ANDROID_SDK_ROOT=""

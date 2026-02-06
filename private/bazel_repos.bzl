@@ -66,3 +66,38 @@ bazel_binaries = repository_rule(
     implementation = _bazel_repo_impl,
     attrs = {"versions": attr.string_list(mandatory = True)},
 )
+
+_BCR_URL_TEMPLATE = "https://github.com/bazelbuild/bazel-central-registry/archive/{0}.zip"
+
+_BCR_BUILD_FILE = """
+package(default_visibility = ["//visibility:public"])
+
+# Expose the BCR zip file
+exports_files(["bcr.zip"])
+
+filegroup(
+    name = "bcr",
+    srcs = ["bcr.zip"],
+)
+"""
+
+def _bcr_archive_impl(rctx):
+    url = _BCR_URL_TEMPLATE.format(rctx.attr.commit)
+
+    # Download zip WITHOUT extracting
+    rctx.download(
+        url = url,
+        output = "bcr.zip",
+        sha256 = rctx.attr.sha256,
+    )
+
+    rctx.file("BUILD", _BCR_BUILD_FILE)
+
+# A repository to download a specific commit of the Bazel Central Registry
+bcr_archive = repository_rule(
+    implementation = _bcr_archive_impl,
+    attrs = {
+        "commit": attr.string(mandatory = True, doc = "Git commit SHA of the BCR to download"),
+        "sha256": attr.string(mandatory = True, doc = "SHA256 checksum of the downloaded zip file"),
+    },
+)

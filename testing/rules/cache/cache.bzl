@@ -8,11 +8,13 @@ def _repo_cache_impl(ctx):
     input = proto.encode_text(struct(
         output_archive = output.path,
         project_archive = ctx.file.project.path,
+        aspect_module = ctx.file._aspect_module.path,
+        bcr_archive = ctx.file._bcr.path,
         configs = serialize_test_matrix(matrix),
     ))
 
     ctx.actions.run(
-        inputs = [it.executable for it in matrix.bazel_binaries] + [ctx.file.project],
+        inputs = [it.executable for it in matrix.bazel_binaries] + [ctx.file.project, ctx.file._aspect_module, ctx.file._bcr],
         outputs = [output],
         executable = ctx.executable._builder,
         arguments = [input],
@@ -32,6 +34,14 @@ repo_cache = rule(
         "config": attr.label(
             providers = [TestMatrix],
             mandatory = True,
+        ),
+        "_aspect_module": attr.label(
+            allow_single_file = True,
+            default = Label("//:MODULE.bazel.bcr"),
+        ),
+        "_bcr": attr.label(
+            allow_single_file = [".zip"],
+            default = Label("@registry_bcr//:bcr.zip"),
         ),
         "_builder": attr.label(
             cfg = "exec",

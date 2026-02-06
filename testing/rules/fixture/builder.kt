@@ -33,17 +33,10 @@ private val OUTPUT_GROUPS = listOf("intellij-info")
 fun main(args: Array<String>) = action<BuilderInput>(args) { input ->
   deployProject(input.projectArchive)
   deployRepoCache(input.cacheArchive)
+  deployRegistry(input.bcrArchive)
 
   val aspectPath = deployAspect(input.aspectArchive)
-
-  writeModule {
-    for (module in input.config.modulesList) {
-      appendLine("bazel_dep(name = '${module.name}', version = '${module.version}')")
-    }
-
-    appendLine("bazel_dep(name = 'intellij_aspect')")
-    appendLine("local_path_override(module_name = 'intellij_aspect', path = '$aspectPath')")
-  }
+  writeModule(input.config.modulesList, aspectPath)
 
   val files = bazelBuild(
     bazel = input.config.bazel,

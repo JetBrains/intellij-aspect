@@ -71,6 +71,7 @@ def test_fixture(name, srcs, config, strip_prefix = "", export_cache = None, imp
             config = config,
             project = name + "_project",
             visibility = ["//visibility:private"],
+            tags = ["requires-network"],
             testonly = 1,
         )
 

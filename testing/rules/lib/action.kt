@@ -3,7 +3,7 @@ package com.intellij.aspect.testing.rules.lib
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.protobuf.Message
 import com.google.protobuf.TextFormat
-import java.io.BufferedWriter
+import com.intellij.aspect.testing.rules.lib.ActionLibProto.BazelModule
 import java.io.IOException
 import java.net.URI
 import java.nio.file.Files
@@ -29,6 +29,8 @@ class ActionContext {
 
   private val outputRootDirectory: Path by lazy { tempDirectory("output_root") }
 
+  private val registryDirectory: Path by lazy { tempDirectory("registry") }
+
   @Throws(IOException::class)
   fun tempDirectory(name: String): Path {
     return Files.createDirectories(Path.of(name)).toAbsolutePath()
@@ -45,6 +47,11 @@ class ActionContext {
   }
 
   @Throws(IOException::class)
+  fun deployRegistry(registry: String) {
+    unzip(Path.of(registry), registryDirectory, stripPrefix = 1)
+  }
+
+  @Throws(IOException::class)
   fun deployRepoCache(archive: String) {
     val addressable = repoCacheDirectory.resolve("content_addressable")
     Files.createDirectories(addressable)
@@ -58,11 +65,22 @@ class ActionContext {
   }
 
   @Throws(IOException::class)
-  fun writeModule(block: BufferedWriter.() -> Unit) = Files.newOutputStream(
-    projectDirectory.resolve("MODULE.bazel"),
-    StandardOpenOption.CREATE,
-    StandardOpenOption.TRUNCATE_EXISTING,
-  ).bufferedWriter().use(block)
+  fun writeModule(modules: List<BazelModule>, aspect: Path) {
+    val writer = Files.newOutputStream(
+      projectDirectory.resolve("MODULE.bazel"),
+      StandardOpenOption.CREATE,
+      StandardOpenOption.TRUNCATE_EXISTING,
+    ).bufferedWriter()
+
+    writer.use {
+      for (module in modules) {
+        it.appendLine("bazel_dep(name = '${module.name}', version = '${module.version}')")
+      }
+
+      it.appendLine("bazel_dep(name = 'intellij_aspect')")
+      it.appendLine("local_path_override(module_name = 'intellij_aspect', path = '$aspect')")
+    }
+  }
 
   @Throws(IOException::class)
   fun bazelBuild(
@@ -77,6 +95,7 @@ class ActionContext {
     cmd.add("--output_user_root=$outputRootDirectory")
     cmd.add("build")
     cmd.add("--repository_cache=$repoCacheDirectory")
+    cmd.add("--registry=file://$registryDirectory")
 
     val bepFile = tempFile("build.bep.json")
     cmd.add("--build_event_json_file=$bepFile")
