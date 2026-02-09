@@ -1,4 +1,4 @@
-load("//private:bazel_rules.bzl", "BazelBinary")
+load("//private/rules:bazel_binary.bzl", "BazelBinary")
 load("//testing/rules/lib:config.bzl", "TestMatrix", "serialize_test_matrix")
 
 def _repo_cache_impl(ctx):
@@ -41,7 +41,7 @@ repo_cache = rule(
         ),
         "_bcr": attr.label(
             allow_single_file = [".zip"],
-            default = Label("@registry_bcr//:bcr.zip"),
+            default = Label("@bcr_archive//:bcr.zip"),
         ),
         "_builder": attr.label(
             cfg = "exec",

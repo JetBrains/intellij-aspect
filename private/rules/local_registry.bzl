@@ -15,6 +15,6 @@ local_registry = rule(
         "module_file": attr.label(mandatory = True, allow_single_file = True),
         "module_name": attr.string(mandatory = True),
         "module_version": attr.string(mandatory = True),
-        "_local_registry": attr.label(default = "//private/lib:local_registry", executable = True, cfg = "exec"),
+        "_local_registry": attr.label(default = "//private/rules:local_registry", executable = True, cfg = "exec"),
     },
 )

@@ -37,7 +37,7 @@ def test_fixture(name, srcs, config, strip_prefix = "", export_cache = None, imp
         test_matrix(
             name = "matrix",
             aspects = [...],
-            bazel = ["@registry_bazel//:8_5_1"],
+            bazel = ["@bazel_versions//:8_5_1"],
             modules = {"rules_cc": ["0.2.14"]},
         )
 

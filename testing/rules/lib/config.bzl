@@ -1,4 +1,4 @@
-load("//private:bazel_rules.bzl", "BazelBinary")
+load("//private/rules:bazel_binary.bzl", "BazelBinary")
 
 TestConfig = provider(
     doc = "Single fixture configuration (Bazel, modules, aspects).",

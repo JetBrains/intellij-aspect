@@ -1,7 +1,7 @@
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files")
 load("@rules_pkg//pkg:pkg.bzl", "pkg_tar", "pkg_zip")
-load("//private:local_registry.bzl", "local_registry")
+load("//private/rules:local_registry.bzl", "local_registry")
 
 BCR_NAME = "intellij_aspect"
 

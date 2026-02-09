@@ -80,7 +80,7 @@ test_fixture = rule(
         ),
         "_bcr": attr.label(
             allow_single_file = [".zip"],
-            default = Label("@registry_bcr//:bcr.zip"),
+            default = Label("@bcr_archive//:bcr.zip"),
         ),
         "_builder": attr.label(
             cfg = "exec",

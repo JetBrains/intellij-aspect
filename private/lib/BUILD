@@ -1,5 +1,4 @@
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
-load("@rules_python//python:py_binary.bzl", "py_binary")
 
 kt_jvm_library(
     name = "deploy",
@@ -15,10 +14,4 @@ kt_jvm_library(
         "//tools:__subpackages__",
     ],
     deps = ["@maven//:com_fasterxml_jackson_core_jackson_databind"],
-)
-
-py_binary(
-    name = "local_registry",
-    srcs = ["local_registry.py"],
-    visibility = ["//visibility:public"],
 )

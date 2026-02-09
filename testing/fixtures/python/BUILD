@@ -12,9 +12,9 @@ test_matrix(
         "@intellij_aspect//intellij:aspect.bzl%intellij_info_aspect",
     ],
     bazel = [
-        "@registry_bazel//:7_7_0",
-        "@registry_bazel//:8_5_1",
-        "@registry_bazel//:9_0_0",
+        "@bazel_versions//:7_7_0",
+        "@bazel_versions//:8_5_1",
+        "@bazel_versions//:9_0_0",
     ],
     modules = {
         "rules_python": [

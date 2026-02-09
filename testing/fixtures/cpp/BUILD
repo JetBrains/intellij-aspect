@@ -21,9 +21,9 @@ test_matrix(
     name = "matrix",
     aspects = _ASPECTS,
     bazel = [
-        "@registry_bazel//:7_7_0",
-        "@registry_bazel//:8_5_1",
-        "@registry_bazel//:9_0_0",
+        "@bazel_versions//:7_7_0",
+        "@bazel_versions//:8_5_1",
+        "@bazel_versions//:9_0_0",
     ],
     modules = _MODULES,
     visibility = ["//visibility:private"],
@@ -32,7 +32,7 @@ test_matrix(
 test_matrix(
     name = "bazel8",
     aspects = _ASPECTS,
-    bazel = ["@registry_bazel//:8_5_1"],
+    bazel = ["@bazel_versions//:8_5_1"],
     modules = _MODULES,
     visibility = ["//visibility:private"],
 )
@@ -40,7 +40,7 @@ test_matrix(
 test_matrix(
     name = "bazel9",
     aspects = _ASPECTS,
-    bazel = ["@registry_bazel//:9_0_0"],
+    bazel = ["@bazel_versions//:9_0_0"],
     modules = _MODULES,
     visibility = ["//visibility:private"],
 )
