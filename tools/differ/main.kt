@@ -27,7 +27,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.system.exitProcess
 
-private val SEPARATOR = "=".repeat(80)
 
 fun main(args: Array<String>) {
   val parser = ArgParser("differ")
@@ -58,6 +57,13 @@ fun main(args: Array<String>) {
     description = "Show detailed progress and stack traces"
   ).default(false)
 
+  val showFiltered by parser.option(
+    ArgType.Boolean,
+    shortName = "f",
+    fullName = "show-filtered",
+    description = "Show differences that were filtered by exception rules"
+  ).default(false)
+
   parser.parse(args)
 
   try {
@@ -80,11 +86,20 @@ fun main(args: Array<String>) {
       System.err.println("Current aspect generated: ${currentFiles.size} files")
 
       System.err.println("Comparing...")
-      val result = compareTargets(legacyTargets, currentTargets)
+      val rawResult = compareTargets(legacyTargets, currentTargets)
 
-      println(reportComparison(result))
+      // Apply exception filters to suppress known benign differences
+      val filterResult = filterDifferences(rawResult.differences, DefaultFilters.ALL)
+      System.err.println("Filtered ${filterResult.filtered.values.sumOf { it.size }} benign differences")
 
-      if (result.differences.isEmpty() && result.missing.isEmpty()) {
+      // Create filtered comparison result
+      val filteredComparison = rawResult.copy(differences = filterResult.kept)
+
+      // Convert to JSON and output
+      val jsonReport = filteredComparison.toJsonReport()
+      println(serializeToJson(jsonReport))
+
+      if (filteredComparison.differences.isEmpty() && filteredComparison.missing.isEmpty()) {
         exitProcess(0)
       } else {
         exitProcess(1)
@@ -111,51 +126,3 @@ fun loadTargets(files: List<Path>): List<TargetIdeInfo> {
   }
 }
 
-private fun reportComparison(result: Comparison): String {
-  val sb = StringBuilder()
-
-  sb.appendLine("TARGET SUMMARY")
-  sb.appendLine(SEPARATOR)
-  sb.appendLine("  Common:     ${result.common.size}")
-  sb.appendLine("  Missing:    ${result.missing.size}")
-  sb.appendLine("  Additional: ${result.additional.size}")
-  sb.appendLine("  Different:  ${result.differences.size}")
-  sb.appendLine()
-
-  if (result.missing.isNotEmpty()) {
-    sb.appendLine("MISSING TARGETS (${result.missing.size})")
-    sb.appendLine(SEPARATOR)
-    result.missing.forEach { target ->
-      sb.appendLine("  ${target.key.label}")
-    }
-    sb.appendLine()
-  }
-
-  if (result.additional.isNotEmpty()) {
-    sb.appendLine("ADDITIONAL TARGETS (${result.additional.size})")
-    sb.appendLine(SEPARATOR)
-    result.additional.forEach { target ->
-      sb.appendLine("  ${target.key.label}")
-    }
-    sb.appendLine()
-  }
-
-  if (result.differences.isNotEmpty()) {
-    sb.appendLine("DIFFERENCES (${result.differences.size})")
-    sb.appendLine(SEPARATOR)
-    result.differences.forEach { (label, diff) ->
-      val path = diff.path.trimEnd('/')
-      sb.appendLine("  $label#$path: ${diff.msg}")
-    }
-    sb.appendLine()
-  }
-
-  if (result.differences.isEmpty() && result.missing.isEmpty()) {
-    sb.appendLine("RESULT: OK")
-  } else {
-    sb.appendLine("RESULT: DIFFERENCES FOUND")
-  }
-  sb.appendLine(SEPARATOR)
-
-  return sb.toString()
-}

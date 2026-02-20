@@ -13,16 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.intellij.aspect.private.lib
+package com.intellij.aspect.tools.lib
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.intellij.aspect.private.lib.parseBepFile
 import java.io.IOException
-import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
-import kotlin.io.path.toPath
-
-private val MAPPER = ObjectMapper()
 
 /**
  * Execute a command and returns stdout.
@@ -75,21 +71,8 @@ fun executeBuild(
       throw IOException("BEP file was not created")
     }
 
-    return Files.newBufferedReader(bepFile).use { reader ->
-      reader.lineSequence().flatMap(::parseBepEvent).distinct().toList()
-    }
+    return parseBepFile(bepFile)
   } finally {
     Files.delete(bepFile)
   }
-}
-
-/**
- * Parses a single BEP JSON event and extracts file URIs from the
- * namedSetOfFiles.files array.
- */
-private fun parseBepEvent(event: String): List<Path> {
-  val root = MAPPER.readTree(event)
-  val files = root.get("namedSetOfFiles")?.get("files") ?: return emptyList()
-
-  return files.mapNotNull { it.get("uri")?.asText() }.map { URI(it).toPath() }
 }

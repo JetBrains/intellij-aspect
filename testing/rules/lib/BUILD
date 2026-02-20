@@ -35,7 +35,7 @@ kt_jvm_library(
     deps = [
         ":action_lib_java_proto",
         ":zip_lib",
-        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+        "//private/lib:bep",
         "@protobuf//:protobuf_java",
     ],
 )

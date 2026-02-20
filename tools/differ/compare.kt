@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 The Bazel Authors. All rights reserved.
+ * Copyright 2026 The Bazel Authors. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,22 +19,45 @@ import com.google.devtools.intellij.ideinfo.IdeInfo.TargetIdeInfo
 import com.google.devtools.intellij.ideinfo.IdeInfo.TargetKey
 import com.google.protobuf.Descriptors
 import com.google.protobuf.Message
+import com.google.protobuf.TextFormat
+import java.nio.file.Path
+
+enum class DifferenceType {
+  MISSING_ELEMENT,
+  ADDITIONAL_ELEMENT,
+  VALUE_MISMATCH
+}
 
 /**
  * Represents a difference between two protobuf messages.
- * Nodes recursively build field paths like "parent/child/field".
+ * Path is built in reverse as we return from recursion.
  */
-sealed interface Difference {
-  val path: String
-  val msg: String
+data class Difference(
+  val path: Path,
+  val type: DifferenceType,
+  val expected: String?,
+  val actual: String?
+)
 
-  class Leaf(override val msg: String) : Difference {
-    override val path: String get() = ""
+private fun valueToString(value: Any): String {
+  return when (value) {
+    is Message -> TextFormat.printer().printToString(value)
+    else -> value.toString()
   }
+}
 
-  class Node(private val name: String, private val next: Difference) : Difference {
-    override val path: String get() = name + "/" + next.path
-    override val msg: String get() = next.msg
+private fun difference(type: DifferenceType, actual: Any? = null, expected: Any? = null): Difference {
+  return Difference(
+    path = Path.of(""),
+    type = type,
+    actual = actual?.let(::valueToString),
+    expected = expected?.let(::valueToString),
+  )
+}
+
+private fun updatePaths(prefix: String, differences: List<Difference>): List<Difference> {
+  return differences.map {
+    it.copy(path = Path.of(prefix).resolve(it.path))
   }
 }
 
@@ -46,7 +69,7 @@ private fun Message.getDescriptor(): Descriptors.Descriptor {
   return requireNotNull(javaClass.getMethod("getDescriptor").invoke(null) as? Descriptors.Descriptor)
 }
 
-private fun compare(legacy: Any, current: Any): Difference? {
+private fun compare(legacy: Any, current: Any): List<Difference> {
   require(legacy.javaClass == current.javaClass)
 
   return when (legacy) {
@@ -56,55 +79,66 @@ private fun compare(legacy: Any, current: Any): Difference? {
   }
 }
 
-private fun compareField(legacy: Message, current: Message, name: String): Difference? {
+private fun areEqual(legacy: Any, current: Any): Boolean = compare(legacy, current).isEmpty()
+
+private fun compareField(legacy: Message, current: Message, name: String): List<Difference> {
   return compareField(legacy, current, legacy.getDescriptor().findFieldByName(name))
 }
 
 /**
  * Bidirectional list comparison: checks that every legacy item exists in
- * current and vice versa.
+ * current and vice versa. Collects ALL missing and additional items.
  */
-private fun compareList(legacy: List<*>, current: List<*>): Difference? {
-  for (legacyItem in legacy.filterNotNull()) {
-    if (current.filterNotNull().none { compare(legacyItem, it) == null }) {
-      return Difference.Leaf("missing $legacyItem")
+private fun compareList(legacy: List<*>, current: List<*>): List<Difference> {
+  val legacyItems = legacy.filterNotNull()
+  val currentItems = current.filterNotNull()
+  val diffs = mutableListOf<Difference>()
+
+  for (legacyItem in legacyItems) {
+    if (currentItems.none { areEqual(legacyItem, it) }) {
+      diffs.add(difference(DifferenceType.MISSING_ELEMENT, expected = legacyItem))
     }
   }
 
-  for (currentItem in current.filterNotNull()) {
-    if (legacy.filterNotNull().none { compare(it, currentItem) == null }) {
-      return Difference.Leaf("superfluous $currentItem")
+  for (currentItem in currentItems) {
+    if (legacyItems.none { areEqual(it, currentItem) }) {
+      diffs.add(difference(DifferenceType.ADDITIONAL_ELEMENT, actual = currentItem))
     }
   }
 
-  return null
+  return diffs
 }
 
 /**
  * Compares a single protobuf field: uses list comparison for repeated fields,
  * direct comparison otherwise.
  */
-private fun compareField(legacy: Message, current: Message, descriptor: Descriptors.FieldDescriptor): Difference? {
-  return if (!descriptor.isRepeated) {
+private fun compareField(legacy: Message, current: Message, descriptor: Descriptors.FieldDescriptor): List<Difference> {
+  val diffs = if (!descriptor.isRepeated) {
     compare(legacy.getField(descriptor), current.getField(descriptor))
   } else {
     compareList(legacy.getField(descriptor) as List<*>, current.getField(descriptor) as List<*>)
-  }?.let { Difference.Node(descriptor.name, it) }
+  }
+
+  return updatePaths(descriptor.name, diffs)
 }
 
-private fun compareMessage(legacy: Message, current: Message): Difference? {
-  return legacy.getDescriptor().fields.firstNotNullOfOrNull {
+private fun compareMessage(legacy: Message, current: Message): List<Difference> {
+  return legacy.getDescriptor().fields.flatMap {
     compareField(legacy, current, it)
   }
 }
 
-private fun compareDefault(legacy: Any, current: Any): Difference? {
-  return if (legacy == current) null else Difference.Leaf("'$legacy' != '$current'")
+private fun compareDefault(legacy: Any, current: Any): List<Difference> {
+  return if (legacy == current) {
+    emptyList()
+  } else {
+    listOf(difference(DifferenceType.VALUE_MISMATCH, expected = legacy, actual = current))
+  }
 }
 
 data class Comparison(
-  val differences: Map<String, Difference>,
-  val common: List<TargetIdeInfo>,
+  val differences: Map<String, List<Difference>>,
   val missing: List<TargetIdeInfo>,
   val additional: List<TargetIdeInfo>
 )
@@ -115,21 +149,17 @@ fun compareTargets(legacy: List<TargetIdeInfo>, current: List<TargetIdeInfo>): C
 
   val commonKeys = legacyByKey.keys.intersect(currentByKey.keys)
 
-  val differences = mutableMapOf<String, Difference>()
-  val common = mutableListOf<TargetIdeInfo>()
+  val differences = mutableMapOf<String, List<Difference>>()
 
   for (key in commonKeys) {
-    val diff = compare(legacyByKey[key]!!, currentByKey[key]!!)
+    val diffs = compare(legacyByKey[key]!!, currentByKey[key]!!)
 
-    if (diff != null) {
-      differences[key] = diff
-    } else {
-      common.add(legacyByKey[key]!!)
+    if (diffs.isNotEmpty()) {
+      differences[key] = diffs
     }
   }
 
   return Comparison(
-    common = common,
     differences = differences,
     missing = (legacyByKey.keys - currentByKey.keys).map { legacyByKey[it]!! },
     additional = (currentByKey.keys - legacyByKey.keys).map { currentByKey[it]!! }

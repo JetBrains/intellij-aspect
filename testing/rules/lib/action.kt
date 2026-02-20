@@ -1,17 +1,13 @@
 package com.intellij.aspect.testing.rules.lib
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.protobuf.Message
 import com.google.protobuf.TextFormat
+import com.intellij.aspect.private.lib.parseBepFile
 import com.intellij.aspect.testing.rules.lib.ActionLibProto.BazelModule
 import java.io.IOException
-import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
-import kotlin.io.path.toPath
-
-private val MAPPER = ObjectMapper()
 
 @Throws(IOException::class)
 inline fun <reified T : Message> action(args: Array<String>, crossinline block: ActionContext.(T) -> Unit) {
@@ -121,19 +117,6 @@ class ActionContext {
       throw IOException("Command failed: ${cmd.joinToString(" ")}")
     }
 
-    return Files.newBufferedReader(bepFile).use { reader ->
-      reader.lineSequence().flatMap(::parseBepEvent).distinct().toList()
-    }
+    return parseBepFile(bepFile)
   }
-}
-
-/**
- * Parses a single BEP JSON event and extracts file URIs from the
- * namedSetOfFiles.files array.
- */
-private fun parseBepEvent(event: String): List<Path> {
-  val root = MAPPER.readTree(event)
-  val files = root.get("namedSetOfFiles")?.get("files") ?: return emptyList()
-
-  return files.mapNotNull { it.get("uri")?.asText() }.map { URI(it).toPath() }
 }

@@ -17,9 +17,9 @@ package com.intellij.aspect.tools.differ
 
 import com.intellij.aspect.private.lib.AspectConfig
 import com.intellij.aspect.private.lib.deployAspectZip
-import com.intellij.aspect.private.lib.executeBuild
-import com.intellij.aspect.private.lib.executeCommand
 import com.intellij.aspect.tools.RunfilesRepo
+import com.intellij.aspect.tools.lib.executeBuild
+import com.intellij.aspect.tools.lib.executeCommand
 import java.io.IOException
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
@@ -47,7 +47,7 @@ private data class Aspect(
 
 private val LEGACY_ASPECT = Aspect(
   deployDirectory = ASPECTS_DIRECTORY.resolve("legacy"),
-  runfilesLocation = "tools/legacy_aspect.zip",
+  runfilesLocation = "tools/differ/legacy_aspect.zip",
   aspectTargets = listOf(":intellij_info_bundled.bzl%intellij_info_aspect"),
   outputGroups = listOf("intellij-info-generic", "intellij-info-cpp"),
 )
