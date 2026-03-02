@@ -2,12 +2,13 @@ load("@rules_java//java:defs.bzl", "java_test")
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("//testing/rules/cache:cache.bzl", _repo_cache = "repo_cache")
 load("//testing/rules/fixture:fixture.bzl", _test_fixture = "test_fixture")
-load("//testing/rules/lib:config.bzl", _test_matrix = "test_matrix")
+load("//testing/rules/lib:config.bzl", _test_matrix = "test_matrix", _test_matrix_suite = "test_matrix_suite")
 load("//testing/rules/lib:project.bzl", _project_archive = "project_archive")
 
 test_matrix = _test_matrix
+test_matrix_suite = _test_matrix_suite
 
-def test_fixture(name, srcs, config, strip_prefix = "", export_cache = None, import_cache = None, **kwargs):
+def test_fixture(name, srcs, configs, strip_prefix = "", export_cache = None, import_cache = None, **kwargs):
     """Creates a test fixture that with the result of the IntelliJ aspect applied to the project.
 
     A test fixture packages a small Bazel project, builds it with the aspect across
@@ -16,7 +17,7 @@ def test_fixture(name, srcs, config, strip_prefix = "", export_cache = None, imp
 
     Args:
         srcs: Source files for the test project. Typically uses glob(["project_name/**"]).
-        config: Label of a test_matrix target that defines the test configurations.
+        configs: Label list of a test_matrix target that defines the test configurations.
         strip_prefix: Optional. Prefix to strip from source file paths when creating
             the project archive. Defaults to the fixture name if not specified.
         export_cache: Optional. If provided, creates a repository cache target with
@@ -44,7 +45,7 @@ def test_fixture(name, srcs, config, strip_prefix = "", export_cache = None, imp
         test_fixture(
             name = "simple",
             srcs = glob(["simple/**"]),
-            config = ":matrix",
+            configs = [":matrix"],
             export_cache = "repo_cache",  # First fixture exports cache
             targets = ["//:main"],
         )
@@ -52,7 +53,7 @@ def test_fixture(name, srcs, config, strip_prefix = "", export_cache = None, imp
         test_fixture(
             name = "advanced",
             srcs = glob(["advanced/**"]),
-            config = ":matrix",
+            configs = [":matrix"],
             import_cache = ":repo_cache",  # Subsequent fixtures import cache
             targets = ["//:lib", "//:bin"],
         )
@@ -68,7 +69,7 @@ def test_fixture(name, srcs, config, strip_prefix = "", export_cache = None, imp
     if export_cache:
         _repo_cache(
             name = export_cache,
-            config = config,
+            configs = configs,
             project = name + "_project",
             visibility = ["//visibility:private"],
             tags = ["requires-network"],
@@ -77,7 +78,7 @@ def test_fixture(name, srcs, config, strip_prefix = "", export_cache = None, imp
 
     _test_fixture(
         name = name,
-        config = config,
+        configs = configs,
         project = name + "_project",
         repo_cache = export_cache or import_cache,
         testonly = 1,

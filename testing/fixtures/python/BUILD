@@ -8,8 +8,8 @@ package(
 test_matrix(
     name = "matrix",
     aspects = [
-        "@intellij_aspect//modules:py_info.bzl%intellij_py_info_aspect",
-        "@intellij_aspect//intellij:aspect.bzl%intellij_info_aspect",
+        "modules:py_info.bzl%intellij_py_info_aspect",
+        "intellij:aspect.bzl%intellij_info_aspect",
     ],
     bazel = [
         "@bazel_versions//:7_7_0",
@@ -28,7 +28,7 @@ test_matrix(
 test_fixture(
     name = "simple",
     srcs = glob(["simple/**"]),
-    config = ":matrix",
+    configs = [":matrix"],
     export_cache = "repo_cache",
     targets = [
         "//:main",
@@ -39,7 +39,7 @@ test_fixture(
 test_fixture(
     name = "args",
     srcs = glob(["args/**"]),
-    config = ":matrix",
+    configs = [":matrix"],
     import_cache = ":repo_cache",
     targets = ["//:all"],
 )

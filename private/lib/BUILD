@@ -12,6 +12,11 @@ kt_jvm_library(
 
 kt_jvm_library(
     name = "deploy",
-    srcs = ["deploy.kt"],
+    srcs = [
+        "config.kt",
+        "deploy.kt",
+        "loads.kt",
+        "transformers.kt",
+    ],
     visibility = ["//visibility:public"],
 )

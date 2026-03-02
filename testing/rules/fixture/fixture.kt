@@ -164,6 +164,7 @@ private fun matchAspectIds(key: TargetKey, fractionalAspectIds: List<String>): B
 private fun configString(config: TestConfig): String {
   return buildMap {
     put("bazel", config.bazel.version)
+    put("deploy", config.aspectDeployment.name.lowercase())
     config.modulesList.forEach { put(it.name, it.version) }
   }.entries.joinToString(separator = ", ") { "${it.key}:${it.value}" }
 }

@@ -6,6 +6,7 @@ TestConfig = provider(
         "bazel": "BazelBinary - Bazel binary used to build the fixture.",
         "modules": "map[str, str] - Map of BCR modules the fixture depends upon.",
         "aspects": "list[str] - Aspects enabled when building the fixture.",
+        "aspect_deployment": "str - Aspect deployment option (bcr, materialized, builtin).",
     },
 )
 
@@ -19,6 +20,12 @@ TestMatrix = provider(
 
 def serialize_test_config(config):
     """Returns a struct that can be encoded into the proto represenation of a test config."""
+    aspect_deployment_map = {
+        "bcr": 0,
+        "materialized": 1,
+        "builtin": 2,
+    }
+
     return struct(
         bazel = struct(version = config.bazel.version, executable = config.bazel.executable.path),
         modules = [
@@ -26,11 +33,23 @@ def serialize_test_config(config):
             for (name, version) in config.modules.items()
         ],
         aspects = config.aspects,
+        aspect_deployment = aspect_deployment_map[config.aspect_deployment],
     )
 
-def serialize_test_matrix(matrix):
-    """Returns a list of structs for each config in the matrix."""
-    return [serialize_test_config(config) for config in matrix.configs]
+def merge_matrixes(matrixes):
+    configs = [
+        config
+        for matrix in matrixes
+        for config in matrix.configs
+    ]
+
+    binaries = {
+        provider.executable: provider
+        for matrix in matrixes
+        for provider in matrix.bazel_binaries
+    }
+
+    return TestMatrix(configs = configs, bazel_binaries = binaries.values())
 
 def _test_matrix_impl(ctx):
     bazel_binaries = [it[BazelBinary] for it in ctx.attr.bazel]
@@ -50,7 +69,12 @@ def _test_matrix_impl(ctx):
         module_combinations = new_combinations
 
     configs = [
-        TestConfig(bazel = bazel, modules = modules, aspects = ctx.attr.aspects)
+        TestConfig(
+            bazel = bazel,
+            modules = modules,
+            aspects = ctx.attr.aspects,
+            aspect_deployment = ctx.attr.aspect_deployment,
+        )
         for bazel in bazel_binaries
         for modules in module_combinations
     ]
@@ -73,6 +97,27 @@ test_matrix = rule(
         "aspects": attr.string_list(
             mandatory = True,
             doc = "list of enabled aspects when building the fixture",
+        ),
+        "aspect_deployment": attr.string(
+            default = "bcr",
+            values = ["bcr", "materialized", "builtin"],
+            doc = "aspect deployment option: bcr (default), materialized, or builtin",
+        ),
+    },
+    provides = [TestMatrix],
+)
+
+def _test_matrix_suite_impl(ctx):
+    return [merge_matrixes([it[TestMatrix] for it in ctx.attr.deps])]
+
+test_matrix_suite = rule(
+    implementation = _test_matrix_suite_impl,
+    doc = "Merges multiple test matrices into a single matrix.",
+    attrs = {
+        "deps": attr.label_list(
+            mandatory = True,
+            providers = [TestMatrix],
+            doc = "list of test_matrix targets to merge",
         ),
     },
     provides = [TestMatrix],

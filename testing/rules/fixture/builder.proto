@@ -6,15 +6,19 @@ import "testing/rules/lib/action.proto";
 option java_outer_classname = "BuilderProto";
 option java_package = "com.intellij.aspect.testing.rules.fixture";
 
+
 message BuilderInput {
   string output_proto = 1;
   string project_archive = 2;
   string cache_archive = 3;
-  string aspect_archive = 4;
-  string bcr_archive = 5;
+  string bcr_archive = 4;
 
-  TestConfig config = 6;
-  repeated string targets = 7;
+  string aspect_bcr_archive = 5;
+  string aspect_ide_archive = 6;
+  AspectDeployment aspect_deployment = 7;
+
+  TestConfig config = 8;
+  repeated string targets = 9;
 }
 
 message BuilderOutput {

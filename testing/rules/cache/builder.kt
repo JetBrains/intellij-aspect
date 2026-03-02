@@ -2,6 +2,7 @@ package com.intellij.aspect.testing.rules.cache
 
 import com.intellij.aspect.testing.rules.cache.BuilderProto.BuilderInput
 import com.intellij.aspect.testing.rules.lib.ActionContext
+import com.intellij.aspect.testing.rules.lib.ActionLibProto.AspectDeployment
 import com.intellij.aspect.testing.rules.lib.action
 import java.io.IOException
 import java.nio.file.Files
@@ -14,7 +15,12 @@ fun main(args: Array<String>) = action<BuilderInput>(args) { input ->
   val aspectPath = deployAspectMock(input.aspectModule)
 
   for (config in input.configsList) {
-    writeModule(config.modulesList, aspectPath)
+    if (config.aspectDeployment == AspectDeployment.BCR)  {
+      writeModule(config.modulesList, aspectPath)
+    } else {
+      writeModule(config.modulesList, null)
+    }
+
     bazelBuild(config.bazel, listOf("//..."), flags = listOf("--nobuild"))
   }
 

@@ -1,14 +1,14 @@
 load("@bazel_skylib//lib:paths.bzl", "paths")
 load("@rules_pkg//pkg:providers.bzl", "PackageFilesInfo")
 load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
-load("//testing/rules/lib:config.bzl", "TestMatrix", "serialize_test_config")
+load("//testing/rules/lib:config.bzl", "TestMatrix", "merge_matrixes", "serialize_test_config")
 
 def _config_name(config):
     """
     A user friendly name for the configuration, including bazel and module
     versions.
     """
-    parts = ["bazel:%s" % config.bazel.version] + [
+    parts = ["bazel:%s" % config.bazel.version, "deploy:%s" % config.aspect_deployment] + [
         "%s:%s" % (name, version)
         for (name, version) in config.modules.items()
     ]
@@ -22,6 +22,7 @@ def _config_hash(config):
     """
     parts = [config.bazel.version]
     parts.extend(["%s:%s" % (name, version) for (name, version) in config.modules.items()])
+    parts.append(config.aspect_deployment)
     parts.extend(config.aspects)
 
     return hash(".".join(parts))
@@ -29,21 +30,31 @@ def _config_hash(config):
 def _test_fixture_impl(ctx):
     outputs = []
 
-    for config in ctx.attr.config[TestMatrix].configs:
+    matrix = merge_matrixes([it[TestMatrix] for it in ctx.attr.configs])
+
+    for config in matrix.configs:
         output = ctx.actions.declare_file("%s-%s.intellij-aspect-fixture" % (ctx.label.name, _config_hash(config)))
 
         input = proto.encode_text(struct(
             output_proto = output.path,
             project_archive = ctx.file.project.path,
             cache_archive = ctx.file.repo_cache.path,
-            aspect_archive = ctx.file._aspect.path,
+            aspect_bcr_archive = ctx.file._aspect_bcr.path,
+            aspect_ide_archive = ctx.file._aspect_ide.path,
             bcr_archive = ctx.file._bcr.path,
             config = serialize_test_config(config),
             targets = ctx.attr.targets,
         ))
 
         ctx.actions.run(
-            inputs = [ctx.file.project, ctx.file.repo_cache, ctx.file._aspect, ctx.file._bcr, config.bazel.executable],
+            inputs = [
+                ctx.file.project,
+                ctx.file.repo_cache,
+                ctx.file._aspect_bcr,
+                ctx.file._aspect_ide,
+                ctx.file._bcr,
+                config.bazel.executable,
+            ],
             outputs = [output],
             executable = ctx.executable._builder,
             arguments = [input],
@@ -66,7 +77,7 @@ test_fixture = rule(
             allow_single_file = [".zip"],
             mandatory = True,
         ),
-        "config": attr.label(
+        "configs": attr.label_list(
             providers = [TestMatrix],
             mandatory = True,
         ),
@@ -74,9 +85,13 @@ test_fixture = rule(
             mandatory = True,
             doc = "list of targets to build for the fixture; do not us patterns",
         ),
-        "_aspect": attr.label(
+        "_aspect_bcr": attr.label(
             allow_single_file = [".zip"],
             default = Label("//:archive_test"),
+        ),
+        "_aspect_ide": attr.label(
+            allow_single_file = [".zip"],
+            default = Label("//:archive_ide"),
         ),
         "_bcr": attr.label(
             allow_single_file = [".zip"],

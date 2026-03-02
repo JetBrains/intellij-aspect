@@ -1,8 +1,8 @@
 load("//private/rules:bazel_binary.bzl", "BazelBinary")
-load("//testing/rules/lib:config.bzl", "TestMatrix", "serialize_test_matrix")
+load("//testing/rules/lib:config.bzl", "TestMatrix", "merge_matrixes", "serialize_test_config")
 
 def _repo_cache_impl(ctx):
-    matrix = ctx.attr.config[TestMatrix]
+    matrix = merge_matrixes([it[TestMatrix] for it in ctx.attr.configs])
     output = ctx.actions.declare_file(ctx.label.name + ".zip")
 
     input = proto.encode_text(struct(
@@ -10,7 +10,7 @@ def _repo_cache_impl(ctx):
         project_archive = ctx.file.project.path,
         aspect_module = ctx.file._aspect_module.path,
         bcr_archive = ctx.file._bcr.path,
-        configs = serialize_test_matrix(matrix),
+        configs = [serialize_test_config(it) for it in matrix.configs],
     ))
 
     ctx.actions.run(
@@ -31,7 +31,7 @@ repo_cache = rule(
             allow_single_file = [".zip"],
             mandatory = True,
         ),
-        "config": attr.label(
+        "configs": attr.label_list(
             providers = [TestMatrix],
             mandatory = True,
         ),

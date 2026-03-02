@@ -13,45 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.intellij.aspect.private.lib
+package com.intellij.aspect.lib
 
 import java.io.IOException
-import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import java.util.zip.ZipFile
 import kotlin.io.path.extension
 
-/**
- * Regex to match Bazel load statements. Captures:
- * group 1 = path (e.g., "//foo:bar.bzl"),
- * group 2 = symbols (e.g., "symbol1, symbol2")
- */
-private val LOAD_STATEMENT_REGEX = Regex("""load\(\s*"([^"]+)"\s*,\s*([^)]+)\)""")
+data class AspectConfig(
+  /**
+   * The Bazel version written into the config file.
+   */
+  val bazelVersion: String,
 
-/**
- * Regex to identify repository-relative paths that need rewriting. Matches:
- * //path:file.bzl (but not external @repo paths, which don't start with //)
- */
-private val REPO_RELATIVE_PATH_REGEX = Regex("""^//([^:]+):([^"]+)$""")
+  /**
+   * A mapping from default repo names to a specific replacement e.g., conical repo name.
+   */
+  val repoMapping: Map<String, String>,
 
-/**
- * Config for the aspect deployment. Used to generate the config/config.bzl
- * file.
- */
-data class AspectConfig(val bazelVersion: String)
+  /**
+   * Whether to use builtin rules i.e. whether to strip rule set loads.
+   */
+  val useBuiltin: Boolean,
+)
 
 /**
  * Deploy an aspect archive to a workspace directory.
  *
- * This function extracts all files from the archive and rewrites their load statements
- * to point to the deployed location.
+ * Extracts all files from the archive, rewrites their load statements using the
+ * provided transformers, and generates the aspect configuration.
  *
- * @param workspaceRoot The root directory of the workspace
- * @param relativeDestination The relative path from workspace root where aspect should be deployed
- * @param archiveZip The path to the zip archive containing the aspect files
- * @param config Configuration for the aspect deployment
  * @throws IOException if extraction or file operations fail
  */
 @Throws(IOException::class)
@@ -67,12 +60,26 @@ fun deployAspectZip(
   val destination = workspaceRoot.resolve(relativeDestination)
   Files.createDirectories(destination)
 
-  extractZipArchive(destination, relativeDestination, archiveZip)
+  val transformers = mutableListOf(
+    TransformRelativePaths(relativeDestination),
+    TransformExternalRepositories(config.repoMapping),
+  )
+
+  if (config.useBuiltin) {
+    transformers.add(TransformCcToolchainType)
+    transformers.add(TransformBuiltinRules)
+  }
+
+  extractZipArchive(destination, archiveZip, transformers)
   writeAspectConfig(destination, config)
 }
 
 @Throws(IOException::class)
-private fun extractZipArchive(destination: Path, deployPath: Path, archiveZip: Path) {
+private fun extractZipArchive(
+  destination: Path,
+  archiveZip: Path,
+  transformers: List<Transformer>,
+) {
   Files.createDirectories(destination)
 
   ZipFile(archiveZip.toFile()).use { zip ->
@@ -84,70 +91,12 @@ private fun extractZipArchive(destination: Path, deployPath: Path, archiveZip: P
       } else {
         Files.writeString(
           target,
-          rewriteLoadStatements(zip.getInputStream(entry), deployPath),
+          transformFile(zip.getInputStream(entry), transformers),
           Charsets.UTF_8,
           StandardOpenOption.CREATE,
           StandardOpenOption.TRUNCATE_EXISTING,
-          )
+        )
       }
     }
   }
 }
-
-/**
- * Rewrites all load statements from the input file and returns the rewritten
- * contents. Assumes all files in the archive are UTF-8 encoded text.
- */
-@Throws(IOException::class)
-private fun rewriteLoadStatements(input: InputStream, deployPath: Path): String {
-  val content = String(input.readAllBytes(), Charsets.UTF_8)
-
-  return LOAD_STATEMENT_REGEX.replace(content) { matchResult ->
-    val originalPath = matchResult.groupValues[1]
-    val symbols = matchResult.groupValues[2]
-
-    val newPath = rewritePath(originalPath, deployPath.toString())
-
-    """load("$newPath", $symbols)"""
-  }
-}
-
-/**
- * Rewrite a load path if it's a repository-relative path.
- *
- * Repository-relative paths (e.g. //path:file.bzl) are rewritten with the deploy
- * path prefix. Other paths (external dependencies, relative paths) are left
- * unchanged.
- */
-private fun rewritePath(originalPath: String, deployPath: String): String {
-  val match = REPO_RELATIVE_PATH_REGEX.matchEntire(originalPath) ?: return originalPath
-
-  val packagePath = match.groupValues[1]
-  val fileName = match.groupValues[2]
-
-  return "//$deployPath/$packagePath:$fileName"
-}
-
-/**
- * Creates the config directory and writes the config file as well as the
- * required BUILD file.
- */
-@Throws(IOException::class)
-fun writeAspectConfig(destination: Path, config: AspectConfig) {
-  val directory = destination.resolve("config")
-  Files.createDirectories(directory)
-
-  val buildFile = directory.resolve("BUILD")
-  Files.writeString(buildFile, "# generated build file", Charsets.UTF_8)
-
-  val configFile = directory.resolve("config.bzl")
-  Files.writeString(configFile, generateConfigStruct(config), Charsets.UTF_8)
-}
-
-private fun generateConfigStruct(config: AspectConfig) = """
-# generated config file by deployment
-
-config = struct(
-	bazel_version = "${config.bazelVersion}",
-)
-"""

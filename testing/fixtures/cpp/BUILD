@@ -1,54 +1,24 @@
 load("//testing/rules:defs.bzl", "test_fixture", "test_matrix")
+load(":defs.bzl", "test_matrix_cc")
 
 package(
     default_testonly = 1,
     default_visibility = ["//testing/tests:__subpackages__"],
 )
 
-_ASPECTS = [
-    "@intellij_aspect//modules:xcode_info.bzl%intellij_xcode_info_aspect",
-    "@intellij_aspect//modules:cc_info.bzl%intellij_cc_info_aspect",
-    "@intellij_aspect//intellij:aspect.bzl%intellij_info_aspect",
-]
-
-_MODULES = {"rules_cc": [
-    "0.1.1",
-    "0.2.9",
-    "0.2.14",
-]}
-
-test_matrix(
-    name = "matrix",
-    aspects = _ASPECTS,
+test_matrix_cc(
+    name = "simple_matrix",
     bazel = [
         "@bazel_versions//:7_7_0",
         "@bazel_versions//:8_5_1",
         "@bazel_versions//:9_0_0",
     ],
-    modules = _MODULES,
-    visibility = ["//visibility:private"],
-)
-
-test_matrix(
-    name = "bazel8",
-    aspects = _ASPECTS,
-    bazel = ["@bazel_versions//:8_5_1"],
-    modules = _MODULES,
-    visibility = ["//visibility:private"],
-)
-
-test_matrix(
-    name = "bazel9",
-    aspects = _ASPECTS,
-    bazel = ["@bazel_versions//:9_0_0"],
-    modules = _MODULES,
-    visibility = ["//visibility:private"],
 )
 
 test_fixture(
     name = "simple",
     srcs = glob(["simple/**"]),
-    config = ":matrix",
+    configs = [":simple_matrix"],
     export_cache = "repo_cache",
     targets = ["//:main"],
 )
@@ -56,7 +26,7 @@ test_fixture(
 test_fixture(
     name = "transition",
     srcs = glob(["transition/**"]),
-    config = ":matrix",
+    configs = [":simple_matrix"],
     import_cache = ":repo_cache",
     targets = [
         "//:main",
@@ -64,18 +34,35 @@ test_fixture(
     ],
 )
 
+test_matrix_cc(
+    name = "builtin_matrix",
+    bazel = [
+        "@bazel_versions//:7_7_0",
+        "@bazel_versions//:8_5_1",
+    ],
+    builtin = True,
+)
+
 test_fixture(
     name = "builtin",
     srcs = glob(["builtin/**"]),
-    config = ":bazel8",
+    configs = [":builtin_matrix"],
     import_cache = ":repo_cache",
     targets = ["//:main"],
+)
+
+test_matrix_cc(
+    name = "tool_matrix",
+    bazel = [
+        "@bazel_versions//:8_5_1",
+        "@bazel_versions//:9_0_0",
+    ],
 )
 
 test_fixture(
     name = "tool",
     srcs = glob(["tool/**"]),
-    config = ":bazel9",
+    configs = [":tool_matrix"],
     import_cache = ":repo_cache",
     targets = ["//:tool"],
 )

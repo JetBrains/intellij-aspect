@@ -19,13 +19,13 @@ inline fun <reified T : Message> action(args: Array<String>, crossinline block: 
 
 class ActionContext {
 
-  private val projectDirectory: Path by lazy { tempDirectory("project") }
+  val projectDirectory: Path by lazy { tempDirectory("project") }
 
-  private val repoCacheDirectory: Path by lazy { tempDirectory("repo_cache") }
+  val repoCacheDirectory: Path by lazy { tempDirectory("repo_cache") }
 
-  private val outputRootDirectory: Path by lazy { tempDirectory("output_root") }
+  val outputRootDirectory: Path by lazy { tempDirectory("output_root") }
 
-  private val registryDirectory: Path by lazy { tempDirectory("registry") }
+  val registryDirectory: Path by lazy { tempDirectory("registry") }
 
   @Throws(IOException::class)
   fun tempDirectory(name: String): Path {
@@ -61,7 +61,7 @@ class ActionContext {
   }
 
   @Throws(IOException::class)
-  fun writeModule(modules: List<BazelModule>, aspect: Path) {
+  fun writeModule(modules: List<BazelModule>, aspect: Path? = null) {
     val writer = Files.newOutputStream(
       projectDirectory.resolve("MODULE.bazel"),
       StandardOpenOption.CREATE,
@@ -73,8 +73,10 @@ class ActionContext {
         it.appendLine("bazel_dep(name = '${module.name}', version = '${module.version}')")
       }
 
-      it.appendLine("bazel_dep(name = 'intellij_aspect')")
-      it.appendLine("local_path_override(module_name = 'intellij_aspect', path = '$aspect')")
+      if (aspect != null) {
+        it.appendLine("bazel_dep(name = 'intellij_aspect')")
+        it.appendLine("local_path_override(module_name = 'intellij_aspect', path = '$aspect')")
+      }
     }
   }
 

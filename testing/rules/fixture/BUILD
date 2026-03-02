@@ -28,6 +28,7 @@ kt_jvm_library(
     srcs = ["builder.kt"],
     deps = [
         ":builder_java_proto",
+        "//private/lib:deploy",
         "//testing/rules/lib:action_lib",
         "//testing/rules/lib:zip_lib",
     ],

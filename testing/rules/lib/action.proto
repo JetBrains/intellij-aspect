@@ -13,8 +13,15 @@ message BazelBinary {
   string executable = 2;
 }
 
+enum AspectDeployment {
+  BCR = 0;
+  MATERIALIZED = 1;
+  BUILTIN = 2;
+}
+
 message TestConfig {
   BazelBinary bazel = 1;
   repeated BazelModule modules = 2;
   repeated string aspects = 3;
+  AspectDeployment aspect_deployment = 4;
 }
