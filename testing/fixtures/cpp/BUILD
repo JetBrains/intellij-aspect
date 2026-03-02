@@ -10,7 +10,7 @@ test_matrix_cc(
     name = "simple_matrix",
     bazel = [
         "@bazel_versions//:7_7_0",
-        "@bazel_versions//:8_5_1",
+        "@bazel_versions//:8_6_0",
         "@bazel_versions//:9_0_0",
     ],
 )
@@ -38,7 +38,7 @@ test_matrix_cc(
     name = "builtin_matrix",
     bazel = [
         "@bazel_versions//:7_7_0",
-        "@bazel_versions//:8_5_1",
+        "@bazel_versions//:8_6_0",
     ],
     builtin = True,
 )
@@ -54,7 +54,7 @@ test_fixture(
 test_matrix_cc(
     name = "tool_matrix",
     bazel = [
-        "@bazel_versions//:8_5_1",
+        "@bazel_versions//:8_6_0",
         "@bazel_versions//:9_0_0",
     ],
 )

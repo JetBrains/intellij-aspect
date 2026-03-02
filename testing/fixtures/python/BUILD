@@ -13,7 +13,7 @@ test_matrix(
     ],
     bazel = [
         "@bazel_versions//:7_7_0",
-        "@bazel_versions//:8_5_1",
+        "@bazel_versions//:8_6_0",
         "@bazel_versions//:9_0_0",
     ],
     modules = {
