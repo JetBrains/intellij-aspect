@@ -30,7 +30,7 @@ use_repo(maven, "maven")
 bazel_registry = use_extension("//private:extension.bzl", "bazel_registry")
 bazel_registry.bazel(versions = [
     "7.7.0",
-    "8.5.1",
+    "8.6.0",
     "9.0.0",
 ])
 bazel_registry.bcr(
