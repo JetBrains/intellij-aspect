@@ -4,5 +4,10 @@ cc_library(
     name = "lib",
     hdrs = ["header.h"],
     srcs = ["source.cc"],
+    copts = ["-DLIB_COPT"],
+    defines = ["PUBLIC_DEFINE"],
+    local_defines = ["LOCAL_DEFINE"],
+    includes = ["include/path"],
+    include_prefix = "prefixed",
     visibility = ["//visibility:public"],
 )

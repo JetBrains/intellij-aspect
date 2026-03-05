@@ -20,7 +20,10 @@ test_fixture(
     srcs = glob(["simple/**"]),
     configs = [":simple_matrix"],
     export_cache = "repo_cache",
-    targets = ["//:main"],
+    targets = [
+        "//:main",
+        "//lib",
+    ],
 )
 
 test_fixture(
