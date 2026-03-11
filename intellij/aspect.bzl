@@ -2,6 +2,7 @@ load("//common:common.bzl", "intellij_common")
 load("//common:dependencies.bzl", "intellij_deps")
 load("//common:ide_info.bzl", "ide_info")
 load("//modules:provider.bzl", "intellij_provider")
+load("//modules:test_info.bzl", "intellij_test_info_aspect")
 load(":provider.bzl", "IntelliJInfo", "intellij_info_builder")
 
 # compile time dependencies collected for every target
@@ -101,6 +102,7 @@ def _aspect_impl(target, ctx):
 
 intellij_info_aspect = intellij_common.aspect(
     implementation = _aspect_impl,
+    requires = [intellij_test_info_aspect],
     required_aspect_providers = [[it] for it in intellij_provider.ALL],
     provides = [IntelliJInfo],
 )

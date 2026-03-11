@@ -22,6 +22,7 @@ test_fixture(
     export_cache = "repo_cache",
     targets = [
         "//:main",
+        "//:test",
         "//lib",
     ],
 )
