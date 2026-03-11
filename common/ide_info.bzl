@@ -22,6 +22,7 @@ def _write_info(target, ctx, fields):
 
     info = fields | {
         "build_file_artifact_location": build_file_location,
+        "features": ctx.features,
         "kind_string": ctx.rule.kind,
         "tags": ctx.rule.attr.tags,
         "key": target[intellij_common.TargetInfo].key,
