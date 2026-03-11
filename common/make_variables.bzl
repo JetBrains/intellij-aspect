@@ -1,3 +1,7 @@
+################################################################################
+# The following functions are taken from the bazel project.                    #
+################################################################################
+
 # Copyright 2020 The Bazel Authors. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,9 +15,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# Utility functions to expand make variables. Implementation taken from cc_helper.
-# Source: https://github.com/bazelbuild/bazel/blob/6f7faa659e5eb3e56c8a6274ebcb86884703d603/src/main/starlark/builtins_bzl/common/cc/cc_helper.bzl
 
 def expand_make_variables(ctx, tokenization, unexpanded_tokens, additional_make_variable_substitutions = {}):
     tokens = []
