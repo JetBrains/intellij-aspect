@@ -1,5 +1,6 @@
 # Copyright 2025 The Bazel Authors. All rights reserved.
 # Modified by JetBrains s.r.o. and contributors.
+# Source: https://github.com/bazelbuild/intellij/blob/master/aspect/intellij_info_impl.bzl
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

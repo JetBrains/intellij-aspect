@@ -1,8 +1,5 @@
-################################################################################
-# The following functions are taken from the bazel project.                    #
-################################################################################
-
 # Copyright 2020 The Bazel Authors. All rights reserved.
+# Source: https://github.com/bazelbuild/intellij/blob/master/aspect/make_variables.bzl
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

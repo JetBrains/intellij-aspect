@@ -1,10 +1,5 @@
-load("//config:config.bzl", "config")
-
-################################################################################
-# The following functions are taken from bazel-skylib project.                 #
-################################################################################
-
 # Copyright 2018 The Bazel Authors. All rights reserved.
+# Source: https://github.com/bazelbuild/bazel-skylib/blob/main/lib/versions.bzl
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +12,8 @@ load("//config:config.bzl", "config")
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+load("//config:config.bzl", "config")
 
 def _extract_version_number(bazel_version):
     """Extracts the semantic version number from a version string
@@ -57,10 +54,6 @@ def _parse_bazel_version(bazel_version):
     if not version:
         return (999999, 999999, 999999)
     return tuple([int(n) for n in version.split(".")])
-
-################################################################################
-# End of bazel-skylib section.                                                 #
-################################################################################
 
 # Copyright 2025 JetBrains s.r.o. and contributors.
 #
