@@ -1,7 +1,7 @@
 header:
   license:
     spdx-id: Apache-2.0
-    copyright-owner: JetBrains s.r.o. and contributors
+    copyright-owner: JetBrains s.r.o.
     pattern: Copyright \d{4}
   paths:
     - '**/*.kt'

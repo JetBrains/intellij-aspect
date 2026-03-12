@@ -55,7 +55,7 @@ def _parse_bazel_version(bazel_version):
         return (999999, 999999, 999999)
     return tuple([int(n) for n in version.split(".")])
 
-# Copyright 2025 JetBrains s.r.o. and contributors.
+# Copyright 2025 JetBrains s.r.o.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
