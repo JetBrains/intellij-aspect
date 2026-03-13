@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 The Bazel Authors. All rights reserved.
+ * Copyright 2026 JetBrains s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,11 +38,18 @@ object DefaultFilters {
     diff.actual?.contains("dependency_type: TOOLCHAIN") ?: false
   }
 
+  val BUILD_FILE_NAME: DifferenceFilter = { diff ->
+    diff.path.endsWith("relative_path") &&
+    diff.type == DifferenceType.VALUE_MISMATCH &&
+    diff.expected?.equals("/BUILD") ?: false
+  }
+
   /**
    * All active filters. Add new filters to this list to enable them.
    */
   val ALL = listOf(
-    ADDITIONAL_TOOLCHAIN
+    ADDITIONAL_TOOLCHAIN,
+    BUILD_FILE_NAME,
   )
 }
 
