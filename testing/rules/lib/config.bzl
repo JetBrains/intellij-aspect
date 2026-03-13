@@ -19,7 +19,7 @@ TestMatrix = provider(
 )
 
 def serialize_test_config(config):
-    """Returns a struct that can be encoded into the proto represenation of a test config."""
+    """Returns a struct that can be encoded into the proto representation of a test config."""
     aspect_deployment_map = {
         "bcr": 0,
         "materialized": 1,
