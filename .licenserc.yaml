@@ -1,0 +1,14 @@
+header:
+  license:
+    spdx-id: Apache-2.0
+    copyright-owner: JetBrains s.r.o.
+  paths:
+    - '**/*.kt'
+    - '**/*.java'
+    - '**/*.bzl'
+    - '**/*.proto'
+    - '**/*.py'
+  paths-ignore:
+    - 'testing/fixtures/**'
+    - 'private/repos/common.bzl'
+  comment: on-failure
