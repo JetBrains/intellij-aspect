@@ -1,5 +1,5 @@
-# Copyright 2018 The Bazel Authors. All rights reserved.
-# Source: https://github.com/bazelbuild/bazel-skylib/blob/main/lib/versions.bzl
+# Copyright 2018 The Bazel Authors.
+# Copyright 2026 JetBrains s.r.o.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,6 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+# Derived from: https://github.com/bazelbuild/bazel-skylib/blob/f7718b7b8e2003b9359248e9632c875cb48a6e48/lib/versions.bzl
 
 load("//config:config.bzl", "config")
 
@@ -54,20 +56,6 @@ def _parse_bazel_version(bazel_version):
     if not version:
         return (999999, 999999, 999999)
     return tuple([int(n) for n in version.split(".")])
-
-# Copyright 2025 JetBrains s.r.o.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 # load the version written to the repository rule and parse it
 _BAZEL_VERSION = _parse_bazel_version(config.bazel_version)
