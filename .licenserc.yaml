@@ -12,3 +12,9 @@ header:
     - 'testing/fixtures/**'
     - 'private/repos/common.bzl'
   comment: on-failure
+  language:
+    Starlark:
+      extensions:
+        - ".bzl"
+        - ".bazel"
+      comment_style_id: PythonStyle
