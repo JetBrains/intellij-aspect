@@ -27,11 +27,13 @@ def _intellij_module_provider():
 _IntelliJCcInfo = _intellij_module_provider()
 _IntelliJPyInfo = _intellij_module_provider()
 _IntelliJJavaInfo = _intellij_module_provider()
+_IntelliJTestInfo = _intellij_module_provider()
 
 _MODULE_PROVIDERS = {
     "c_ide_info": _IntelliJCcInfo,
     "py_ide_info": _IntelliJPyInfo,
     "java_ide_info": _IntelliJJavaInfo,
+    "test_info": _IntelliJTestInfo,
 }
 
 def _intellij_toolchain_provider():
@@ -98,6 +100,7 @@ intellij_provider = struct(
     JavaInfo = _IntelliJJavaInfo,
     JavaToolchainInfo = _IntelliJJavaToolchainInfo,
     PyInfo = _IntelliJPyInfo,
+    TestInfo = _IntelliJTestInfo,
     MODULE_MAP = _MODULE_PROVIDERS,
     TOOLCHAINS = _TOOLCHAIN_PROVIDERS,
     ALL = _MODULE_PROVIDERS.values() + _TOOLCHAIN_PROVIDERS,

@@ -19,3 +19,8 @@ test_runner(
     fixture = "//testing/fixtures/cpp:simple",
     test = "ToolchainTest.kt",
 )
+
+test_runner(
+    fixture = "//testing/fixtures/cpp:simple",
+    test = "TestInfoTest.kt",
+)
