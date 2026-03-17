@@ -36,7 +36,7 @@ class PyLibraryTest {
     val target = aspect.findTarget("//:lib")
     assertThat(target.hasPyIdeInfo()).isTrue()
 
-    assertThat(target.kindString).isEqualTo("py_library")
+    assertThat(target.kind).isEqualTo("py_library")
     assertThat(target.pyIdeInfo.sourcesList.map { it.relativePath }).containsExactly("lib.py")
     assertThat(target.pyIdeInfo.srcsVersion).isEqualTo(PythonSrcsVersion.SRC_PY3)
     assertThat(target.pyIdeInfo.pythonVersion).isEqualTo(PythonVersion.PY3)

@@ -37,7 +37,7 @@ class PyTestTest {
     val target = aspect.findTarget("//:test")
     assertThat(target.hasPyIdeInfo()).isTrue()
 
-    assertThat(target.kindString).isEqualTo("py_test")
+    assertThat(target.kind).isEqualTo("py_test")
     assertThat(target.pyIdeInfo.sourcesList.map { it.relativePath }).containsExactly("test.py")
     assertThat(target.pyIdeInfo.srcsVersion).isEqualTo(PythonSrcsVersion.SRC_PY3)
     assertThat(target.pyIdeInfo.pythonVersion).isEqualTo(PythonVersion.PY3)

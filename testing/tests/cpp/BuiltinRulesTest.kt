@@ -33,14 +33,14 @@ class BuiltinRulesTest {
   fun testFindsMain() {
     val target = aspect.findTarget("//:main")
     assertThat(target.hasCIdeInfo()).isTrue()
-    assertThat(target.kindString).isEqualTo("cc_binary")
+    assertThat(target.kind).isEqualTo("cc_binary")
   }
 
   @Test
   fun testFindsLib() {
     val target = aspect.findTarget("//lib:lib")
     assertThat(target.hasCIdeInfo()).isTrue()
-    assertThat(target.kindString).isEqualTo("cc_library")
+    assertThat(target.kind).isEqualTo("cc_library")
   }
 
   @Test
@@ -49,6 +49,6 @@ class BuiltinRulesTest {
       .map { aspect.findTarget(it.target.label) }
       .first { it.hasCToolchainIdeInfo() }
 
-    assertThat(target.kindString).isEqualTo("cc_toolchain_alias")
+    assertThat(target.kind).isEqualTo("cc_toolchain_alias")
   }
 }
