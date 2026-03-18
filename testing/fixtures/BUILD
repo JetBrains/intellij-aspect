@@ -16,8 +16,8 @@ test_module_deps(
 
 test_module_deps(
     flags = [
-        "build --java_runtime_version=remotejdk_21",
-        "build --java_language_version=21",
+        "build --java_runtime_version=remotejdk_21 --java_language_version=21",
+        "build --tool_java_runtime_version=remotejdk_21 --tool_java_language_version=21",
     ],
     module_name = "rules_java",
     versions = [
