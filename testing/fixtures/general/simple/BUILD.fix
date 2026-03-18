@@ -1,0 +1,19 @@
+load("@rules_cc//cc:cc_binary.bzl", "cc_binary")
+load("@rules_java//java:java_binary.bzl", "java_binary")
+load("@rules_python//python:defs.bzl", "py_binary")
+
+py_binary(
+    name = "main",
+    srcs = ["main.py"],
+)
+
+java_binary(
+    name = "main_java",
+    srcs = ["Main.java"],
+    main_class = "com.intellij.aspect.testing.fixtures.genral.simple.Main",
+)
+
+cc_binary(
+    name = "main_cc",
+    srcs = ["main.cc"],
+)

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.intellij.aspect.testing.rules.lib
+package com.intellij.aspect.private.lib.utils
 
 import java.io.IOException
 import java.nio.file.Files
@@ -29,7 +29,7 @@ private val EXECUTABLE_MARKER = byteArrayOf(0x45, 0x58)
 /**
  * Compress a directory into a ZIP file.
  *
- * Custom ZIP to preserve a file's executbale flag when extraced with [unzip].
+ * Custom ZIP to preserve a file's executable flag when extracted with [unzip].
  */
 @Throws(IOException::class)
 fun zip(srcDirectory: Path, outFile: Path) {
@@ -46,7 +46,7 @@ fun zip(srcDirectory: Path, outFile: Path) {
 /**
  * Extracts a ZIP file into a directory.
  *
- * Custom ZIP to preserve a file's executbale flag when compressed with [zip].
+ * Custom ZIP to preserve a file's executable flag when compressed with [zip].
  */
 @Throws(IOException::class)
 fun unzip(srcFile: Path, outDirectory: Path, stripPrefix: Int = 0) {

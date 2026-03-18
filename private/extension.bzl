@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("//private/repos:bazel_versions.bzl", "bazel_versions")
+load("//private/repos:bazelisk.bzl", "bazelisk")
 load("//private/repos:bcr_archive.bzl", "bcr_archive")
 
-_bazel = tag_class(attrs = {
-    "versions": attr.string_list(),
+_bazelisk = tag_class(attrs = {
+    "version": attr.string(mandatory = True),
+    "sha256": attr.string(),
 })
 
 _bcr = tag_class(attrs = {
@@ -24,13 +25,11 @@ _bcr = tag_class(attrs = {
     "sha256": attr.string(mandatory = True),
 })
 
-def _collect_bazel_versions(mctx):
-    return [
-        version
-        for mod in mctx.modules
-        for tag in mod.tags.bazel
-        for version in tag.versions
-    ]
+def _collect_bazelisk_config(mctx):
+    for mod in mctx.modules:
+        for tag in mod.tags.bazelisk:
+            return struct(version = tag.version, sha256 = tag.sha256)
+    return None
 
 def _collect_bcr_config(mctx):
     for mod in mctx.modules:
@@ -39,9 +38,14 @@ def _collect_bcr_config(mctx):
     return None
 
 def _bazel_registry_impl(mctx):
-    bazel_versions(
-        name = "bazel_versions",
-        versions = _collect_bazel_versions(mctx),
+    bazelisk_config = _collect_bazelisk_config(mctx)
+    if not bazelisk_config:
+        fail("no bazelisk config provided")
+
+    bazelisk(
+        name = "bazelisk",
+        version = bazelisk_config.version,
+        sha256 = bazelisk_config.sha256,
     )
 
     bcr_config = _collect_bcr_config(mctx)
@@ -57,7 +61,7 @@ def _bazel_registry_impl(mctx):
 bazel_registry = module_extension(
     implementation = _bazel_registry_impl,
     tag_classes = {
-        "bazel": _bazel,
+        "bazelisk": _bazelisk,
         "bcr": _bcr,
     },
 )

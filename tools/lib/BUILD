@@ -13,7 +13,7 @@ kt_jvm_library(
     srcs = ["exec.kt"],
     visibility = ["//tools:__subpackages__"],
     deps = [
-        "//private/lib:bep",
+        "//private/lib:utils",
         "@maven//:com_fasterxml_jackson_core_jackson_databind",
     ],
 )

@@ -53,7 +53,7 @@ class SimpleTest {
         assertThat(toolchains).isNotEmpty()
         assertThat(toolchains.first().javaToolchainIdeInfo.sourceVersion).isEqualTo("21")
         assertThat(toolchains.first().javaToolchainIdeInfo.javaHome).isNotEmpty()
-        assertThat(toolchains.first().javaToolchainIdeInfo.bootClasspathJavaHome).endsWith("local_jdk")
+        assertThat(toolchains.first().javaToolchainIdeInfo.bootClasspathJavaHome).contains("remotejdk")
     }
 
     @Test

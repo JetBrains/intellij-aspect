@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest-8-core-x64
 
     steps:
     - name: Checkout code
@@ -25,7 +25,7 @@ jobs:
       run: bazel build //...
 
     - name: Test all targets
-      run: bazel test //...
+      run: bazel test //... --test_output=errors
 
   license-check:
     runs-on: ubuntu-latest

@@ -6,8 +6,8 @@ kt_jvm_library(
     srcs = glob(["*.kt"]),
     visibility = ["//visibility:private"],
     deps = [
-        "//private/lib:bep",
         "//private/lib:deploy",
+        "//private/lib:utils",
         "//private/proto:common_java_proto",
         "//private/proto:ide_info_java_proto",
         "//tools/lib:exec",
