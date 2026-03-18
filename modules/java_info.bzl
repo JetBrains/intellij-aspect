@@ -77,6 +77,7 @@ def _get_jvm_info(target, ctx):
         jvm_flags = expand_make_variables(ctx, True, intellij_common.attr_as_list(ctx, "jvm_flags")),
         jars = _get_jvm_outputs(target, ctx),
         has_api_generating_plugins = _has_api_generating_plugins(target, ctx),
+        resource_strip_prefix = getattr(ctx.rule.attr, "resource_strip_prefix", None),
     )
 
 def _aspect_impl(target, ctx):
