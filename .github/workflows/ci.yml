@@ -25,7 +25,7 @@ jobs:
       run: bazel build //...
 
     - name: Test all targets
-      run: bazel test //...
+      run: bazel test //... --test_output=errors
 
   license-check:
     runs-on: ubuntu-latest
