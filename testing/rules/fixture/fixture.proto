@@ -14,17 +14,16 @@
 
 syntax = "proto3";
 
-option java_outer_classname = "ActionLibProto";
-option java_package = "com.intellij.aspect.testing.rules.lib";
+import "private/proto/ide_info.proto";
+
+option java_outer_classname = "FixtureProto";
+option java_package = "com.intellij.aspect.testing.rules.fixture";
 
 message BazelModule {
   string name = 1;
   string version = 2;
-}
-
-message BazelBinary {
-  string version = 1;
-  string executable = 2;
+  string config = 3;
+  repeated string flags = 4;
 }
 
 enum AspectDeployment {
@@ -34,8 +33,13 @@ enum AspectDeployment {
 }
 
 message TestConfig {
-  BazelBinary bazel = 1;
-  repeated BazelModule modules = 2;
-  repeated string aspects = 3;
-  AspectDeployment aspect_deployment = 4;
+  repeated BazelModule modules = 1;
+  repeated string aspects = 2;
+  AspectDeployment aspect_deployment = 3;
+  string bazel_version = 4;
+}
+
+message TestFixture {
+  TestConfig config = 1;
+  repeated TargetIdeInfo targets = 2;
 }

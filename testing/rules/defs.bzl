@@ -14,64 +14,117 @@
 
 load("@rules_java//java:defs.bzl", "java_test")
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
-load("//testing/rules/cache:cache.bzl", _repo_cache = "repo_cache")
-load("//testing/rules/fixture:fixture.bzl", _test_fixture = "test_fixture")
-load("//testing/rules/lib:config.bzl", _test_matrix = "test_matrix", _test_matrix_suite = "test_matrix_suite")
-load("//testing/rules/lib:project.bzl", _project_archive = "project_archive")
+load(":bazel.bzl", _resolve_bazel_spec = "resolve")
+load(":config.bzl", _test_matrix = "test_matrix", _test_matrix_suite = "test_matrix_suite")
+load(":fixture.bzl", _test_fixture = "test_fixture")
+load(":module_dep.bzl", _test_module_dep = "test_module_dep")
+load(":project.bzl", _project_archive = "project_archive")
 
 test_matrix = _test_matrix
 test_matrix_suite = _test_matrix_suite
 
-def test_fixture(name, srcs, configs, strip_prefix = "", export_cache = None, import_cache = None, **kwargs):
-    """Creates a test fixture that with the result of the IntelliJ aspect applied to the project.
+def test_module_deps(module_name, versions, **kwargs):
+    """Declares Bazel module dependencies for use in test fixtures.
 
-    A test fixture packages a small Bazel project, builds it with the aspect across
-    multiple configurations (Bazel versions, rule set versions), and collects the
-    resulting .intellij-info.txt files for test validation.
+    Creates a test_module_dep target for each version with an auto-generated
+    name derived from the module name and version (e.g., module_name="rules_cc",
+    version="0.2.14" produces a target named ":rules_cc_0_2_14"). The generated
+    target can then be referenced in the "modules" list of a test_fixture. The
+    last specified version is aliased as latest.
 
     Args:
+        module_name: The module name as used in bazel_dep().
+        versions: List of version strings of the module.
+        **kwargs: Additional arguments passed to each test_module_dep.
+    """
+    for version in versions:
+        _test_module_dep(
+            name = "%s_%s" % (module_name, version.replace(".", "_")),
+            module_name = module_name,
+            version = version,
+            **kwargs
+        )
+
+    native.alias(
+        name = "%s_latest" % module_name,
+        actual = "%s_%s" % (module_name, versions[-1].replace(".", "_")),
+    )
+
+def test_fixture(name, srcs, modules, aspects, targets, bazel = None, builtin = False, strip_prefix = ""):
+    """Creates a test fixture with the result of the IntelliJ aspect applied to the project.
+
+    Packages a small Bazel project, builds it with the aspect across multiple
+    configurations (Bazel versions, module versions, deployment modes), and collects
+    the resulting .intellij-info.txt files for test validation.
+
+    Args:
+        name: Name of the fixture target.
         srcs: Source files for the test project. Typically uses glob(["project_name/**"]).
-        configs: Label list of a test_matrix target that defines the test configurations.
+        bazel: Bazel version spec. Can be None (all versions), an int (e.g., 8),
+            a string expression (e.g., ">=8", ">7", "<10"), or a list of version strings.
+        modules: Label list of test_module_dep targets the fixture depends upon.
+        aspects: List of aspect strings to apply.
+        targets: List of targets to build in the test project.
+        builtin: If True, also tests the builtin aspect deployment mode.
         strip_prefix: Optional. Prefix to strip from source file paths when creating
             the project archive. Defaults to the fixture name if not specified.
-        export_cache: Optional. If provided, creates a repository cache target with
-            this name. The cache can be imported by other fixtures to speed up builds.
-            Either export_cache or import_cache must be specified.
-        import_cache: Optional. Label of a repository cache target to import. Reuses
-            downloaded external dependencies to speed up test execution.
-            Either export_cache or import_cache must be specified.
-        **kwargs: Additional arguments passed to the underlying test_fixture rule.
-
-    Note:
-        Either export_cache or import_cache is REQUIRED. Repository caching significantly
-        speeds up builds by avoiding redundant downloads of external dependencies. The first
-        fixture in a test suite should export a cache, and
-        subsequent fixtures should import it.
 
     Example:
-        test_matrix(
-            name = "matrix",
-            aspects = [...],
-            bazel = ["@bazel_versions//:8_5_1"],
-            modules = {"rules_cc": ["0.2.14"]},
-        )
+        test_module_dep(name = "rules_cc", version = "0.2.14")
 
         test_fixture(
             name = "simple",
             srcs = glob(["simple/**"]),
-            configs = [":matrix"],
-            export_cache = "repo_cache",  # First fixture exports cache
+            bazel = ">=8",
+            modules = [":rules_cc"],
+            aspects = ["intellij:aspect.bzl%intellij_info_aspect"],
             targets = ["//:main"],
         )
-
-        test_fixture(
-            name = "advanced",
-            srcs = glob(["advanced/**"]),
-            configs = [":matrix"],
-            import_cache = ":repo_cache",  # Subsequent fixtures import cache
-            targets = ["//:lib", "//:bin"],
-        )
     """
+    bazel_versions = _resolve_bazel_spec(bazel)
+    matrix_name = name + "_matrix"
+
+    _test_matrix(
+        name = matrix_name + "_bcr",
+        aspects = aspects,
+        bazel = bazel_versions,
+        modules = modules,
+        aspect_deployment = "bcr",
+        visibility = ["//visibility:private"],
+        testonly = 1,
+    )
+
+    _test_matrix(
+        name = matrix_name + "_materialized",
+        aspects = aspects,
+        bazel = bazel_versions,
+        modules = modules,
+        aspect_deployment = "materialized",
+        visibility = ["//visibility:private"],
+        testonly = 1,
+    )
+
+    configs = [matrix_name + "_bcr", matrix_name + "_materialized"]
+
+    if builtin:
+        _test_matrix(
+            name = matrix_name + "_builtin",
+            aspects = aspects,
+            bazel = bazel_versions,
+            modules = modules,
+            aspect_deployment = "builtin",
+            visibility = ["//visibility:private"],
+            testonly = 1,
+        )
+        configs.append(matrix_name + "_builtin")
+
+    _test_matrix_suite(
+        name = matrix_name,
+        deps = configs,
+        visibility = ["//visibility:private"],
+        testonly = 1,
+    )
+
     _project_archive(
         name = name + "_project",
         srcs = srcs,
@@ -80,23 +133,12 @@ def test_fixture(name, srcs, configs, strip_prefix = "", export_cache = None, im
         testonly = 1,
     )
 
-    if export_cache:
-        _repo_cache(
-            name = export_cache,
-            configs = configs,
-            project = name + "_project",
-            visibility = ["//visibility:private"],
-            tags = ["requires-network"],
-            testonly = 1,
-        )
-
     _test_fixture(
         name = name,
-        configs = configs,
+        configs = [matrix_name],
         project = name + "_project",
-        repo_cache = export_cache or import_cache,
         testonly = 1,
-        **kwargs
+        targets = targets,
     )
 
 def _derive_test_class(test):
@@ -126,7 +168,8 @@ def test_runner(test, fixture, deps = None, env = None):
         srcs = [test],
         deps = (deps or []) + [
             "//testing/rules/fixture:fixture_lib",
-            "//testing/rules/lib:test_utils_lib",
+            "//testing/tests/lib:test_utils_lib",
+            "//private/lib:utils",
             "//private/proto:ide_info_java_proto",
             "@maven//:junit_junit",
             "@maven//:com_google_truth_truth",
@@ -146,7 +189,7 @@ def test_runner(test, fixture, deps = None, env = None):
     )
 
 def junit_test(test, deps = None, **kwargs):
-    """Creates a JUint4 test. All JUnit dependencies are provided."""
+    """Creates a JUnit4 test. All JUnit dependencies are provided."""
     name = test.removesuffix(".kt")
 
     kt_jvm_library(

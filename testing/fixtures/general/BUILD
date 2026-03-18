@@ -6,13 +6,17 @@ package(
 )
 
 _MODULES = [
-    "//testing/fixtures:rules_java_8_16_1",
-    "//testing/fixtures:rules_java_9_3_0",
+    "//testing/fixtures:rules_cc_latest",
+    "//testing/fixtures:rules_python_latest",
+    "//testing/fixtures:rules_java_latest",
     "//testing/fixtures:toolchains_llvm_latest",
 ]
 
 _ASPECTS = [
+    "modules:xcode_info.bzl%intellij_xcode_info_aspect",
+    "modules:cc_info.bzl%intellij_cc_info_aspect",
     "modules:java_info.bzl%intellij_java_info_aspect",
+    "modules:py_info.bzl%intellij_py_info_aspect",
     "intellij:aspect.bzl%intellij_info_aspect",
 ]
 
@@ -21,5 +25,5 @@ test_fixture(
     srcs = glob(["simple/**"]),
     aspects = _ASPECTS,
     modules = _MODULES,
-    targets = ["//:main"],
+    targets = ["//:all"],
 )

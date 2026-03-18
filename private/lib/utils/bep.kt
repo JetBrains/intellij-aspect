@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.intellij.aspect.private.lib
+
+package com.intellij.aspect.private.lib.utils
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.io.IOException

@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("//private/rules:bazel_binary.bzl", "BazelBinary")
+load(":module_dep.bzl", "TestModuleDep")
 
 TestConfig = provider(
-    doc = "Single fixture configuration (Bazel, modules, aspects).",
+    doc = "Single fixture configuration (Bazel version, modules, aspects).",
     fields = {
-        "bazel": "BazelBinary - Bazel binary used to build the fixture.",
-        "modules": "map[str, str] - Map of BCR modules the fixture depends upon.",
+        "bazel": "str - Bazel version string (e.g., 8.6.0).",
+        "modules": "list[TestModuleDep] - List of BCR modules the fixture depends upon.",
         "aspects": "list[str] - Aspects enabled when building the fixture.",
         "aspect_deployment": "str - Aspect deployment option (bcr, materialized, builtin).",
     },
@@ -28,9 +28,32 @@ TestMatrix = provider(
     doc = "Collection of derived test configurations.",
     fields = {
         "configs": "list[TestConfig] - Materialized configurations to execute.",
-        "bazel_binaries": "list[BazelBinary] - List of bazel binaries used by any configurations.",
     },
 )
+
+def config_hash(config):
+    """
+    Generates a unique hash for the configuration. Used to generate unique file
+    names for every fixture.
+    """
+    parts = [config.bazel]
+    parts.extend(["%s:%s" % (m.name, m.version) for m in config.modules])
+    parts.append(config.aspect_deployment)
+    parts.extend(config.aspects)
+
+    return hash(".".join(parts))
+
+def config_name(config):
+    """
+    A user friendly name for the configuration, including bazel and module
+    versions.
+    """
+    parts = ["bazel:%s" % config.bazel, "deploy:%s" % config.aspect_deployment] + [
+        "%s:%s" % (m.name, m.version)
+        for m in config.modules
+    ]
+
+    return "[%s]" % ", ".join(parts)
 
 def serialize_test_config(config):
     """Returns a struct that can be encoded into the proto representation of a test config."""
@@ -41,10 +64,10 @@ def serialize_test_config(config):
     }
 
     return struct(
-        bazel = struct(version = config.bazel.version, executable = config.bazel.executable.path),
+        bazel_version = config.bazel,
         modules = [
-            struct(name = name, version = version)
-            for (name, version) in config.modules.items()
+            struct(name = it.name, version = it.version, config = it.config, flags = it.flags)
+            for it in config.modules
         ],
         aspects = config.aspects,
         aspect_deployment = aspect_deployment_map[config.aspect_deployment],
@@ -57,56 +80,53 @@ def merge_matrixes(matrixes):
         for config in matrix.configs
     ]
 
-    binaries = {
-        provider.executable: provider
-        for matrix in matrixes
-        for provider in matrix.bazel_binaries
-    }
-
-    return TestMatrix(configs = configs, bazel_binaries = binaries.values())
+    return TestMatrix(configs = configs)
 
 def _test_matrix_impl(ctx):
-    bazel_binaries = [it[BazelBinary] for it in ctx.attr.bazel]
-    module_combinations = [{}]
+    deps = [it[TestModuleDep] for it in ctx.attr.modules]
+
+    # group TestModuleDep targets by module name
+    groups = {}
+    for dep in deps:
+        if dep.name not in groups:
+            groups[dep.name] = []
+        groups[dep.name].append(dep)
 
     # calculate the cartesian product of all module combinations
-    for name, versions in ctx.attr.modules.items():
+    module_combinations = [[]]
+    for name, dep_list in groups.items():
         new_combinations = []
         for combo in module_combinations:
-            for version in versions:
-                # dicts are mutable, so just make a copy of the current combination before adding the next module
-                new_combo = dict(combo)
-                new_combo[name] = version
-                new_combinations.append(new_combo)
+            for dep in dep_list:
+                new_combinations.append(combo + [dep])
 
-        # update the main list to the newly expanded list
         module_combinations = new_combinations
 
     configs = [
         TestConfig(
-            bazel = bazel,
+            bazel = version,
             modules = modules,
             aspects = ctx.attr.aspects,
             aspect_deployment = ctx.attr.aspect_deployment,
         )
-        for bazel in bazel_binaries
+        for version in ctx.attr.bazel
         for modules in module_combinations
     ]
 
-    return [TestMatrix(configs = configs, bazel_binaries = bazel_binaries)]
+    return [TestMatrix(configs = configs)]
 
 test_matrix = rule(
     implementation = _test_matrix_impl,
-    doc = "A single configuration that describes how a test fixture should be processed.",
+    doc = "Generates a test matrix from the cartesian product of Bazel versions, module versions, and a deployment mode.",
     attrs = {
-        "bazel": attr.label_list(
+        "bazel": attr.string_list(
             mandatory = True,
-            providers = [BazelBinary],
-            doc = "bazel binary used to build the fixture, generates matrix over all provided versions",
+            doc = "bazel version strings to test (e.g., ['8.6.0', '9.0.0'])",
         ),
-        "modules": attr.string_list_dict(
+        "modules": attr.label_list(
             mandatory = True,
-            doc = "map of BCR modules the fixture depends upon, generates matrix over all provided versions",
+            providers = [TestModuleDep],
+            doc = "list of TestModuleDep targets the fixture depends upon, generates matrix over all provided versions",
         ),
         "aspects": attr.string_list(
             mandatory = True,
