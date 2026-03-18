@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load(":config.bzl", "TestMatrix", "config_hash", "config_name", "merge_matrixes", "serialize_test_config")
 
 def _test_fixture_impl(ctx):
@@ -29,7 +30,7 @@ def _test_fixture_impl(ctx):
         worker_options = proto.encode_text(struct(
             bazelisk = ctx.file._bazelisk.path,
             registry_file = ctx.file._registry_file.path,
-            max_servers = 2,
+            max_servers = ctx.attr._max_servers[BuildSettingInfo].value,
         ))
 
         work_arguments = proto.encode_text(struct(
@@ -109,6 +110,9 @@ test_fixture = rule(
             cfg = "exec",
             executable = True,
             default = Label("//testing/rules/worker:builder_bin"),
+        ),
+        "_max_servers": attr.label(
+            default = Label("//testing/rules:max_servers"),
         ),
     },
     implementation = _test_fixture_impl,

@@ -49,6 +49,8 @@ fun worker(
   val options = parseTextProto<WorkerOptions>(args[0])
   val shared = createResources(cwd, options)
 
+  require(options.maxServers > 0)
+
   // keep track of fixed number of bazel servers per version
   val pools = mutableMapOf<String, ServerPool>()
 
@@ -56,7 +58,7 @@ fun worker(
     val request = WorkRequest.parseDelimitedFrom(System.`in`) ?: break
     val input = parseTextProto<WorkArguments>(request.argumentsList.joinToString(separator = "\n"))
 
-    val pool = pools.getOrPut(input.config.bazelVersion) { ServerPool(input.config.bazelVersion) }
+    val pool = pools.getOrPut(input.config.bazelVersion) { ServerPool(input.config.bazelVersion, options.maxServers) }
 
     launch(Dispatchers.IO) {
       val server = pool.acquireOrCreate { createServer(cwd, input.config.bazelVersion, shared) }
@@ -166,8 +168,8 @@ private fun createServer(cwd: Path, version: String, shared: SharedResources): B
   )
 }
 
-private class ServerPool(private val version: String) {
-  private val semaphore = Semaphore(3)
+private class ServerPool(private val version: String, maxServers: Int) {
+  private val semaphore = Semaphore(maxServers)
   private val available = ConcurrentLinkedQueue<BazelServer>()
 
   suspend fun acquireOrCreate(create: (String) -> BazelServer): BazelServer {
