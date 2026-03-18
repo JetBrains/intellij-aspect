@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.intellij.aspect.testing.rules.lib
+
+package com.intellij.aspect.private.lib.utils
 
 fun isMacOS(): Boolean = System.getProperty("os.name").lowercase().contains("mac")
 
 fun isLinux(): Boolean = System.getProperty("os.name").lowercase().contains("linux")
 
 fun isWindows(): Boolean = System.getProperty("os.name").lowercase().contains("windows")
-
-inline fun <reified T : Any> assertNotNull(value: T?): T = value ?: throw AssertionError("value of type ${T::class} is null")

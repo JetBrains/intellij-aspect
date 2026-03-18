@@ -12,82 +12,71 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@bazel_skylib//lib:paths.bzl", "paths")
-load("@rules_pkg//pkg:providers.bzl", "PackageFilesInfo")
-load("@rules_pkg//pkg:tar.bzl", "pkg_tar")
-load("//testing/rules/lib:config.bzl", "TestMatrix", "merge_matrixes", "serialize_test_config")
-
-def _config_name(config):
-    """
-    A user friendly name for the configuration, including bazel and module
-    versions.
-    """
-    parts = ["bazel:%s" % config.bazel.version, "deploy:%s" % config.aspect_deployment] + [
-        "%s:%s" % (name, version)
-        for (name, version) in config.modules.items()
-    ]
-
-    return "[%s]" % ", ".join(parts)
-
-def _config_hash(config):
-    """
-    Generates a unique hash for the configuration. Used to generate unique file
-    names for every fixture.
-    """
-    parts = [config.bazel.version]
-    parts.extend(["%s:%s" % (name, version) for (name, version) in config.modules.items()])
-    parts.append(config.aspect_deployment)
-    parts.extend(config.aspects)
-
-    return hash(".".join(parts))
+load(":config.bzl", "TestMatrix", "config_hash", "config_name", "merge_matrixes", "serialize_test_config")
 
 def _test_fixture_impl(ctx):
-    outputs = []
+    output_protos = []
+    profile_files = []
 
     matrix = merge_matrixes([it[TestMatrix] for it in ctx.attr.configs])
 
     for config in matrix.configs:
-        output = ctx.actions.declare_file("%s-%s.intellij-aspect-fixture" % (ctx.label.name, _config_hash(config)))
+        unique_hash = config_hash(config)
 
-        input = proto.encode_text(struct(
-            output_proto = output.path,
+        output_proto = ctx.actions.declare_file("%s-%s.intellij-aspect-fixture" % (ctx.label.name, unique_hash))
+        profile_file = ctx.actions.declare_file("%s-%s_profile.gz" % (ctx.label.name, unique_hash))
+
+        worker_options = proto.encode_text(struct(
+            bazelisk = ctx.file._bazelisk.path,
+            registry_file = ctx.file._registry_file.path,
+            max_servers = 2,
+        ))
+
+        work_arguments = proto.encode_text(struct(
+            output_proto = output_proto.path,
+            output_profile = profile_file.path,
             project_archive = ctx.file.project.path,
-            cache_archive = ctx.file.repo_cache.path,
             aspect_bcr_archive = ctx.file._aspect_bcr.path,
             aspect_ide_archive = ctx.file._aspect_ide.path,
-            bcr_archive = ctx.file._bcr.path,
             config = serialize_test_config(config),
             targets = ctx.attr.targets,
         ))
 
+        flagfile = ctx.actions.declare_file("%s-%s_flagfile" % (ctx.label.name, unique_hash))
+        ctx.actions.write(flagfile, work_arguments)
+
         ctx.actions.run(
             inputs = [
+                flagfile,
+                ctx.file._bazelisk,
+                ctx.file._registry_file,
                 ctx.file.project,
-                ctx.file.repo_cache,
                 ctx.file._aspect_bcr,
                 ctx.file._aspect_ide,
-                ctx.file._bcr,
-                config.bazel.executable,
             ],
-            outputs = [output],
             executable = ctx.executable._builder,
-            arguments = [input],
+            arguments = [worker_options, "@" + flagfile.path],
+            outputs = [output_proto, profile_file],
             mnemonic = "FixtureBuilder",
-            progress_message = "Building test fixture for %{label} " + _config_name(config),
-            use_default_shell_env = True,
+            progress_message = "Building test fixture for %{label} " + config_name(config),
+            execution_requirements = {
+                "supports-multiplex-workers": "1",
+                "requires-worker-protocol": "proto",
+                "requires-network": "1",
+            },
         )
 
-        outputs.append(output)
+        output_protos.append(output_proto)
+        profile_files.append(profile_file)
 
-    return [DefaultInfo(files = depset(outputs))]
+    return [
+        DefaultInfo(files = depset(output_protos)),
+        OutputGroupInfo(debug = depset(profile_files)),
+    ]
 
 test_fixture = rule(
     attrs = {
         "project": attr.label(
-            allow_single_file = [".zip"],
-            mandatory = True,
-        ),
-        "repo_cache": attr.label(
             allow_single_file = [".zip"],
             mandatory = True,
         ),
@@ -97,7 +86,7 @@ test_fixture = rule(
         ),
         "targets": attr.string_list(
             mandatory = True,
-            doc = "list of targets to build for the fixture; do not us patterns",
+            doc = "list of targets to build for the fixture; do not use patterns",
         ),
         "_aspect_bcr": attr.label(
             allow_single_file = [".zip"],
@@ -107,14 +96,19 @@ test_fixture = rule(
             allow_single_file = [".zip"],
             default = Label("//:archive_ide"),
         ),
-        "_bcr": attr.label(
+        "_registry_file": attr.label(
             allow_single_file = [".zip"],
             default = Label("@bcr_archive//:bcr.zip"),
+        ),
+        "_bazelisk": attr.label(
+            allow_single_file = True,
+            cfg = "exec",
+            default = Label("@bazelisk//:bazelisk"),
         ),
         "_builder": attr.label(
             cfg = "exec",
             executable = True,
-            default = Label("//testing/rules/fixture:builder_bin"),
+            default = Label("//testing/rules/worker:builder_bin"),
         ),
     },
     implementation = _test_fixture_impl,

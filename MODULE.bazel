@@ -18,6 +18,7 @@ maven.install(
         "com.google.guava:guava:33.0.0-jre",
         "com.fasterxml.jackson.core:jackson-databind:2.20.1",
         "org.jetbrains.kotlinx:kotlinx-cli-jvm:0.3.6",
+        "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2",
     ],
     known_contributing_modules = [
         "bazel_worker_java",
@@ -28,13 +29,9 @@ maven.install(
 use_repo(maven, "maven")
 
 bazel_registry = use_extension("//private:extension.bzl", "bazel_registry")
-bazel_registry.bazel(versions = [
-    "7.7.0",
-    "8.6.0",
-    "9.0.0",
-])
+bazel_registry.bazelisk(version = "1.25.0")
 bazel_registry.bcr(
-    commit = "4dca62e2ed42e03cf0e361201f4fcb0b3c0f6dbd",
-    sha256 = "d6f16bb30507b85beeafe4594f6f60acec7b1252c385e3b2296a72bec8775dcb",
+    commit = "b39c3ac444c83f5e13f6878d06d4724620088eb6",
+    sha256 = "8ee37fdca410f4487583138d3ac366efa6380de2ed31d5ce4df0fa060d961285",
 )
-use_repo(bazel_registry, "bazel_versions", "bcr_archive")
+use_repo(bazel_registry, "bazelisk", "bcr_archive")

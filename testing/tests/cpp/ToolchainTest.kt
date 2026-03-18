@@ -20,8 +20,8 @@ import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IdeInfo.*
 import com.google.protobuf.Message
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
-import com.intellij.aspect.testing.rules.lib.assertNotNull
-import com.intellij.aspect.testing.rules.lib.isMacOS
+import com.intellij.aspect.testing.tests.lib.assertNotNull
+import com.intellij.aspect.private.lib.utils.isMacOS
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test

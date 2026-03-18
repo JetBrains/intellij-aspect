@@ -15,7 +15,7 @@
  */
 package com.intellij.aspect.tools.lib
 
-import com.intellij.aspect.private.lib.parseBepFile
+import com.intellij.aspect.private.lib.utils.parseBepFile
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path

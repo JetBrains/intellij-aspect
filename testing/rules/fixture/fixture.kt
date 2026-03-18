@@ -17,8 +17,8 @@ package com.intellij.aspect.testing.rules.fixture
 
 import com.google.devtools.build.runfiles.Runfiles
 import com.google.devtools.intellij.ideinfo.IdeInfo.*
-import com.intellij.aspect.testing.rules.fixture.BuilderProto.BuilderOutput
-import com.intellij.aspect.testing.rules.lib.ActionLibProto.TestConfig
+import com.intellij.aspect.testing.rules.fixture.FixtureProto.TestFixture
+import com.intellij.aspect.testing.rules.fixture.FixtureProto.TestConfig
 import org.junit.AssumptionViolatedException
 import org.junit.rules.ExternalResource
 import org.junit.runner.Description
@@ -33,7 +33,7 @@ private val RUNFILES = Runfiles.preload()
  */
 class AspectFixture : ExternalResource() {
 
-  private lateinit var output: BuilderOutput
+  private lateinit var output: TestFixture
 
   override fun apply(base: Statement, description: Description): Statement {
     val files = System.getenv("ASPECT_FIXTURES").split(" ")
@@ -96,7 +96,7 @@ class AspectFixture : ExternalResource() {
   }
 
   fun bazelVersion(min: Int? = null, max: Int? = null): Boolean {
-    val (major, _, _) = output.config.bazel.version.split(".")
+    val (major, _, _) = output.config.bazelVersion.split(".")
     if (min != null && min > major.toInt()) return false
     if (max != null && max < major.toInt()) return false
 
@@ -105,11 +105,11 @@ class AspectFixture : ExternalResource() {
 }
 
 @Throws(IOException::class)
-private fun loadAspectFixture(file: String): BuilderOutput {
-  val fixturePath = RUNFILES.unmapped().rlocation(file);
+private fun loadAspectFixture(file: String): TestFixture {
+  val fixturePath = RUNFILES.unmapped().rlocation(file)
 
   FileInputStream(fixturePath).use { inputStream ->
-    return BuilderOutput.parseFrom(inputStream)
+    return TestFixture.parseFrom(inputStream)
   }
 }
 
@@ -163,7 +163,7 @@ private fun matchAspectIds(key: TargetKey, fractionalAspectIds: List<String>): B
  */
 private fun configString(config: TestConfig): String {
   return buildMap {
-    put("bazel", config.bazel.version)
+    put("bazel", config.bazelVersion)
     put("deploy", config.aspectDeployment.name.lowercase())
     config.modulesList.forEach { put(it.name, it.version) }
   }.entries.joinToString(separator = ", ") { "${it.key}:${it.value}" }
