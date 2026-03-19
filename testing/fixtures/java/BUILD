@@ -23,3 +23,11 @@ test_fixture(
     modules = _MODULES,
     targets = ["//:main"],
 )
+
+test_fixture(
+    name = "macro",
+    srcs = glob(["macro/**"]),
+    aspects = _ASPECTS,
+    modules = _MODULES,
+    targets = ["//..."],
+)
