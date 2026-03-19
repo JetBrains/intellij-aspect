@@ -42,7 +42,7 @@ def _write_info(target, ctx, fields):
         "key": target[intellij_common.TargetInfo].key,
         "workspace_name": ctx.workspace_name,
         "generator_name": getattr(ctx.rule.attr, "generator_name", ""),
-        "executable": target[DefaultInfo] and (target[DefaultInfo].files_to_run.executable != None),
+        "executable": target[DefaultInfo].files_to_run.executable != None,
     }
 
     # bazel allows target names differing only by case, so append a hash to support case-insensitive file systems
