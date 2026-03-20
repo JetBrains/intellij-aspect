@@ -71,12 +71,12 @@ fun main(args: Array<String>) {
 
     // set up the temporary workspace
     TemporaryWorkspace(Path.of(projectPath), bazelExecutable).use { workspace ->
-      System.err.println("Deploying legacy aspect...")
-      workspace.deployLegacyAspect()
+      System.err.println("Deploying CLwB aspect...")
+      workspace.deployClwbAspect()
 
-      val legacyFiles = workspace.runLegacyAspect(targetPattern)
-      val legacyTargets = loadTargets(legacyFiles)
-      System.err.println("Legacy aspect generated: ${legacyFiles.size} files")
+      val clwbFiles = workspace.runClwbAspect(targetPattern)
+      val clwbTargets = loadTargets(clwbFiles)
+      System.err.println("CLwB aspect generated: ${clwbFiles.size} files")
 
       System.err.println("Deploying current aspect...")
       workspace.deployCurrentAspect()
@@ -86,7 +86,7 @@ fun main(args: Array<String>) {
       System.err.println("Current aspect generated: ${currentFiles.size} files")
 
       System.err.println("Comparing...")
-      val rawResult = compareTargets(legacyTargets, currentTargets)
+      val rawResult = compareTargets(clwbTargets, currentTargets)
 
       // Apply exception filters to suppress known benign differences
       val filterResult = filterDifferences(rawResult.differences, DefaultFilters.ALL)

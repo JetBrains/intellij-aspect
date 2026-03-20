@@ -22,7 +22,7 @@ package com.intellij.aspect.tools.differ
 typealias DifferenceFilter = (Difference) -> Boolean
 
 /**
- * Predefined filters for common benign differences.
+ * Predefined filters for known differences between the new aspect and the CLwB aspect.
  * Add new exception patterns here.
  */
 object DefaultFilters {
@@ -38,10 +38,21 @@ object DefaultFilters {
     diff.actual?.contains("dependency_type: TOOLCHAIN") ?: false
   }
 
+  /**
+   * Build file names are prefix with / in the CLwB aspect.
+   */
   val BUILD_FILE_NAME: DifferenceFilter = { diff ->
     diff.path.endsWith("relative_path") &&
     diff.type == DifferenceType.VALUE_MISMATCH &&
     diff.expected?.equals("/BUILD") ?: false
+  }
+
+  /**
+   * These are new fields introduced by the new aspect which are not required in CLwB.
+   */
+  val NEW_FIELDS: DifferenceFilter = { diff ->
+    !diff.path.equals("workspace_name") &&
+    !diff.path.equals("executable")
   }
 
   /**
@@ -50,6 +61,7 @@ object DefaultFilters {
   val ALL = listOf(
     ADDITIONAL_TOOLCHAIN,
     BUILD_FILE_NAME,
+    NEW_FIELDS,
   )
 }
 
