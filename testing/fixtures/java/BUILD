@@ -21,7 +21,10 @@ test_fixture(
     srcs = glob(["simple/**"]),
     aspects = _ASPECTS,
     modules = _MODULES,
-    targets = ["//:main"],
+    targets = [
+        "//:main",
+        "//test/...",
+    ],
 )
 
 test_fixture(
