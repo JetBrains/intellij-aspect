@@ -22,7 +22,7 @@ jobs:
         repository-cache: true
 
     - name: Build all targets
-      run: bazel build //...
+      run: bazel build //... --lockfile_mode=error
 
     - name: Test all targets
       run: bazel test //... --test_output=errors
