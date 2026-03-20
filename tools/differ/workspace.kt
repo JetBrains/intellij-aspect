@@ -45,9 +45,9 @@ private data class Aspect(
   val outputGroups: List<String>
 )
 
-private val LEGACY_ASPECT = Aspect(
-  deployDirectory = ASPECTS_DIRECTORY.resolve("legacy"),
-  runfilesLocation = "tools/differ/legacy_aspect.zip",
+private val CLWB_ASPECT = Aspect(
+  deployDirectory = ASPECTS_DIRECTORY.resolve("clwb"),
+  runfilesLocation = "tools/differ/clwb_aspect.zip",
   aspectTargets = listOf(":intellij_info_bundled.bzl%intellij_info_aspect"),
   outputGroups = listOf("intellij-info-generic", "intellij-info-cpp"),
 )
@@ -69,14 +69,14 @@ private val CURRENT_ASPECT = Aspect(
 class TemporaryWorkspace(private val workspace: Path, private val bazelExecutable: String) : AutoCloseable {
 
   /**
-   * Extracts the legacy aspect from the zip file and copies it into the
+   * Extracts the CLwB aspect from the zip file and copies it into the
    * workspace.
    */
   @Throws(IOException::class)
-  fun deployLegacyAspect() {
-    val archive = RunfilesRepo.rlocation(LEGACY_ASPECT.runfilesLocation)
+  fun deployClwbAspect() {
+    val archive = RunfilesRepo.rlocation(CLWB_ASPECT.runfilesLocation)
 
-    val destination = workspace.resolve(LEGACY_ASPECT.deployDirectory)
+    val destination = workspace.resolve(CLWB_ASPECT.deployDirectory)
     Files.createDirectories(destination)
 
     ZipFile(archive.toFile()).use { zip ->
@@ -118,7 +118,7 @@ class TemporaryWorkspace(private val workspace: Path, private val bazelExecutabl
   }
 
   @Throws(IOException::class)
-  fun runLegacyAspect(target: String): List<Path> = runAspect(LEGACY_ASPECT, target)
+  fun runClwbAspect(target: String): List<Path> = runAspect(CLWB_ASPECT, target)
 
   @Throws(IOException::class)
   fun runCurrentAspect(target: String): List<Path> = runAspect(CURRENT_ASPECT, target)
