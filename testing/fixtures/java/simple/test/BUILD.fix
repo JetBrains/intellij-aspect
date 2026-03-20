@@ -1,0 +1,10 @@
+load("@rules_java//java:java_test.bzl", "java_test")
+
+java_test(
+  name = "util",
+  srcs = ["UtilTest.java"],
+  test_class = "UtilTest",
+  env_inherit = ["PROPERTIES"],
+  env = {"PATH": "/opt/test/bin:/bin:/usr/bin"},
+  deps = ["//lib:util"],
+)

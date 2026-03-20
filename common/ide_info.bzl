@@ -14,6 +14,7 @@
 
 load(":artifact_location.bzl", "artifact_location")
 load(":common.bzl", "intellij_common")
+load(":make_variables.bzl", "expand_make_variables")
 
 def _target_hash(target):
     """Creates a unique hash for the target based on its key."""
@@ -43,6 +44,11 @@ def _write_info(target, ctx, fields):
         "workspace_name": ctx.workspace_name,
         "generator_name": getattr(ctx.rule.attr, "generator_name", ""),
         "executable": target[DefaultInfo].files_to_run.executable != None,
+        "env_inherit": getattr(ctx.rule.attr, "env_inherit", []),
+        "env": {
+            k: "".join(expand_make_variables(ctx, False, [v]))
+            for k, v in getattr(ctx.rule.attr, "env", {}).items()
+        },
     }
 
     # bazel allows target names differing only by case, so append a hash to support case-insensitive file systems

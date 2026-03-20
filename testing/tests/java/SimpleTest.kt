@@ -50,7 +50,8 @@ class SimpleTest {
         assertThat(jvmInfo.mainClass).isEqualTo("com.intellij.aspect.testing.fixtures.java.simple.Main")
 
         // The toolchain dependency is reported
-        val toolchains = target.depsList.map { aspect.findTarget(it.target.label) }.filter { it.hasJavaToolchainIdeInfo() }
+        val toolchains =
+            target.depsList.map { aspect.findTarget(it.target.label) }.filter { it.hasJavaToolchainIdeInfo() }
         assertThat(toolchains).isNotEmpty()
         assertThat(toolchains.first().javaToolchainIdeInfo.sourceVersion).isEqualTo("21")
         assertThat(toolchains.first().javaToolchainIdeInfo.javaHome).isNotEmpty()
@@ -80,9 +81,26 @@ class SimpleTest {
         assertThat(jvmInfo.hasApiGeneratingPlugins).isFalse()
 
         // The toolchain dependency is reported
-        val toolchains = target.depsList.map { aspect.findTarget(it.target.label) }.filter { it.hasJavaToolchainIdeInfo() }
+        val toolchains =
+            target.depsList.map { aspect.findTarget(it.target.label) }.filter { it.hasJavaToolchainIdeInfo() }
         assertThat(toolchains).isNotEmpty()
         assertThat(toolchains.first().javaToolchainIdeInfo.sourceVersion).isEqualTo("21")
         assertThat(toolchains.first().javaToolchainIdeInfo.javaHome).isNotEmpty()
+    }
+
+    @Test
+    fun testFindTest() {
+        val target = aspect.findTarget("//test:util")
+
+        assertThat(target.hasJavaIdeInfo()).isTrue()
+        assertThat(target.kind).isEqualTo("java_test")
+        assertThat(target.executable).isTrue()
+
+        // Dependencies are reported correctly
+        assertThat(target.depsList.map { it.target.label }).contains("//lib:util")
+
+        // Test environment is reported correctly
+        assertThat(target.envInheritList).isEqualTo(listOf("PROPERTIES"))
+        assertThat(target.envMap).isEqualTo(mapOf("PATH" to "/opt/test/bin:/bin:/usr/bin"))
     }
 }
