@@ -1,0 +1,6 @@
+load(":lib_suite.bzl", "lib_suite")
+
+lib_suite(
+    name = "LotsOfLibraries",
+    srcs = glob(["*.java"], allow_empty = True),
+)

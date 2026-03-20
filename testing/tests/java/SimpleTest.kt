@@ -35,6 +35,7 @@ class SimpleTest {
         val target = aspect.findTarget("//:main")
         assertThat(target.hasJavaIdeInfo()).isTrue()
         assertThat(target.kind).isEqualTo("java_binary")
+        assertThat(target.executable).isTrue()
 
         // Sources are reported correctly
         assertThat(target.javaIdeInfo.sourcesList.size).isEqualTo(1)
@@ -61,6 +62,7 @@ class SimpleTest {
         val target = aspect.findTarget("//lib:util")
         assertThat(target.hasJavaIdeInfo()).isTrue()
         assertThat(target.kind).isEqualTo("java_library")
+        assertThat(target.executable).isFalse()
 
         // Sources are reported correctly
         assertThat(target.javaIdeInfo.sourcesList.size).isEqualTo(1)
