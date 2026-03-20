@@ -17,7 +17,7 @@
 
 syntax = "proto3";
 
-import "private/proto/common.proto";
+import "sdk/proto/common.proto";
 
 option java_package = "com.google.devtools.intellij.ideinfo";
 

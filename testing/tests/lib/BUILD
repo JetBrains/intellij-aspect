@@ -2,8 +2,8 @@ load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load("//testing/rules:defs.bzl", "junit_test")
 
 kt_jvm_library(
-    name = "test_utils_lib",
-    srcs = ["test_utils.kt"],
+    name = "utils",
+    srcs = ["utils.kt"],
     visibility = ["//testing/tests:__subpackages__"],
 )
 
@@ -14,7 +14,7 @@ junit_test(
     },
     test = "DeployTest.kt",
     deps = [
-        "//private/lib:deploy",
+        "//sdk/lib:deploy",
         "@rules_java//java/runfiles",
     ],
 )

@@ -168,9 +168,8 @@ def test_runner(test, fixture, deps = None, env = None):
         srcs = [test],
         deps = (deps or []) + [
             "//testing/rules/fixture:fixture_lib",
-            "//testing/tests/lib:test_utils_lib",
-            "//private/lib:utils",
-            "//private/proto:ide_info_java_proto",
+            "//testing/tests/lib:utils",
+            "//sdk",
             "@maven//:junit_junit",
             "@maven//:com_google_truth_truth",
         ],

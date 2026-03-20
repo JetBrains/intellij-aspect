@@ -6,7 +6,7 @@ proto_library(
     name = "fixture_proto",
     srcs = ["fixture.proto"],
     visibility = ["//testing/rules:__subpackages__"],
-    deps = ["//private/proto:ide_info_proto"],
+    deps = ["//sdk/proto:ide_info_proto"],
 )
 
 java_proto_library(
