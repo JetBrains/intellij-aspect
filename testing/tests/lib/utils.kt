@@ -15,7 +15,9 @@
  */
 package com.intellij.aspect.testing.tests.lib
 
-inline fun <reified T : Any> assertNotNull(value: T?): T = value ?: throw AssertionError("value of type ${T::class} is null")
+inline fun <reified T : Any> assertNotNull(value: T?): T {
+  return value ?: throw AssertionError("value of type ${T::class} is null")
+}
 
 fun isMacOS(): Boolean = System.getProperty("os.name").lowercase().contains("mac")
 

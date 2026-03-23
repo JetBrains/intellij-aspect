@@ -17,8 +17,8 @@ package com.intellij.aspect.testing.rules.fixture
 
 import com.google.devtools.build.runfiles.Runfiles
 import com.google.devtools.intellij.ideinfo.IdeInfo.*
-import com.intellij.aspect.testing.rules.fixture.FixtureProto.TestFixture
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.TestConfig
+import com.intellij.aspect.testing.rules.fixture.FixtureProto.TestFixture
 import org.junit.AssumptionViolatedException
 import org.junit.rules.ExternalResource
 import org.junit.runner.Description
@@ -122,9 +122,9 @@ private fun matchTarget(
   externalRepo: String?,
   fractionalAspectIds: List<String>,
 ): Boolean {
-  return info.hasKey()
-      && matchLabel(info.key, label, externalRepo)
-      && matchAspectIds(info.key, fractionalAspectIds)
+  return info.hasKey() &&
+    matchLabel(info.key, label, externalRepo) &&
+    matchAspectIds(info.key, fractionalAspectIds)
 }
 
 /**

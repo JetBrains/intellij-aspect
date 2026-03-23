@@ -77,7 +77,7 @@ object TransformCcToolchainType : Transformer {
   override fun apply(loads: MutableList<LoadStatement>, lines: MutableList<String>) {
     val needsToolchainType = loads.removeAll { stmt ->
       stmt.repository is Repository.External && stmt.repository.name == "@rules_cc" && stmt.arguments.contains(
-        CC_TOOLCHAIN_FIELD
+        CC_TOOLCHAIN_FIELD,
       )
     }
 

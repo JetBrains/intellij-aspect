@@ -36,26 +36,26 @@ fun main(args: Array<String>) {
 
   val method by parser.argument(
     ArgType.String,
-    description = "Deployment method: bcr, materialized, or builtin"
+    description = "Deployment method: bcr, materialized, or builtin",
   )
 
   val path by parser.argument(
     ArgType.String,
-    description = "Target directory path"
+    description = "Target directory path",
   )
 
   val bazelExecutable by parser.option(
     ArgType.String,
     shortName = "b",
     fullName = "bazel",
-    description = "Path to bazel executable"
+    description = "Path to bazel executable",
   ).default("bazel")
 
   val verbose by parser.option(
     ArgType.Boolean,
     shortName = "v",
     fullName = "verbose",
-    description = "Show detailed progress and stack traces"
+    description = "Show detailed progress and stack traces",
   ).default(false)
 
   parser.parse(args)
@@ -106,6 +106,6 @@ private fun deployIde(targetPath: Path, bazelExecutable: String, useBuiltin: Boo
     workspaceRoot = targetPath,
     relativeDestination = Path.of("aspect", if (useBuiltin) "builtin" else "default"),
     archiveZip = RunfilesRepo.rlocation(ARCHIVE_IDE),
-    config = config
+    config = config,
   )
 }

@@ -27,12 +27,10 @@ data class AspectConfig(
    * The Bazel version written into the config file.
    */
   val bazelVersion: String,
-
   /**
    * A mapping from default repo names to a specific replacement e.g., conical repo name.
    */
   val repoMapping: Map<String, String>,
-
   /**
    * Whether to use builtin rules i.e. whether to strip rule set loads.
    */

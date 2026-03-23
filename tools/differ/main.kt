@@ -27,41 +27,40 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.system.exitProcess
 
-
 fun main(args: Array<String>) {
   val parser = ArgParser("differ")
 
   val projectPath by parser.argument(
     ArgType.String,
-    description = "Path to the Bazel project to analyze"
+    description = "Path to the Bazel project to analyze",
   )
 
   val bazelExecutable by parser.option(
     ArgType.String,
     shortName = "b",
     fullName = "bazel",
-    description = "Path to bazel executable"
+    description = "Path to bazel executable",
   ).default("bazel")
 
   val targetPattern by parser.option(
     ArgType.String,
     shortName = "t",
     fullName = "targets",
-    description = "Target pattern to build"
+    description = "Target pattern to build",
   ).default("//...")
 
   val verbose by parser.option(
     ArgType.Boolean,
     shortName = "v",
     fullName = "verbose",
-    description = "Show detailed progress and stack traces"
+    description = "Show detailed progress and stack traces",
   ).default(false)
 
   val showFiltered by parser.option(
     ArgType.Boolean,
     shortName = "f",
     fullName = "show-filtered",
-    description = "Show differences that were filtered by exception rules"
+    description = "Show differences that were filtered by exception rules",
   ).default(false)
 
   parser.parse(args)
@@ -125,4 +124,3 @@ fun loadTargets(files: List<Path>): List<TargetIdeInfo> {
     }
   }
 }
-

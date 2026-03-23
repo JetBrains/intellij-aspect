@@ -21,14 +21,12 @@ import com.intellij.aspect.tools.RunfilesRepo
 import com.intellij.aspect.tools.lib.executeBuild
 import com.intellij.aspect.tools.lib.executeCommand
 import java.io.IOException
-import java.nio.file.FileVisitResult
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.SimpleFileVisitor
 import java.nio.file.StandardCopyOption
-import java.nio.file.attribute.BasicFileAttributes
 import java.util.zip.ZipFile
 import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.deleteRecursively
 
 /**
  * Prefix directory for the aspect deploy locations.
@@ -42,7 +40,7 @@ private data class Aspect(
   val deployDirectory: Path,
   val runfilesLocation: String,
   val aspectTargets: List<String>,
-  val outputGroups: List<String>
+  val outputGroups: List<String>,
 )
 
 private val CLWB_ASPECT = Aspect(
@@ -85,10 +83,11 @@ class TemporaryWorkspace(private val workspace: Path, private val bazelExecutabl
 
         when {
           entry.isDirectory -> Files.createDirectories(target)
+
           else -> Files.copy(
             zip.getInputStream(entry),
             target,
-            StandardCopyOption.REPLACE_EXISTING
+            StandardCopyOption.REPLACE_EXISTING,
           )
         }
       }
@@ -137,16 +136,6 @@ class TemporaryWorkspace(private val workspace: Path, private val bazelExecutabl
     val aspectsDirectory = workspace.resolve(ASPECTS_DIRECTORY)
     if (!Files.exists(aspectsDirectory)) return
 
-    Files.walkFileTree(aspectsDirectory, object : SimpleFileVisitor<Path>() {
-      override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
-        Files.delete(file)
-        return FileVisitResult.CONTINUE
-      }
-
-      override fun postVisitDirectory(dir: Path, exc: IOException?): FileVisitResult {
-        Files.delete(dir)
-        return FileVisitResult.CONTINUE
-      }
-    })
+    aspectsDirectory.deleteRecursively()
   }
 }

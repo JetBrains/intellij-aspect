@@ -29,7 +29,7 @@ import com.google.protobuf.TextFormat
 data class ComparisonReport(
   @get:JsonProperty("additional_targets") val additionalTargets: List<String>,
   @get:JsonProperty("missing_targets") val missingTargets: List<String>,
-  val differences: List<DifferenceEntry>
+  val differences: List<DifferenceEntry>,
 )
 
 /**
@@ -41,7 +41,7 @@ data class DifferenceEntry(
   val path: String,
   val type: String,
   val expected: String?,
-  val actual: String?
+  val actual: String?,
 )
 
 /**
@@ -55,7 +55,7 @@ fun Comparison.toJsonReport(): ComparisonReport {
   return ComparisonReport(
     missingTargets = missing.map { it.key.label },
     additionalTargets = additional.map { it.key.label },
-    differences = differenceEntries
+    differences = differenceEntries,
   )
 }
 
@@ -71,7 +71,7 @@ private fun Difference.toJsonEntry(targetLabel: String): DifferenceEntry {
     path = path.toString(),
     type = typeString,
     expected = expected?.let { formatValueForJson(it) },
-    actual = actual?.let { formatValueForJson(it) }
+    actual = actual?.let { formatValueForJson(it) },
   )
 }
 

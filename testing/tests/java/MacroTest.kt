@@ -26,30 +26,29 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class MacroTest {
 
-    @Rule
-    @JvmField
-    val aspect = AspectFixture()
+  @Rule
+  @JvmField
+  val aspect = AspectFixture()
 
-    @Test
-    fun testFindFoo() {
-        val target = aspect.findTarget("//:Foo")
-        assertThat(target.hasJavaIdeInfo()).isTrue()
-        assertThat(target.kind).isEqualTo("java_library")
-        assertThat(target.executable).isFalse()
-        assertThat(target.generatorName).isEqualTo("LotsOfLibraries")
-        assertThat(target.srcsCount).isEqualTo(1)
-        assertThat(target.srcsList[0].relativePath).isEqualTo("Foo.java")
-    }
+  @Test
+  fun testFindFoo() {
+    val target = aspect.findTarget("//:Foo")
+    assertThat(target.hasJavaIdeInfo()).isTrue()
+    assertThat(target.kind).isEqualTo("java_library")
+    assertThat(target.executable).isFalse()
+    assertThat(target.generatorName).isEqualTo("LotsOfLibraries")
+    assertThat(target.srcsCount).isEqualTo(1)
+    assertThat(target.srcsList[0].relativePath).isEqualTo("Foo.java")
+  }
 
-    @Test
-    fun testFindBar() {
-        val target = aspect.findTarget("//:Bar")
-        assertThat(target.hasJavaIdeInfo()).isTrue()
-        assertThat(target.kind).isEqualTo("java_library")
-        assertThat(target.executable).isFalse()
-        assertThat(target.generatorName).isEqualTo("LotsOfLibraries")
-        assertThat(target.srcsCount).isEqualTo(1)
-        assertThat(target.srcsList[0].relativePath).isEqualTo("Bar.java")
-    }
-
+  @Test
+  fun testFindBar() {
+    val target = aspect.findTarget("//:Bar")
+    assertThat(target.hasJavaIdeInfo()).isTrue()
+    assertThat(target.kind).isEqualTo("java_library")
+    assertThat(target.executable).isFalse()
+    assertThat(target.generatorName).isEqualTo("LotsOfLibraries")
+    assertThat(target.srcsCount).isEqualTo(1)
+    assertThat(target.srcsList[0].relativePath).isEqualTo("Bar.java")
+  }
 }

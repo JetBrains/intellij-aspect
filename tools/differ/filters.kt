@@ -34,8 +34,8 @@ object DefaultFilters {
    */
   val ADDITIONAL_TOOLCHAIN: DifferenceFilter = { diff ->
     diff.path.endsWith("deps") &&
-    diff.type == DifferenceType.ADDITIONAL_ELEMENT &&
-    diff.actual?.contains("dependency_type: TOOLCHAIN") ?: false
+      diff.type == DifferenceType.ADDITIONAL_ELEMENT &&
+      diff.actual?.contains("dependency_type: TOOLCHAIN") ?: false
   }
 
   /**
@@ -43,16 +43,15 @@ object DefaultFilters {
    */
   val BUILD_FILE_NAME: DifferenceFilter = { diff ->
     diff.path.endsWith("relative_path") &&
-    diff.type == DifferenceType.VALUE_MISMATCH &&
-    diff.expected?.equals("/BUILD") ?: false
+      diff.type == DifferenceType.VALUE_MISMATCH &&
+      diff.expected?.equals("/BUILD") ?: false
   }
 
   /**
    * These are new fields introduced by the new aspect which are not required in CLwB.
    */
   val NEW_FIELDS: DifferenceFilter = { diff ->
-    !diff.path.equals("workspace_name") &&
-    !diff.path.equals("executable")
+    !diff.path.equals("workspace_name") && !diff.path.equals("executable")
   }
 
   /**
@@ -71,7 +70,7 @@ object DefaultFilters {
  */
 fun filterDifferences(
   differences: Map<String, List<Difference>>,
-  filters: List<DifferenceFilter>
+  filters: List<DifferenceFilter>,
 ): FilterResult {
   val kept = mutableMapOf<String, List<Difference>>()
   val filtered = mutableMapOf<String, List<Difference>>()
@@ -92,5 +91,5 @@ fun filterDifferences(
 
 data class FilterResult(
   val kept: Map<String, List<Difference>>,
-  val filtered: Map<String, List<Difference>>
+  val filtered: Map<String, List<Difference>>,
 )

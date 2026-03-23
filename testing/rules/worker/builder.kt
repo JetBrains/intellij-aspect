@@ -19,10 +19,10 @@ import com.google.devtools.intellij.ideinfo.IdeInfo.TargetIdeInfo
 import com.google.protobuf.TextFormat
 import com.intellij.aspect.lib.AspectConfig
 import com.intellij.aspect.lib.deployAspectZip
-import com.intellij.aspect.testing.rules.fixture.FixtureProto.TestFixture
 import com.intellij.aspect.private.lib.utils.unzip
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.AspectDeployment
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.BazelModule
+import com.intellij.aspect.testing.rules.fixture.FixtureProto.TestFixture
 import java.io.IOException
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
@@ -152,4 +152,3 @@ fun Sandbox.writeModules(modules: List<BazelModule>, aspect: Path? = null) {
     }
   }
 }
-

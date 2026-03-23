@@ -25,7 +25,7 @@ import java.nio.file.Path
 enum class DifferenceType {
   MISSING_ELEMENT,
   ADDITIONAL_ELEMENT,
-  VALUE_MISMATCH
+  VALUE_MISMATCH,
 }
 
 /**
@@ -36,7 +36,7 @@ data class Difference(
   val path: Path,
   val type: DifferenceType,
   val expected: String?,
-  val actual: String?
+  val actual: String?,
 )
 
 private fun valueToString(value: Any): String {
@@ -140,7 +140,7 @@ private fun compareDefault(legacy: Any, current: Any): List<Difference> {
 data class Comparison(
   val differences: Map<String, List<Difference>>,
   val missing: List<TargetIdeInfo>,
-  val additional: List<TargetIdeInfo>
+  val additional: List<TargetIdeInfo>,
 )
 
 fun compareTargets(legacy: List<TargetIdeInfo>, current: List<TargetIdeInfo>): Comparison {
@@ -162,6 +162,6 @@ fun compareTargets(legacy: List<TargetIdeInfo>, current: List<TargetIdeInfo>): C
   return Comparison(
     differences = differences,
     missing = (legacyByKey.keys - currentByKey.keys).map { legacyByKey[it]!! },
-    additional = (currentByKey.keys - legacyByKey.keys).map { currentByKey[it]!! }
+    additional = (currentByKey.keys - legacyByKey.keys).map { currentByKey[it]!! },
   )
 }
