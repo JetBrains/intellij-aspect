@@ -27,8 +27,25 @@ jobs:
     - name: Test all targets
       run: bazel test //... --test_output=errors
 
+  format-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Bazel
+      uses: bazel-contrib/setup-bazel@0.18.0
+      with:
+        bazelisk-cache: true
+        repository-cache: true
+
+    - name: Check formatting
+      run: bazel run //tools/format:format.check
+
   license-check:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
