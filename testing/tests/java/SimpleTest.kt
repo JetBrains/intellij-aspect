@@ -38,9 +38,9 @@ class SimpleTest {
         assertThat(target.executable).isTrue()
 
         // Sources are reported correctly
-        assertThat(target.javaIdeInfo.sourcesList.size).isEqualTo(1)
-        assertThat(target.javaIdeInfo.sourcesList[0].isSource).isTrue()
-        assertThat(target.javaIdeInfo.sourcesList[0].relativePath).isEqualTo("Main.java")
+        assertThat(target.srcsList.size).isEqualTo(1)
+        assertThat(target.srcsList[0].isSource).isTrue()
+        assertThat(target.srcsList[0].relativePath).isEqualTo("Main.java")
 
         // Dependencies are reported correctly
         assertThat(target.depsList.map { it.target.label }).contains("//lib:util")
@@ -66,9 +66,9 @@ class SimpleTest {
         assertThat(target.executable).isFalse()
 
         // Sources are reported correctly
-        assertThat(target.javaIdeInfo.sourcesList.size).isEqualTo(1)
-        assertThat(target.javaIdeInfo.sourcesList[0].isSource).isTrue()
-        assertThat(target.javaIdeInfo.sourcesList[0].relativePath).isEqualTo("lib/Util.java")
+        assertThat(target.srcsList.size).isEqualTo(1)
+        assertThat(target.srcsList[0].isSource).isTrue()
+        assertThat(target.srcsList[0].relativePath).isEqualTo("lib/Util.java")
 
         // JVM-info is reported correctly
         val jvmInfo = target.javaIdeInfo.jvmTargetInfo

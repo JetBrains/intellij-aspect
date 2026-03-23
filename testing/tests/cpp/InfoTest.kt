@@ -32,8 +32,8 @@ class InfoTest {
 
   @Test
   fun testSourcesList() {
-    val info = aspect.findCIdeInfo("//lib:lib")
-    assertThat(info.ruleContext.sourcesList.map { it.relativePath }).contains("lib/source.cc")
+    val info = aspect.findTarget("//lib:lib")
+    assertThat(info.srcsList.map { it.relativePath }).contains("lib/source.cc")
   }
 
   @Test

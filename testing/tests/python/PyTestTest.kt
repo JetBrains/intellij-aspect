@@ -38,7 +38,7 @@ class PyTestTest {
     assertThat(target.hasPyIdeInfo()).isTrue()
 
     assertThat(target.kind).isEqualTo("py_test")
-    assertThat(target.pyIdeInfo.sourcesList.map { it.relativePath }).containsExactly("test.py")
+    assertThat(target.srcsList.map { it.relativePath }).containsExactly("test.py")
     assertThat(target.pyIdeInfo.srcsVersion).isEqualTo(PythonSrcsVersion.SRC_PY3)
     assertThat(target.pyIdeInfo.pythonVersion).isEqualTo(PythonVersion.PY3)
   }

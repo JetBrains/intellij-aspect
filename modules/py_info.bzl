@@ -68,7 +68,6 @@ def _aspect_impl(target, ctx):
         value = intellij_common.struct(
             launcher = _get_py_launcher(ctx),
             python_version = PY3,
-            sources = artifact_location.from_attr(ctx, "srcs"),
             srcs_version = _get_srcs_version(ctx),
             args = expand_make_variables(ctx, False, intellij_common.attr_as_list(ctx, "args")),
             imports = intellij_common.attr_as_list(ctx, "imports"),

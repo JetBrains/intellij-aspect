@@ -38,7 +38,6 @@ def _collect_rule_context(ctx):
         return struct()
 
     return intellij_common.struct(
-        sources = artifact_location.from_attr(ctx, "srcs"),
         headers = artifact_location.from_attr(ctx, "hdrs"),
         textual_headers = artifact_location.from_attr(ctx, "textual_hdrs"),
         copts = expand_make_variables(ctx, True, intellij_common.attr_as_list(ctx, "copts")),
