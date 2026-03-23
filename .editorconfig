@@ -1,0 +1,21 @@
+root = true
+
+[*]
+insert_final_newline = true
+
+[*.kt]
+indent_size = 2
+max_line_length = 120
+# disabled rules to match existing code style
+ktlint_standard_filename = disabled
+ktlint_standard_no-wildcard-imports = disabled
+ktlint_standard_function-expression-body = disabled
+ktlint_standard_multiline-expression-wrapping = disabled
+ktlint_standard_class-signature = disabled
+ktlint_standard_argument-list-wrapping = disabled
+ktlint_standard_function-signature = disabled
+ktlint_standard_chain-method-continuation = disabled
+ktlint_standard_when-entry-bracing = disabled
+ktlint_standard_no-empty-first-line-in-class-body = disabled
+# configure the IJ formatter
+ij_kotlin_blank_lines_after_class_header = 1
