@@ -1,4 +1,4 @@
-module(name = "intellij_aspect")
+module(name = "intellij_aspect_sdk")
 
 bazel_dep(name = "rules_python", version = "1.9.0")
 bazel_dep(name = "bazel_skylib", version = "1.9.0")

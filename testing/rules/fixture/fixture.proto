@@ -14,7 +14,7 @@
 
 syntax = "proto3";
 
-import "private/proto/ide_info.proto";
+import "sdk/proto/ide_info.proto";
 
 option java_outer_classname = "FixtureProto";
 option java_package = "com.intellij.aspect.testing.rules.fixture";

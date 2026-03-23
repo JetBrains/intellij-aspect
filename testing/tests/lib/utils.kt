@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.intellij.aspect.testing.tests.lib
 
-package com.intellij.aspect.private.lib.utils
+inline fun <reified T : Any> assertNotNull(value: T?): T = value ?: throw AssertionError("value of type ${T::class} is null")
 
 fun isMacOS(): Boolean = System.getProperty("os.name").lowercase().contains("mac")
 

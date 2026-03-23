@@ -6,10 +6,7 @@ kt_jvm_library(
     srcs = glob(["*.kt"]),
     visibility = ["//visibility:private"],
     deps = [
-        "//private/lib:deploy",
-        "//private/lib:utils",
-        "//private/proto:common_java_proto",
-        "//private/proto:ide_info_java_proto",
+        "//sdk",
         "//tools/lib:exec",
         "//tools/lib:runfiles_repo",
         "@maven//:com_fasterxml_jackson_core_jackson_databind",

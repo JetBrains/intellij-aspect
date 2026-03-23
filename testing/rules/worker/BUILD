@@ -24,8 +24,11 @@ kt_jvm_library(
     visibility = ["//testing/rules:__subpackages__"],
     deps = [
         ":worker_java_proto",
-        "//private/lib:deploy",
-        "//private/lib:utils",
+        "//private/lib:bep",
+        "//private/lib:proto",
+        "//private/lib:tee",
+        "//private/lib:zip",
+        "//sdk/lib:deploy",
         "//testing/rules/fixture:fixture_java_proto",
         "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_core",
     ],
