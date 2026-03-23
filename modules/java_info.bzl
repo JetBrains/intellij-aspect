@@ -87,7 +87,6 @@ def _aspect_impl(target, ctx):
     return [intellij_provider.create(
         provider = intellij_provider.JavaInfo,
         value = intellij_common.struct(
-            sources = [s for s in all_sources if s.is_source],
             generated_sources = [s for s in all_sources if not s.is_source],
             jvm_target_info = _get_jvm_info(target, ctx),
         ),

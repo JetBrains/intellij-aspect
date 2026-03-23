@@ -37,8 +37,8 @@ class MacroTest {
         assertThat(target.kind).isEqualTo("java_library")
         assertThat(target.executable).isFalse()
         assertThat(target.generatorName).isEqualTo("LotsOfLibraries")
-        assertThat(target.javaIdeInfo.sourcesCount).isEqualTo(1)
-        assertThat(target.javaIdeInfo.sourcesList[0].relativePath).isEqualTo("Foo.java")
+        assertThat(target.srcsCount).isEqualTo(1)
+        assertThat(target.srcsList[0].relativePath).isEqualTo("Foo.java")
     }
 
     @Test
@@ -48,8 +48,8 @@ class MacroTest {
         assertThat(target.kind).isEqualTo("java_library")
         assertThat(target.executable).isFalse()
         assertThat(target.generatorName).isEqualTo("LotsOfLibraries")
-        assertThat(target.javaIdeInfo.sourcesCount).isEqualTo(1)
-        assertThat(target.javaIdeInfo.sourcesList[0].relativePath).isEqualTo("Bar.java")
+        assertThat(target.srcsCount).isEqualTo(1)
+        assertThat(target.srcsList[0].relativePath).isEqualTo("Bar.java")
     }
 
 }

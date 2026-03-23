@@ -29,7 +29,6 @@ message XcodeIdeInfo {
 message CIdeInfo {
   // Information collected from rules_cc rule attributes.
   message RuleContext {
-    repeated ArtifactLocation sources = 1;
     repeated ArtifactLocation headers = 2;
     repeated ArtifactLocation textual_headers = 3;
 
@@ -72,7 +71,6 @@ message PyIdeInfo {
     SRC_PY3ONLY = 5;
   }
 
-  repeated ArtifactLocation sources = 1;
   string launcher = 2;
   // the python version this target has been configured for
   PythonVersion python_version = 3;
@@ -84,15 +82,12 @@ message PyIdeInfo {
 }
 
 message JsIdeInfo {
-  repeated ArtifactLocation sources = 1;
 }
 
 message TsIdeInfo {
-  repeated ArtifactLocation sources = 1;
 }
 
 message DartIdeInfo {
-  repeated ArtifactLocation sources = 1;
 }
 
 message JavaToolchainInfo {
@@ -120,7 +115,6 @@ message JvmTargetInfo {
 }
 
 message JavaIdeInfo {
-  repeated ArtifactLocation sources = 1;
   repeated ArtifactLocation generated_sources = 2;
   JvmTargetInfo jvm_target_info = 3;
 }
@@ -168,6 +162,7 @@ message TargetIdeInfo {
   TargetKey key = 2;
   ArtifactLocation build_file_artifact_location = 3;
   repeated Dependency deps = 4;
+  repeated ArtifactLocation srcs = 50;
   repeated string tags = 5;
   repeated string features = 6;
   TestInfo test_info = 7;

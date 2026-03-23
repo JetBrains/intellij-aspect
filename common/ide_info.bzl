@@ -49,6 +49,7 @@ def _write_info(target, ctx, fields):
             k: "".join(expand_make_variables(ctx, False, [v]))
             for k, v in getattr(ctx.rule.attr, "env", {}).items()
         },
+        "srcs": artifact_location.from_attr(ctx, "srcs"),
     }
 
     # bazel allows target names differing only by case, so append a hash to support case-insensitive file systems
