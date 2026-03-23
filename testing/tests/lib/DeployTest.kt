@@ -62,7 +62,7 @@ class DeployTest {
         bazelVersion = "8.5.0",
         repoMapping = emptyMap(),
         useBuiltin = false,
-      )
+      ),
     )
 
     val repos = readLoads(path, "modules/cc_info.bzl").map { it.repository }
@@ -76,8 +76,8 @@ class DeployTest {
       AspectConfig(
         bazelVersion = "8.5.0",
         repoMapping = emptyMap(),
-        useBuiltin = true
-      )
+        useBuiltin = true,
+      ),
     )
 
     val repos = readLoads(path, "modules/cc_info.bzl").map { it.repository }
@@ -94,7 +94,7 @@ class DeployTest {
         bazelVersion = "8.5.0",
         repoMapping = mapOf("@rules_cc" to "@my_rules_cc"),
         useBuiltin = false,
-      )
+      ),
     )
 
     val repos = readLoads(path, "modules/cc_info.bzl").map { it.repository }

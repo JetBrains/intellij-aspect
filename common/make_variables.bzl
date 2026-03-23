@@ -212,4 +212,3 @@ def _tokenize(options, options_string):
 
     if force_token or len(token) > 0:
         options.append("".join(token))
-
