@@ -12,6 +12,7 @@ _MODULES = [
 ]
 
 _ASPECTS = [
+    "modules:jvm_info.bzl%intellij_jvm_info_aspect",
     "modules:java_info.bzl%intellij_java_info_aspect",
     "intellij:aspect.bzl%intellij_info_aspect",
 ]
