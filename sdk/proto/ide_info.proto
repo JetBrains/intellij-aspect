@@ -114,7 +114,6 @@ message JvmTargetInfo {
 
 message JavaIdeInfo {
   JvmOutputs jars = 1;
-  repeated ArtifactLocation generated_sources = 2;
   bool has_api_generating_plugins = 4;
 }
 

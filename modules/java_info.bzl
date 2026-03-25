@@ -72,11 +72,9 @@ def _has_api_generating_plugins(target, ctx):
 def _aspect_impl(target, ctx):
     if not JavaInfo in target:
         return [intellij_provider.JavaInfo(present = False)]
-    all_sources = artifact_location.from_attr(ctx, "srcs")
     return [intellij_provider.create(
         provider = intellij_provider.JavaInfo,
         value = intellij_common.struct(
-            generated_sources = [s for s in all_sources if not s.is_source],
             jars = _get_jvm_outputs(target, ctx),
             has_api_generating_plugins = _has_api_generating_plugins(target, ctx),
         ),
