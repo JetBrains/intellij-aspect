@@ -77,6 +77,7 @@ def _aspect_impl(target, ctx):
         value = intellij_common.struct(
             jars = _get_jvm_outputs(target, ctx),
             has_api_generating_plugins = _has_api_generating_plugins(target, ctx),
+            full_compile_jars = artifact_location.from_depset(target[JavaInfo].full_compile_jars),
         ),
         dependencies = {
             intellij_deps.COMPILE_TIME: intellij_deps.collect(

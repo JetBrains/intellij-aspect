@@ -70,6 +70,10 @@ class SimpleTest {
     assertThat(target.srcsList[0].isSource).isTrue()
     assertThat(target.srcsList[0].relativePath).isEqualTo("lib/Util.java")
 
+    // JavaInfo related information is reported correctly
+    assertThat(target.javaIdeInfo.fullCompileJarsCount).isEqualTo(1)
+    assertThat(target.javaIdeInfo.fullCompileJarsList[0].relativePath).isEqualTo("lib/libutil.jar")
+
     // JVM-info is reported correctly
     val jvmInfo = target.jvmIdeInfo
     assertThat(jvmInfo.javacOptsList).isEqualTo(listOf("-Xep:ReturnValueIgnored:WARN"))
