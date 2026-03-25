@@ -46,7 +46,7 @@ class SimpleTest {
     assertThat(target.depsList.map { it.target.label }).contains("//lib:util")
 
     // JVM-info is reported correctly
-    val jvmInfo = target.javaIdeInfo.jvmTargetInfo
+    val jvmInfo = target.jvmIdeInfo
     assertThat(jvmInfo.mainClass).isEqualTo("com.intellij.aspect.testing.fixtures.java.simple.Main")
 
     // The toolchain dependency is reported
@@ -71,14 +71,16 @@ class SimpleTest {
     assertThat(target.srcsList[0].relativePath).isEqualTo("lib/Util.java")
 
     // JVM-info is reported correctly
-    val jvmInfo = target.javaIdeInfo.jvmTargetInfo
+    val jvmInfo = target.jvmIdeInfo
     assertThat(jvmInfo.javacOptsList).isEqualTo(listOf("-Xep:ReturnValueIgnored:WARN"))
-    assertThat(jvmInfo.jars.binaryJarsList.size).isEqualTo(1)
-    assertThat(jvmInfo.jars.binaryJarsList[0].relativePath).startsWith("lib/")
-    assertThat(jvmInfo.jars.sourceJarsList.size).isEqualTo(1)
-    assertThat(jvmInfo.jars.interfaceJarsList.size).isEqualTo(1)
-    assertThat(jvmInfo.jars.jdepsList.size).isAtMost(1)
-    assertThat(jvmInfo.hasApiGeneratingPlugins).isFalse()
+
+    // Common information is reported correctly
+    assertThat(target.javaIdeInfo.hasApiGeneratingPlugins).isFalse()
+    assertThat(target.javaIdeInfo.jars.binaryJarsList.size).isEqualTo(1)
+    assertThat(target.javaIdeInfo.jars.binaryJarsList[0].relativePath).startsWith("lib/")
+    assertThat(target.javaIdeInfo.jars.sourceJarsList.size).isEqualTo(1)
+    assertThat(target.javaIdeInfo.jars.interfaceJarsList.size).isEqualTo(1)
+    assertThat(target.javaIdeInfo.jars.jdepsList.size).isAtMost(1)
 
     // The toolchain dependency is reported
     val toolchains =
