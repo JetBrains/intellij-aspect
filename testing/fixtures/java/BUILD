@@ -13,8 +13,9 @@ _MODULES = [
 
 _ASPECTS = [
     "modules:java_info.bzl%intellij_java_info_aspect",
-    # order is important, run jvm_info after java_info
+    # order is important, run jvm_info and java_common after all JVM-languages
     "modules:jvm_info.bzl%intellij_jvm_info_aspect",
+    "modules:java_common_info.bzl%intellij_java_common_info_aspect",
     "intellij:aspect.bzl%intellij_info_aspect",
 ]
 

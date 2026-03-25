@@ -112,8 +112,15 @@ message JvmTargetInfo {
   string resource_strip_prefix = 13;
 }
 
+message JavaCommonInfo {
+  repeated string javac_opts = 1;
+  repeated JvmOutputs jars = 2;
+  repeated JvmOutputs generated_jars = 3;
+  repeated ArtifactLocation jdeps = 4;
+  bool jvm_target = 1004;
+}
+
 message JavaIdeInfo {
-  JvmOutputs jars = 1;
   bool has_api_generating_plugins = 4;
   repeated ArtifactLocation full_compile_jars = 5;
 }
@@ -188,4 +195,5 @@ message TargetIdeInfo {
   JvmTargetInfo jvm_ide_info = 182;
   JavaIdeInfo java_ide_info = 180;
   JavaToolchainInfo java_toolchain_ide_info = 181;
+  JavaCommonInfo java_common = 183;
 }

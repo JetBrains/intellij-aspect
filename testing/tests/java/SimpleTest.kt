@@ -80,11 +80,12 @@ class SimpleTest {
 
     // Common information is reported correctly
     assertThat(target.javaIdeInfo.hasApiGeneratingPlugins).isFalse()
-    assertThat(target.javaIdeInfo.jars.binaryJarsList.size).isEqualTo(1)
-    assertThat(target.javaIdeInfo.jars.binaryJarsList[0].relativePath).startsWith("lib/")
-    assertThat(target.javaIdeInfo.jars.sourceJarsList.size).isEqualTo(1)
-    assertThat(target.javaIdeInfo.jars.interfaceJarsList.size).isEqualTo(1)
-    assertThat(target.javaIdeInfo.jars.jdepsList.size).isAtMost(1)
+    val binJars = target.javaCommon.jarsList.flatMap { it.binaryJarsList }
+    assertThat(binJars.size).isEqualTo(1)
+    assertThat(binJars[0].relativePath).startsWith("lib/")
+    assertThat(target.javaCommon.jarsList.flatMap { it.sourceJarsList }.size).isEqualTo(1)
+    assertThat(target.javaCommon.jarsList.flatMap { it.interfaceJarsList }.size).isEqualTo(1)
+    assertThat(target.javaCommon.jarsList.flatMap { it.jdepsList }.size).isEqualTo(1)
 
     // The toolchain dependency is reported
     val toolchains =

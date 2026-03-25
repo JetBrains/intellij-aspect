@@ -26,6 +26,7 @@ def _intellij_module_provider():
 
 _IntelliJCcInfo = _intellij_module_provider()
 _IntelliJPyInfo = _intellij_module_provider()
+_IntelliJJavaCommonInfo = _intellij_module_provider()
 _IntelliJJvmInfo = _intellij_module_provider()
 _IntelliJJavaInfo = _intellij_module_provider()
 _IntelliJTestInfo = _intellij_module_provider()
@@ -34,9 +35,31 @@ _MODULE_PROVIDERS = {
     "c_ide_info": _IntelliJCcInfo,
     "py_ide_info": _IntelliJPyInfo,
     "jvm_ide_info": _IntelliJJvmInfo,
+    "java_common": _IntelliJJavaCommonInfo,
     "java_ide_info": _IntelliJJavaInfo,
     "test_info": _IntelliJTestInfo,
 }
+
+# Modules implying that jvm_info should run on the respective targets to obtain
+# additional information from rule attributes that are common to more than one JVM language.
+_JVM_MODULES = [
+    _IntelliJJavaInfo,
+    # KotlinInfo,
+    # ScalaInfo,
+]
+
+_IntelliJJavaCommonContributorJava = _intellij_module_provider()
+
+# Internal providers that contribute to the `JavaCommon` message which collects the information for
+# Java-like languages that comes from more than one provider. The contributors themselves are not serialized;
+# they are not part of `_MODULE_PROVIDERS` which the main aspect uses to create the text proto file.
+# Instead the `java_common` aspect computes for each field the sum of the values comming from the individual
+# providers and add the consolidated information to the message to be serialized.
+_JAVA_COMMON_CONTRIBUTORS = [
+    _IntelliJJavaCommonContributorJava,
+    # JavaCommonContributorKotlin,
+    # JavaCommonContributorScala,
+]
 
 def _intellij_toolchain_provider():
     return provider(
@@ -101,9 +124,13 @@ intellij_provider = struct(
     XcodeToolchainInfo = _IntelliJXcodeToolchainInfo,
     JvmInfo = _IntelliJJvmInfo,
     JavaInfo = _IntelliJJavaInfo,
+    JavaCommonInfo = _IntelliJJavaCommonInfo,
+    JavaCommonContributorJava = _IntelliJJavaCommonContributorJava,
     JavaToolchainInfo = _IntelliJJavaToolchainInfo,
     PyInfo = _IntelliJPyInfo,
     TestInfo = _IntelliJTestInfo,
+    JVM_MODULES = _JVM_MODULES,
+    JAVA_COMMON_CONTRIBUTORS = _JAVA_COMMON_CONTRIBUTORS,
     MODULE_MAP = _MODULE_PROVIDERS,
     TOOLCHAINS = _TOOLCHAIN_PROVIDERS,
     ALL = _MODULE_PROVIDERS.values() + _TOOLCHAIN_PROVIDERS,
