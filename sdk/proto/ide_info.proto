@@ -105,18 +105,17 @@ message JvmOutputs {
 }
 
 message JvmTargetInfo {
-  JvmOutputs jars = 1;
   repeated string javac_opts = 6;
   repeated string jvm_flags = 7;
   string main_class = 8;
   repeated string args = 9;
-  bool has_api_generating_plugins = 12;
   string resource_strip_prefix = 13;
 }
 
 message JavaIdeInfo {
+  JvmOutputs jars = 1;
   repeated ArtifactLocation generated_sources = 2;
-  JvmTargetInfo jvm_target_info = 3;
+  bool has_api_generating_plugins = 4;
 }
 
 message CToolchainIdeInfo {
@@ -186,6 +185,7 @@ message TargetIdeInfo {
   TsIdeInfo ts_ide_info = 160;
   DartIdeInfo dart_ide_info = 170;
 
+  JvmTargetInfo jvm_ide_info = 182;
   JavaIdeInfo java_ide_info = 180;
   JavaToolchainInfo java_toolchain_ide_info = 181;
 }

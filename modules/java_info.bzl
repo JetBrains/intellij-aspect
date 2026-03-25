@@ -69,17 +69,6 @@ def _get_jvm_outputs(target, ctx):
 def _has_api_generating_plugins(target, ctx):
     return len(target[JavaInfo].api_generating_plugins.processor_classes.to_list()) > 0
 
-def _get_jvm_info(target, ctx):
-    return intellij_common.struct(
-        args = intellij_common.attr_as_list(ctx, "args"),
-        main_class = getattr(ctx.rule.attr, "main_class", None),
-        javac_opts = expand_make_variables(ctx, True, intellij_common.attr_as_list(ctx, "javacopts")),
-        jvm_flags = expand_make_variables(ctx, True, intellij_common.attr_as_list(ctx, "jvm_flags")),
-        jars = _get_jvm_outputs(target, ctx),
-        has_api_generating_plugins = _has_api_generating_plugins(target, ctx),
-        resource_strip_prefix = getattr(ctx.rule.attr, "resource_strip_prefix", None),
-    )
-
 def _aspect_impl(target, ctx):
     if not JavaInfo in target:
         return [intellij_provider.JavaInfo(present = False)]
@@ -88,7 +77,8 @@ def _aspect_impl(target, ctx):
         provider = intellij_provider.JavaInfo,
         value = intellij_common.struct(
             generated_sources = [s for s in all_sources if not s.is_source],
-            jvm_target_info = _get_jvm_info(target, ctx),
+            jars = _get_jvm_outputs(target, ctx),
+            has_api_generating_plugins = _has_api_generating_plugins(target, ctx),
         ),
         dependencies = {
             intellij_deps.COMPILE_TIME: intellij_deps.collect(
