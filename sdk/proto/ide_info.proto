@@ -101,7 +101,6 @@ message JvmOutputs {
   repeated ArtifactLocation binary_jars = 1;
   repeated ArtifactLocation interface_jars = 2;
   repeated ArtifactLocation source_jars = 3;
-  repeated ArtifactLocation jdeps = 4;
 }
 
 message JvmTargetInfo {

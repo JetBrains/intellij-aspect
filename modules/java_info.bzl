@@ -27,44 +27,27 @@ COMPILE_TIME_DEPS = [
     "runtime_jdk",
 ]
 
+def _source_jars(output):
+    if hasattr(output, "source_jars"):
+        source_jars = output.source_jars
+        if type(source_jars) == "depset":
+            return source_jars.to_list()
+        else:
+            # assuming it returns sequence type here
+            return source_jars
+    if hasattr(output, "source_jar") and output.source_jar != None:
+        return [output.source_jar]
+    return []
+
 def _get_jvm_outputs(target, ctx):
-    if hasattr(target[JavaInfo], "java_outputs"):
-        jars = target[JavaInfo].java_outputs
-    elif hasattr(target[JavaInfo], "outputs"):
-        jars = target[JavaInfo].outputs.jars
-    else:
-        return None
-    source_jars_entries = [
-        entry.source_jars
-        for entry in jars
-        if (hasattr(entry, "source_jars") and entry.source_jars)
+    return [
+        intellij_common.struct(
+            binary_jars = [artifact_location.from_file(output.class_jar)] if output.class_jar else [],
+            interface_jars = [artifact_location.from_file(output.compile_jar)] if output.compile_jar else [],
+            source_jars = [artifact_location.from_file(f) for f in _source_jars(output)],
+        )
+        for output in target[JavaInfo].java_outputs
     ]
-    return intellij_common.struct(
-        binary_jars = [
-            artifact_location.from_file(jar.class_jar)
-            for jar in jars
-            if (hasattr(jar, "class_jar") and jar.class_jar)
-        ],
-        interface_jars = [
-            artifact_location.from_file(jar.compile_jar)
-            for jar in jars
-            if (hasattr(jar, "compile_jar") and jar.compile_jar)
-        ],
-        source_jars = [
-            artifact_location.from_file(jar)
-            for entry in source_jars_entries
-            for jar in entry.to_list()
-        ] or [
-            artifact_location.from_file(jar.source_jar)
-            for jar in jars
-            if (hasattr(jar, "source_jar") and jar.source_jar)
-        ],
-        jdeps = [
-            artifact_location.from_file(jar.jdeps)
-            for jar in jars
-            if (hasattr(jar, "jdeps") and jar.jdeps)
-        ],
-    )
 
 def _has_api_generating_plugins(target, ctx):
     return len(target[JavaInfo].api_generating_plugins.processor_classes.to_list()) > 0
@@ -94,7 +77,8 @@ def _aspect_impl(target, ctx):
         intellij_provider.create(
             provider = intellij_provider.JavaCommonContributorJava,
             value = intellij_common.struct(
-                jars = [_get_jvm_outputs(target, ctx)],
+                jars = _get_jvm_outputs(target, ctx),
+                jdeps = [artifact_location.from_file(jo.jdeps) for jo in target[JavaInfo].java_outputs if jo.jdeps != None],
             ),
         ),
     ]

@@ -85,7 +85,7 @@ class SimpleTest {
     assertThat(binJars[0].relativePath).startsWith("lib/")
     assertThat(target.javaCommon.jarsList.flatMap { it.sourceJarsList }.size).isEqualTo(1)
     assertThat(target.javaCommon.jarsList.flatMap { it.interfaceJarsList }.size).isEqualTo(1)
-    assertThat(target.javaCommon.jarsList.flatMap { it.jdepsList }.size).isEqualTo(1)
+    assertThat(target.javaCommon.jdepsList.size).isEqualTo(1)
 
     // The toolchain dependency is reported
     val toolchains =
