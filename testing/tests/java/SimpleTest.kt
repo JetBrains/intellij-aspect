@@ -76,9 +76,9 @@ class SimpleTest {
 
     // JVM-info is reported correctly
     val jvmInfo = target.jvmIdeInfo
-    assertThat(jvmInfo.javacOptsList).isEqualTo(listOf("-Xep:ReturnValueIgnored:WARN"))
 
     // Common information is reported correctly
+    assertThat(target.javaCommon.javacOptsList).contains("-Xep:ReturnValueIgnored:WARN")
     assertThat(target.javaIdeInfo.hasApiGeneratingPlugins).isFalse()
     val binJars = target.javaCommon.jarsList.flatMap { it.binaryJarsList }
     assertThat(binJars.size).isEqualTo(1)

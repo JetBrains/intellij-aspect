@@ -104,7 +104,6 @@ message JvmOutputs {
 }
 
 message JvmTargetInfo {
-  repeated string javac_opts = 6;
   repeated string jvm_flags = 7;
   string main_class = 8;
   repeated string args = 9;

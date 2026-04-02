@@ -20,7 +20,6 @@ def _get_jvm_info(target, ctx):
     return intellij_common.struct(
         args = intellij_common.attr_as_list(ctx, "args"),
         main_class = getattr(ctx.rule.attr, "main_class", None),
-        javac_opts = expand_make_variables(ctx, True, intellij_common.attr_as_list(ctx, "javacopts")),
         jvm_flags = expand_make_variables(ctx, True, intellij_common.attr_as_list(ctx, "jvm_flags")),
         resource_strip_prefix = getattr(ctx.rule.attr, "resource_strip_prefix", None),
     )
