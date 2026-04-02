@@ -12,16 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//common:make_variables.bzl", "expand_make_variables")
 load(":provider.bzl", "intellij_provider")
 
 def _get_jvm_info(target, ctx):
+    resources_attr = getattr(ctx.rule.attr, "resources", None)
+    if resources_attr == None and ctx.rule.kind.endswith("_resources"):
+        # https://github.com/JetBrains/intellij-community/blob/b41a4084da5521effedd334e28896fd9d07410da/build/jvm-rules/rules/resource.bzl#L49
+        resources_attr = getattr(ctx.rule.attr, "files", None)
+
+    resources = []
+    if type(resources_attr) == "list":
+        resources = artifact_location.from_list(resources_attr)
+
     return intellij_common.struct(
         args = intellij_common.attr_as_list(ctx, "args"),
         main_class = getattr(ctx.rule.attr, "main_class", None),
         jvm_flags = expand_make_variables(ctx, True, intellij_common.attr_as_list(ctx, "jvm_flags")),
         resource_strip_prefix = getattr(ctx.rule.attr, "resource_strip_prefix", None),
+        resources = resources,
     )
 
 def _aspect_impl(target, ctx):

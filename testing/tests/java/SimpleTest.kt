@@ -48,6 +48,9 @@ class SimpleTest {
     // JVM-info is reported correctly
     val jvmInfo = target.jvmIdeInfo
     assertThat(jvmInfo.mainClass).isEqualTo("com.intellij.aspect.testing.fixtures.java.simple.Main")
+    assertThat(jvmInfo.resourcesCount).isEqualTo(1)
+    assertThat(jvmInfo.resourcesList[0].isSource).isTrue()
+    assertThat(jvmInfo.resourcesList[0].relativePath.endsWith("data.txt")).isTrue()
 
     // The toolchain dependency is reported
     val toolchains =

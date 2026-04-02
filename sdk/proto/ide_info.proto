@@ -108,6 +108,7 @@ message JvmTargetInfo {
   string main_class = 8;
   repeated string args = 9;
   string resource_strip_prefix = 13;
+  repeated ArtifactLocation resources = 60;
 }
 
 message JavaCommonInfo {

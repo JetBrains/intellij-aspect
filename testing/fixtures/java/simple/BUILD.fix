@@ -4,6 +4,7 @@ java_binary(
     name = "main",
     srcs = ["Main.java"],
     main_class = "com.intellij.aspect.testing.fixtures.java.simple.Main",
+    resources = ["data.txt"],
     deps = ["//lib:util"],
 )
 
