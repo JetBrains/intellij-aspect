@@ -36,7 +36,7 @@ _MODULE_PROVIDERS = {
     "py_ide_info": _IntelliJPyInfo,
     "jvm_ide_info": _IntelliJJvmInfo,
     "java_common": _IntelliJJavaCommonInfo,
-    "java_ide_info": _IntelliJJavaInfo,
+    "java_provider": _IntelliJJavaInfo,
     "test_info": _IntelliJTestInfo,
 }
 

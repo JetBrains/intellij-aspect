@@ -119,9 +119,9 @@ message JavaCommonInfo {
   bool jvm_target = 1004;
 }
 
-message JavaIdeInfo {
-  bool has_api_generating_plugins = 4;
-  repeated ArtifactLocation full_compile_jars = 5;
+message JavaProviderInfo {
+  repeated ArtifactLocation full_compile_jars = 1;
+  bool has_api_generating_plugins = 2;
 }
 
 message CToolchainIdeInfo {
@@ -192,7 +192,7 @@ message TargetIdeInfo {
   DartIdeInfo dart_ide_info = 170;
 
   JvmTargetInfo jvm_ide_info = 182;
-  JavaIdeInfo java_ide_info = 180;
+  JavaProviderInfo java_provider = 180;
   JavaToolchainInfo java_toolchain_ide_info = 181;
   JavaCommonInfo java_common = 183;
 }

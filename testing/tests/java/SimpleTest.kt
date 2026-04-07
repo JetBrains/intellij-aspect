@@ -33,7 +33,7 @@ class SimpleTest {
   @Test
   fun testFindsMain() {
     val target = aspect.findTarget("//:main")
-    assertThat(target.hasJavaIdeInfo()).isTrue()
+    assertThat(target.hasJavaProvider()).isTrue()
     assertThat(target.kind).isEqualTo("java_binary")
     assertThat(target.executable).isTrue()
 
@@ -64,7 +64,7 @@ class SimpleTest {
   @Test
   fun testFindsLib() {
     val target = aspect.findTarget("//lib:util")
-    assertThat(target.hasJavaIdeInfo()).isTrue()
+    assertThat(target.hasJavaProvider()).isTrue()
     assertThat(target.kind).isEqualTo("java_library")
     assertThat(target.executable).isFalse()
 
@@ -74,15 +74,15 @@ class SimpleTest {
     assertThat(target.srcsList[0].relativePath).isEqualTo("lib/Util.java")
 
     // JavaInfo related information is reported correctly
-    assertThat(target.javaIdeInfo.fullCompileJarsCount).isEqualTo(1)
-    assertThat(target.javaIdeInfo.fullCompileJarsList[0].relativePath).isEqualTo("lib/libutil.jar")
+    assertThat(target.javaProvider.fullCompileJarsCount).isEqualTo(1)
+    assertThat(target.javaProvider.fullCompileJarsList[0].relativePath).isEqualTo("lib/libutil.jar")
 
     // JVM-info is reported correctly
     val jvmInfo = target.jvmIdeInfo
 
     // Common information is reported correctly
     assertThat(target.javaCommon.javacOptsList).contains("-Xep:ReturnValueIgnored:WARN")
-    assertThat(target.javaIdeInfo.hasApiGeneratingPlugins).isFalse()
+    assertThat(target.javaProvider.hasApiGeneratingPlugins).isFalse()
     val binJars = target.javaCommon.jarsList.flatMap { it.binaryJarsList }
     assertThat(binJars.size).isEqualTo(1)
     assertThat(binJars[0].relativePath).startsWith("lib/")
@@ -102,7 +102,7 @@ class SimpleTest {
   fun testFindTest() {
     val target = aspect.findTarget("//test:util")
 
-    assertThat(target.hasJavaIdeInfo()).isTrue()
+    assertThat(target.hasJavaProvider()).isTrue()
     assertThat(target.kind).isEqualTo("java_test")
     assertThat(target.executable).isTrue()
 
