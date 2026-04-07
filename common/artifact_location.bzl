@@ -52,6 +52,13 @@ def _from_list(targets):
         for f in target.files.to_list()
     ]
 
+def _from_depset(filedepset):
+    """Converts a depset of files to a list of artifact locations."""
+    return [
+        _from_file(f)
+        for f in filedepset.to_list()
+    ]
+
 def _from_attr(ctx, name):
     """Converts a rule attribute to a list of artifact locations. Rule attribute should be of type label list."""
     return _from_list(getattr(ctx.rule.attr, name, []))
@@ -72,6 +79,7 @@ def _strip_external_workspace_prefix(path):
 
 artifact_location = struct(
     create = _create,
+    from_depset = _from_depset,
     from_file = _from_file,
     from_list = _from_list,
     from_attr = _from_attr,

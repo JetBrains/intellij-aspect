@@ -70,17 +70,22 @@ class SimpleTest {
     assertThat(target.srcsList[0].isSource).isTrue()
     assertThat(target.srcsList[0].relativePath).isEqualTo("lib/Util.java")
 
+    // JavaInfo related information is reported correctly
+    assertThat(target.javaIdeInfo.fullCompileJarsCount).isEqualTo(1)
+    assertThat(target.javaIdeInfo.fullCompileJarsList[0].relativePath).isEqualTo("lib/libutil.jar")
+
     // JVM-info is reported correctly
     val jvmInfo = target.jvmIdeInfo
     assertThat(jvmInfo.javacOptsList).isEqualTo(listOf("-Xep:ReturnValueIgnored:WARN"))
 
     // Common information is reported correctly
     assertThat(target.javaIdeInfo.hasApiGeneratingPlugins).isFalse()
-    assertThat(target.javaIdeInfo.jars.binaryJarsList.size).isEqualTo(1)
-    assertThat(target.javaIdeInfo.jars.binaryJarsList[0].relativePath).startsWith("lib/")
-    assertThat(target.javaIdeInfo.jars.sourceJarsList.size).isEqualTo(1)
-    assertThat(target.javaIdeInfo.jars.interfaceJarsList.size).isEqualTo(1)
-    assertThat(target.javaIdeInfo.jars.jdepsList.size).isAtMost(1)
+    val binJars = target.javaCommon.jarsList.flatMap { it.binaryJarsList }
+    assertThat(binJars.size).isEqualTo(1)
+    assertThat(binJars[0].relativePath).startsWith("lib/")
+    assertThat(target.javaCommon.jarsList.flatMap { it.sourceJarsList }.size).isEqualTo(1)
+    assertThat(target.javaCommon.jarsList.flatMap { it.interfaceJarsList }.size).isEqualTo(1)
+    assertThat(target.javaCommon.jdepsList.size).isEqualTo(1)
 
     // The toolchain dependency is reported
     val toolchains =

@@ -16,12 +16,6 @@ load("//common:common.bzl", "intellij_common")
 load("//common:make_variables.bzl", "expand_make_variables")
 load(":provider.bzl", "intellij_provider")
 
-_JVM_MODULES = [
-    intellij_provider.JavaInfo,
-    # intellij_provider.KotlinInfo,
-    # intellij_provider.ScalaInfo,
-]
-
 def _get_jvm_info(target, ctx):
     return intellij_common.struct(
         args = intellij_common.attr_as_list(ctx, "args"),
@@ -32,7 +26,7 @@ def _get_jvm_info(target, ctx):
     )
 
 def _aspect_impl(target, ctx):
-    if not any([intellij_provider.get(target, it) for it in _JVM_MODULES]):
+    if not any([intellij_provider.get(target, it) for it in intellij_provider.JVM_MODULES]):
         return [intellij_provider.JvmInfo(present = False)]
 
     return [intellij_provider.create(
@@ -43,5 +37,5 @@ def _aspect_impl(target, ctx):
 intellij_jvm_info_aspect = intellij_common.aspect(
     implementation = _aspect_impl,
     provides = [intellij_provider.JvmInfo],
-    required_aspect_providers = [[it] for it in _JVM_MODULES],
+    required_aspect_providers = [[it] for it in intellij_provider.JVM_MODULES],
 )
