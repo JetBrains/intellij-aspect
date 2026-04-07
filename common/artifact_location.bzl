@@ -63,6 +63,17 @@ def _from_attr(ctx, name):
     """Converts a rule attribute to a list of artifact locations. Rule attribute should be of type label list."""
     return _from_list(getattr(ctx.rule.attr, name, []))
 
+def _from_execpath(exec_path):
+    relative_path = _strip_external_workspace_prefix(exec_path)
+    root_exec_path_fragment = exec_path[:-(len("/" + relative_path))] if relative_path != "" else exec_path
+
+    return _create(
+        root_path = root_exec_path_fragment,
+        relative_path = relative_path,
+        is_external = root_exec_path_fragment.startswith("external/"),
+        is_source = False,
+    )
+
 def _strip_root_path(path, root_path):
     """Strips the root_path from the path."""
     if root_path and path.startswith(root_path + "/"):
@@ -80,6 +91,7 @@ def _strip_external_workspace_prefix(path):
 artifact_location = struct(
     create = _create,
     from_depset = _from_depset,
+    from_execpath = _from_execpath,
     from_file = _from_file,
     from_list = _from_list,
     from_attr = _from_attr,
