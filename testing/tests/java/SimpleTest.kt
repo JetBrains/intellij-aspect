@@ -46,7 +46,7 @@ class SimpleTest {
     assertThat(target.depsList.map { it.target.label }).contains("//lib:util")
 
     // JVM-info is reported correctly
-    val jvmInfo = target.jvmIdeInfo
+    val jvmInfo = target.jvmTargetInfo
     assertThat(jvmInfo.mainClass).isEqualTo("com.intellij.aspect.testing.fixtures.java.simple.Main")
     assertThat(jvmInfo.resourcesCount).isEqualTo(1)
     assertThat(jvmInfo.resourcesList[0].isSource).isTrue()
@@ -78,7 +78,7 @@ class SimpleTest {
     assertThat(target.javaProvider.fullCompileJarsList[0].relativePath).isEqualTo("lib/libutil.jar")
 
     // JVM-info is reported correctly
-    val jvmInfo = target.jvmIdeInfo
+    val jvmInfo = target.jvmTargetInfo
 
     // Common information is reported correctly
     assertThat(target.javaCommon.javacOptsList).contains("-Xep:ReturnValueIgnored:WARN")

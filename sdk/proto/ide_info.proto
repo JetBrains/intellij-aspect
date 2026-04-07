@@ -191,7 +191,7 @@ message TargetIdeInfo {
   TsIdeInfo ts_ide_info = 160;
   DartIdeInfo dart_ide_info = 170;
 
-  JvmTargetInfo jvm_ide_info = 182;
+  JvmTargetInfo jvm_target_info = 182;
   JavaProviderInfo java_provider = 180;
   JavaToolchainInfo java_toolchain_ide_info = 181;
   JavaCommonInfo java_common = 183;
