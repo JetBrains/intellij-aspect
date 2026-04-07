@@ -93,8 +93,8 @@ message DartIdeInfo {
 message JavaToolchainInfo {
   string source_version = 1;
   string target_version = 2;
-  string java_home = 3;
-  string boot_classpath_java_home = 4;
+  ArtifactLocation java_home = 3;
+  ArtifactLocation boot_classpath_java_home = 4;
 }
 
 message JvmOutputs {
