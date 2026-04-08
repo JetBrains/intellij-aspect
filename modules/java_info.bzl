@@ -99,6 +99,7 @@ def _aspect_impl(target, ctx):
                     jdeps = [artifact_location.from_file(jo.jdeps) for jo in target[JavaInfo].java_outputs if jo.jdeps != None],
                     javac_opts = _get_javacopts(target, ctx),
                 ),
+                exports = intellij_common.attr_as_label_list(ctx, "exports"),
             ),
         ),
     ]

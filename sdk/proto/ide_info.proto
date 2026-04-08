@@ -135,6 +135,27 @@ message CToolchainIdeInfo {
   string sysroot = 8;
 }
 
+message KotlincPluginOption {
+  string plugin_id = 100;
+  string option_value = 200;
+}
+
+message KotlincPluginInfo {
+  repeated ArtifactLocation plugin_jars = 100;
+  repeated KotlincPluginOption kotlinc_plugin_options = 200;
+}
+
+message KotlinTargetInfo {
+  string language_version = 100;
+  string api_version = 200;
+  repeated string associates = 300;
+  repeated string kotlinc_opts = 400;
+  repeated ArtifactLocation stdlibs = 500;
+  repeated KotlincPluginInfo kotlinc_plugin_infos = 600;
+  string module_name = 700;
+  repeated string exported_compiler_plugin_targets_from_deps = 601;
+}
+
 message TestInfo {
   string size = 1;
 }
@@ -195,4 +216,7 @@ message TargetIdeInfo {
   JavaProviderInfo java_provider = 180;
   JavaToolchainInfo java_toolchain_ide_info = 181;
   JavaCommonInfo java_common = 183;
+
+
+  KotlinTargetInfo kotlin_target_info = 190;
 }

@@ -30,6 +30,7 @@ _IntelliJPyInfo = _intellij_module_provider()
 _IntelliJJavaCommonInfo = _intellij_module_provider()
 _IntelliJJvmInfo = _intellij_module_provider()
 _IntelliJJavaInfo = _intellij_module_provider()
+_IntelliJKotlinInfo = _intellij_module_provider()
 _IntelliJTestInfo = _intellij_module_provider()
 
 _MODULE_PROVIDERS = {
@@ -38,6 +39,7 @@ _MODULE_PROVIDERS = {
     "jvm_target_info": _IntelliJJvmInfo,
     "java_common": _IntelliJJavaCommonInfo,
     "java_provider": _IntelliJJavaInfo,
+    "kotlin_target_info": _IntelliJKotlinInfo,
     "test_info": _IntelliJTestInfo,
 }
 
@@ -46,7 +48,7 @@ _MODULE_PROVIDERS = {
 # Also used by java_common to collect information contributed to by more than one provider.
 _JVM_MODULES = [
     _IntelliJJavaInfo,
-    # KotlinInfo,
+    _IntelliJKotlinInfo,
     # ScalaInfo,
 ]
 
@@ -116,6 +118,7 @@ intellij_provider = struct(
     JavaCommonInfo = _IntelliJJavaCommonInfo,
     JavaInfo = _IntelliJJavaInfo,
     JavaToolchainInfo = _IntelliJJavaToolchainInfo,
+    KotlinInfo = _IntelliJKotlinInfo,
     PyInfo = _IntelliJPyInfo,
     TestInfo = _IntelliJTestInfo,
     JVM_MODULES = _JVM_MODULES,
