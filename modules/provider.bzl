@@ -34,9 +34,9 @@ _IntelliJTestInfo = _intellij_module_provider()
 _MODULE_PROVIDERS = {
     "c_ide_info": _IntelliJCcInfo,
     "py_ide_info": _IntelliJPyInfo,
-    "jvm_ide_info": _IntelliJJvmInfo,
+    "jvm_target_info": _IntelliJJvmInfo,
     "java_common": _IntelliJJavaCommonInfo,
-    "java_ide_info": _IntelliJJavaInfo,
+    "java_provider": _IntelliJJavaInfo,
     "test_info": _IntelliJTestInfo,
 }
 

@@ -27,6 +27,27 @@ COMPILE_TIME_DEPS = [
     "runtime_jdk",
 ]
 
+def _get_javacopts_from_context(ctx):
+    javacopts_raw = getattr(ctx.rule.attr, "javacopts", [])
+    if javacopts_raw == None:  # "javacopts" might exist in ctx.rule.attr as None
+        javacopts_raw = []
+    javacopts = expand_make_variables(ctx, True, javacopts_raw)
+    add_exports = ["--add-exports=" + export + "=ALL-UNNAMED" for export in getattr(ctx.rule.attr, "add_exports", [])]
+    add_opens = ["--add-opens=" + open + "=ALL-UNNAMED" for open in getattr(ctx.rule.attr, "add_opens", [])]
+    return javacopts + add_exports + add_opens
+
+def _get_javacopts(target, ctx):
+    java_info = target[JavaInfo]
+    compilation_info = getattr(java_info, "compilation_info", None)
+    module_flags_info = getattr(java_info, "module_flags_info", None)
+    if compilation_info != None and module_flags_info != None:
+        javacopts = expand_make_variables(ctx, True, compilation_info.javac_options.to_list())
+
+        # javacopts here contain --add-export flags already (https://github.com/bazelbuild/rules_java/blob/faaab4062f81deefaeef76dd21b2a5212432f8e3/java/private/java_common_internal.bzl#L159)
+        add_opens = ["--add-opens=" + open + "=ALL-UNNAMED" for open in module_flags_info.add_opens.to_list()]
+        return javacopts + add_opens
+    return _get_javacopts_from_context(ctx)
+
 def _source_jars(output):
     if hasattr(output, "source_jars"):
         source_jars = output.source_jars
@@ -79,6 +100,7 @@ def _aspect_impl(target, ctx):
             value = intellij_common.struct(
                 jars = _get_jvm_outputs(target, ctx),
                 jdeps = [artifact_location.from_file(jo.jdeps) for jo in target[JavaInfo].java_outputs if jo.jdeps != None],
+                javac_opts = _get_javacopts(target, ctx),
             ),
         ),
     ]

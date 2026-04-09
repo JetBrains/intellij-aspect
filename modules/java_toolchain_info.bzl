@@ -31,8 +31,8 @@ def _aspect_impl(target, ctx):
     info = intellij_common.struct(
         source_version = toolchain.source_version,
         target_version = toolchain.target_version,
-        java_home = runtime.java_home,
-        boot_classpath_java_home = boot_classpath_java_home,
+        java_home = artifact_location.from_execpath(runtime.java_home),
+        boot_classpath_java_home = artifact_location.from_execpath(boot_classpath_java_home),
     )
     return [intellij_provider.create_toolchain(
         provider = intellij_provider.JavaToolchainInfo,

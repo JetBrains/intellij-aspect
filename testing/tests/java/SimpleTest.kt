@@ -33,7 +33,7 @@ class SimpleTest {
   @Test
   fun testFindsMain() {
     val target = aspect.findTarget("//:main")
-    assertThat(target.hasJavaIdeInfo()).isTrue()
+    assertThat(target.hasJavaProvider()).isTrue()
     assertThat(target.kind).isEqualTo("java_binary")
     assertThat(target.executable).isTrue()
 
@@ -46,22 +46,25 @@ class SimpleTest {
     assertThat(target.depsList.map { it.target.label }).contains("//lib:util")
 
     // JVM-info is reported correctly
-    val jvmInfo = target.jvmIdeInfo
+    val jvmInfo = target.jvmTargetInfo
     assertThat(jvmInfo.mainClass).isEqualTo("com.intellij.aspect.testing.fixtures.java.simple.Main")
+    assertThat(jvmInfo.resourcesCount).isEqualTo(1)
+    assertThat(jvmInfo.resourcesList[0].isSource).isTrue()
+    assertThat(jvmInfo.resourcesList[0].relativePath.endsWith("data.txt")).isTrue()
 
     // The toolchain dependency is reported
     val toolchains =
       target.depsList.map { aspect.findTarget(it.target.label) }.filter { it.hasJavaToolchainIdeInfo() }
     assertThat(toolchains).isNotEmpty()
     assertThat(toolchains.first().javaToolchainIdeInfo.sourceVersion).isEqualTo("21")
-    assertThat(toolchains.first().javaToolchainIdeInfo.javaHome).isNotEmpty()
-    assertThat(toolchains.first().javaToolchainIdeInfo.bootClasspathJavaHome).contains("remotejdk")
+    assertThat(toolchains.first().javaToolchainIdeInfo.javaHome.relativePath).isNotEmpty()
+    assertThat(toolchains.first().javaToolchainIdeInfo.bootClasspathJavaHome.relativePath).contains("remotejdk")
   }
 
   @Test
   fun testFindsLib() {
     val target = aspect.findTarget("//lib:util")
-    assertThat(target.hasJavaIdeInfo()).isTrue()
+    assertThat(target.hasJavaProvider()).isTrue()
     assertThat(target.kind).isEqualTo("java_library")
     assertThat(target.executable).isFalse()
 
@@ -71,15 +74,15 @@ class SimpleTest {
     assertThat(target.srcsList[0].relativePath).isEqualTo("lib/Util.java")
 
     // JavaInfo related information is reported correctly
-    assertThat(target.javaIdeInfo.fullCompileJarsCount).isEqualTo(1)
-    assertThat(target.javaIdeInfo.fullCompileJarsList[0].relativePath).isEqualTo("lib/libutil.jar")
+    assertThat(target.javaProvider.fullCompileJarsCount).isEqualTo(1)
+    assertThat(target.javaProvider.fullCompileJarsList[0].relativePath).isEqualTo("lib/libutil.jar")
 
     // JVM-info is reported correctly
-    val jvmInfo = target.jvmIdeInfo
-    assertThat(jvmInfo.javacOptsList).isEqualTo(listOf("-Xep:ReturnValueIgnored:WARN"))
+    val jvmInfo = target.jvmTargetInfo
 
     // Common information is reported correctly
-    assertThat(target.javaIdeInfo.hasApiGeneratingPlugins).isFalse()
+    assertThat(target.javaCommon.javacOptsList).contains("-Xep:ReturnValueIgnored:WARN")
+    assertThat(target.javaProvider.hasApiGeneratingPlugins).isFalse()
     val binJars = target.javaCommon.jarsList.flatMap { it.binaryJarsList }
     assertThat(binJars.size).isEqualTo(1)
     assertThat(binJars[0].relativePath).startsWith("lib/")
@@ -92,14 +95,14 @@ class SimpleTest {
       target.depsList.map { aspect.findTarget(it.target.label) }.filter { it.hasJavaToolchainIdeInfo() }
     assertThat(toolchains).isNotEmpty()
     assertThat(toolchains.first().javaToolchainIdeInfo.sourceVersion).isEqualTo("21")
-    assertThat(toolchains.first().javaToolchainIdeInfo.javaHome).isNotEmpty()
+    assertThat(toolchains.first().javaToolchainIdeInfo.javaHome.relativePath).isNotEmpty()
   }
 
   @Test
   fun testFindTest() {
     val target = aspect.findTarget("//test:util")
 
-    assertThat(target.hasJavaIdeInfo()).isTrue()
+    assertThat(target.hasJavaProvider()).isTrue()
     assertThat(target.kind).isEqualTo("java_test")
     assertThat(target.executable).isTrue()
 

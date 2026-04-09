@@ -33,7 +33,7 @@ class MacroTest {
   @Test
   fun testFindFoo() {
     val target = aspect.findTarget("//:Foo")
-    assertThat(target.hasJavaIdeInfo()).isTrue()
+    assertThat(target.hasJavaProvider()).isTrue()
     assertThat(target.kind).isEqualTo("java_library")
     assertThat(target.executable).isFalse()
     assertThat(target.generatorName).isEqualTo("LotsOfLibraries")
@@ -44,7 +44,7 @@ class MacroTest {
   @Test
   fun testFindBar() {
     val target = aspect.findTarget("//:Bar")
-    assertThat(target.hasJavaIdeInfo()).isTrue()
+    assertThat(target.hasJavaProvider()).isTrue()
     assertThat(target.kind).isEqualTo("java_library")
     assertThat(target.executable).isFalse()
     assertThat(target.generatorName).isEqualTo("LotsOfLibraries")
