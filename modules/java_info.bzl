@@ -77,7 +77,6 @@ def _aspect_impl(target, ctx):
     if not JavaInfo in target:
         return [
             intellij_provider.JavaInfo(present = False),
-            intellij_provider.JavaCommonContributorJava(present = False),
         ]
     return [
         intellij_provider.create(
@@ -94,20 +93,19 @@ def _aspect_impl(target, ctx):
                 ),
             },
             toolchains = intellij_deps.find_toolchains(ctx, JAVA_TOOLCHAIN_TYPE),
-        ),
-        intellij_provider.create(
-            provider = intellij_provider.JavaCommonContributorJava,
-            value = intellij_common.struct(
-                jars = _get_jvm_outputs(target, ctx),
-                jdeps = [artifact_location.from_file(jo.jdeps) for jo in target[JavaInfo].java_outputs if jo.jdeps != None],
-                javac_opts = _get_javacopts(target, ctx),
+            internal_value = intellij_common.struct(
+                common = intellij_common.struct(
+                    jars = _get_jvm_outputs(target, ctx),
+                    jdeps = [artifact_location.from_file(jo.jdeps) for jo in target[JavaInfo].java_outputs if jo.jdeps != None],
+                    javac_opts = _get_javacopts(target, ctx),
+                ),
             ),
         ),
     ]
 
 intellij_java_info_aspect = intellij_common.aspect(
     implementation = _aspect_impl,
-    provides = [intellij_provider.JavaInfo, intellij_provider.JavaCommonContributorJava],
+    provides = [intellij_provider.JavaInfo],
     requires = [intellij_java_toolchain_info_aspect],
     toolchains_aspects = [str(JAVA_TOOLCHAIN_TYPE)],
 )
