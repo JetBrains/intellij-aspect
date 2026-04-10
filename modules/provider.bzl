@@ -19,6 +19,7 @@ def _intellij_module_provider():
             "outputs": "dict[str, depset[File]] - Output groups produced by this module.",
             "dependencies": "dict[int, depset[Target]] - Direct dependencies grouped by dependency type.",
             "value": "struct - Module-specific value serializable to protobuf.",
+            "internal_value": "struct - Module-specific value that can be read by other moudle aspects, but is not serialized",
             "present": "bool - Whether the provider is present on this target.",
             "toolchains": "list[ToolchainAspectProvider] - Toolchains used by the specified target.",
         },
@@ -42,23 +43,11 @@ _MODULE_PROVIDERS = {
 
 # Modules implying that jvm_info should run on the respective targets to obtain
 # additional information from rule attributes that are common to more than one JVM language.
+# Also used by java_common to collect information contributed to by more than one provider.
 _JVM_MODULES = [
     _IntelliJJavaInfo,
     # KotlinInfo,
     # ScalaInfo,
-]
-
-_IntelliJJavaCommonContributorJava = _intellij_module_provider()
-
-# Internal providers that contribute to the `JavaCommon` message which collects the information for
-# Java-like languages that comes from more than one provider. The contributors themselves are not serialized;
-# they are not part of `_MODULE_PROVIDERS` which the main aspect uses to create the text proto file.
-# Instead the `java_common` aspect computes for each field the sum of the values comming from the individual
-# providers and add the consolidated information to the message to be serialized.
-_JAVA_COMMON_CONTRIBUTORS = [
-    _IntelliJJavaCommonContributorJava,
-    # JavaCommonContributorKotlin,
-    # JavaCommonContributorScala,
 ]
 
 def _intellij_toolchain_provider():
@@ -100,11 +89,12 @@ def _get_provider_or_none(target, provider):
 
     return instance
 
-def _create(provider, value, outputs = None, dependencies = None, toolchains = None):
+def _create(provider, value, internal_value = None, outputs = None, dependencies = None, toolchains = None):
     """Creates a new instance of a module provider."""
     return provider(
         present = True,
         value = value,
+        internal_value = internal_value or struct(),
         outputs = outputs or {},
         dependencies = dependencies or {},
         toolchains = toolchains or [],
@@ -123,14 +113,12 @@ intellij_provider = struct(
     CcToolchainInfo = _IntelliJCcToolchainInfo,
     XcodeToolchainInfo = _IntelliJXcodeToolchainInfo,
     JvmInfo = _IntelliJJvmInfo,
-    JavaInfo = _IntelliJJavaInfo,
     JavaCommonInfo = _IntelliJJavaCommonInfo,
-    JavaCommonContributorJava = _IntelliJJavaCommonContributorJava,
+    JavaInfo = _IntelliJJavaInfo,
     JavaToolchainInfo = _IntelliJJavaToolchainInfo,
     PyInfo = _IntelliJPyInfo,
     TestInfo = _IntelliJTestInfo,
     JVM_MODULES = _JVM_MODULES,
-    JAVA_COMMON_CONTRIBUTORS = _JAVA_COMMON_CONTRIBUTORS,
     MODULE_MAP = _MODULE_PROVIDERS,
     TOOLCHAINS = _TOOLCHAIN_PROVIDERS,
     ALL = _MODULE_PROVIDERS.values() + _TOOLCHAIN_PROVIDERS,

@@ -27,13 +27,13 @@ _BOOL_FIELDS = [
 ]
 
 def _aspect_impl(target, ctx):
-    if not any([intellij_provider.get(target, it) for it in intellij_provider.JAVA_COMMON_CONTRIBUTORS]):
+    if not any([intellij_provider.get(target, it) for it in intellij_provider.JVM_MODULES]):
         return [intellij_provider.JavaCommonInfo(present = False)]
 
     value = {}
 
-    for it in intellij_provider.JAVA_COMMON_CONTRIBUTORS:
-        contribution = intellij_provider.get(target, it).value
+    for it in intellij_provider.JVM_MODULES:
+        contribution = getattr(intellij_provider.get(target, it).internal_value, "common", None)
         if not contribution:
             continue
         for k in _LIST_FIELDS:
@@ -49,5 +49,5 @@ def _aspect_impl(target, ctx):
 intellij_java_common_info_aspect = intellij_common.aspect(
     implementation = _aspect_impl,
     provides = [intellij_provider.JavaCommonInfo],
-    required_aspect_providers = [[it] for it in intellij_provider.JAVA_COMMON_CONTRIBUTORS],
+    required_aspect_providers = [[it] for it in intellij_provider.JVM_MODULES],
 )
