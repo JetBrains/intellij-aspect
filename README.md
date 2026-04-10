@@ -6,9 +6,10 @@ language/toolchain logic into independent **module aspects** that each produce a
 provider, while a thin **aggregator aspect** merges those providers and writes a single
 textproto per target for IDE import.
 
-This architecture removes templating entirely (a major source of friction), enables
-publishing to the **Bazel Central Registry (BCR)**, and makes aspect outputs cacheable by
-Bazel.
+This architecture significantly reduces templating (a major source of friction in the old
+aspect). When deployed from the BCR no templating is needed at all; the materialized
+fallback still requires rewriting load statements and generating a config file. The new
+design also enables publishing to the **Bazel Central Registry (BCR)**.
 
 ## Project Structure
 
