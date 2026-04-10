@@ -30,9 +30,8 @@ The top-level `BUILD` file defines four targets that package the aspect for diff
 
 | Target | Format | Purpose |
 |---|---|---|
-| `archive_ide` | zip | Deployment from the IDE into a user's workspace |
 | `archive_bcr` | tar.gz | Publication to the Bazel Central Registry |
-| `archive_test` | zip | Used by the test infrastructure (zip is easier to process in Kotlin) |
+| `archive_ide` | zip | Deployment from the IDE into a user's workspace |
 | `local_deploy` | local registry | A minimal local BCR registry for development and testing |
 
 These support three deployment modes:
@@ -41,17 +40,17 @@ These support three deployment modes:
 intended default. It requires the user to add
 `bazel_dep(name = "intellij_aspect", version = "...")` to their `MODULE.bazel`.
 
-**Local Registry** -- A local registry and distdir are written into the workspace (e.g.
-`.ijaspect/`), and `--registry` / `--distdir` flags are added to `.bazelrc`. This works
-identically to BCR but without actually publishing, useful during development.
-
 **Materialized** -- The aspect sources are written directly into the workspace (like the
 old aspect). This requires limited templating (rewriting load statements, generating a
 config file) and serves as a transparent fallback when BCR is unavailable.
 
-## SDK vs Aspect (`intellij_aspect_sdk` vs `intellij_aspect`)
+**Local Registry** -- A local registry and distdir are written into the workspace (e.g.
+`.ijaspect/`), and `--registry` / `--distdir` flags are added to `.bazelrc`. This works
+identically to BCR but without actually publishing, useful during development.
 
-The repository contains two Bazel module identities:
+## SDK vs Aspect
+
+The repository contains two Bazel modules:
 
 - **`intellij_aspect_sdk`** (`MODULE.bazel`) -- The development module. It declares all
   build-time dependencies (rules_kotlin, rules_pkg, protobuf, maven artifacts, etc.) and
@@ -60,8 +59,8 @@ The repository contains two Bazel module identities:
 
 - **`intellij_aspect`** (`MODULE.bazel.bcr`) -- The published module. It declares only the
   runtime rule-set dependencies needed by the aspect itself (rules_cc, rules_python,
-  rules_java) with `max_compatibility_level` set high to allow version flexibility. This is
-  what users depend on.
+  rules_java) with `max_compatibility_level` set high as high as possible to allow version 
+  flexibility. This is what users depend on.
 
 When building `archive_bcr`, `MODULE.bazel.bcr` is renamed to `MODULE.bazel` inside the
 archive, so consumers see a clean `intellij_aspect` module.
