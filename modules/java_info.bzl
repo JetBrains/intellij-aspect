@@ -94,7 +94,7 @@ def _aspect_impl(target, ctx):
             },
             toolchains = intellij_deps.find_toolchains(ctx, JAVA_TOOLCHAIN_TYPE),
             internal_value = intellij_common.struct(
-                common = intellij_common.struct(
+                java_common = intellij_common.struct(
                     jars = _get_jvm_outputs(target, ctx),
                     jdeps = [artifact_location.from_file(jo.jdeps) for jo in target[JavaInfo].java_outputs if jo.jdeps != None],
                     javac_opts = _get_javacopts(target, ctx),

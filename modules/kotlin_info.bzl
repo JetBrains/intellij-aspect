@@ -180,7 +180,7 @@ def _aspect_impl(target, ctx):
                 module_name = getattr(target[KtJvmInfo], "module_name", None),
             ),
             internal_value = intellij_common.struct(
-                common = intellij_common.struct(
+                java_common = intellij_common.struct(
                     jars = _get_jvm_outputs(target),
                     javac_opts = _get_additional_javac_options(ctx),
                 ),
