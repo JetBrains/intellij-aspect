@@ -7,7 +7,7 @@ bazel_dep(name = "protobuf", version = "34.1")
 bazel_dep(name = "rules_java", version = "9.6.1")
 bazel_dep(name = "rules_kotlin", version = "2.3.20")
 bazel_dep(name = "rules_jvm_external", version = "6.10")
-bazel_dep(name = "aspect_rules_lint", version = "2.3.0")
+bazel_dep(name = "aspect_rules_lint", version = "2.5.0")
 bazel_dep(name = "buildifier_prebuilt", version = "8.0.3")
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
