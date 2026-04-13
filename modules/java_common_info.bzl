@@ -33,9 +33,10 @@ def _aspect_impl(target, ctx):
     value = {}
 
     for it in intellij_provider.JVM_MODULES:
-        contribution = getattr(intellij_provider.get(target, it).internal_value, "common", None)
-        if not contribution:
+        contributor = intellij_provider.get(target, it)
+        if not contributor:
             continue
+        contribution = getattr(contributor.internal_value, "common", struct())
         for k in _LIST_FIELDS:
             value[k] = value.get(k, []) + getattr(contribution, k, [])
         for k in _BOOL_FIELDS:
