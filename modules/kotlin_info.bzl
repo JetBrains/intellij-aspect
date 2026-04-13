@@ -145,6 +145,22 @@ def _get_associates(target, ctx):
                     additional_associates = additional_associates + [str(target.label) for target in getattr(provider_value.internal_value, "exports", [])]
     return associates_labels + additional_associates
 
+def _get_generated_jars(target, ctx):
+    if hasattr(target[KtJvmInfo], "annotation_processing") and target[KtJvmInfo].annotation_processing and target[KtJvmInfo].annotation_processing.enabled:
+        class_jars = [jar for jar in target[KtJvmInfo].annotation_processing.class_jar if jar != None]
+        source_jars = [jar for jar in target[KtJvmInfo].annotation_processing.source_jar if jar != None]
+        if hasattr(target[KtJvmInfo], "additional_generated_source_jars"):
+            source_jars = source_jars + [jar for jar in target[KtJvmInfo].additional_generated_source_jars]
+        if hasattr(target[KtJvmInfo], "all_output_jars"):
+            class_jars = class_jars + [jar for jar in target[KtJvmInfo].all_output_jars]
+        return [
+            struct(
+                binary_jars = [artifact_location.from_file(jar) for jar in class_jars],
+                source_jars = [artifact_location.from_file(jar) for jar in source_jars],
+            ),
+        ]
+    return []
+
 def _aspect_impl(target, ctx):
     if not KtJvmInfo in target:
         return [
@@ -182,6 +198,7 @@ def _aspect_impl(target, ctx):
             internal_value = intellij_common.struct(
                 java_common = intellij_common.struct(
                     jars = _get_jvm_outputs(target),
+                    generated_jars = _get_generated_jars(target, ctx),
                     javac_opts = _get_additional_javac_options(ctx),
                 ),
                 exports = intellij_common.attr_as_label_list(ctx, "exports"),

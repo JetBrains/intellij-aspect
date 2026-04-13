@@ -37,3 +37,11 @@ test_fixture(
     modules = _MODULES,
     targets = ["//..."],
 )
+
+test_fixture(
+    name = "plugin",
+    srcs = glob(["plugin/**"]),
+    aspects = _ASPECTS,
+    modules = _MODULES,
+    targets = ["//:java_lib"],
+)
