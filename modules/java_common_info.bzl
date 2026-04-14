@@ -36,7 +36,7 @@ def _aspect_impl(target, ctx):
         contributor = intellij_provider.get(target, it)
         if not contributor:
             continue
-        contribution = getattr(contributor.internal_value, "common", struct())
+        contribution = getattr(contributor.internal_value, "java_common", struct())
         for k in _LIST_FIELDS:
             value[k] = value.get(k, []) + getattr(contribution, k, [])
         for k in _BOOL_FIELDS:

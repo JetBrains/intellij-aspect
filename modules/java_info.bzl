@@ -73,6 +73,16 @@ def _get_jvm_outputs(target, ctx):
 def _has_api_generating_plugins(target, ctx):
     return len(target[JavaInfo].api_generating_plugins.processor_classes.to_list()) > 0
 
+def _get_generated_jars(target):
+    return [
+        struct(
+            binary_jars = [artifact_location.from_file(output.generated_class_jar)],
+            source_jars = [artifact_location.from_file(output.generated_source_jar)],
+        )
+        for output in target[JavaInfo].java_outputs
+        if (output != None) and (output.generated_class_jar != None)
+    ]
+
 def _aspect_impl(target, ctx):
     if not JavaInfo in target:
         return [
@@ -94,8 +104,9 @@ def _aspect_impl(target, ctx):
             },
             toolchains = intellij_deps.find_toolchains(ctx, JAVA_TOOLCHAIN_TYPE),
             internal_value = intellij_common.struct(
-                common = intellij_common.struct(
+                java_common = intellij_common.struct(
                     jars = _get_jvm_outputs(target, ctx),
+                    generated_jars = _get_generated_jars(target),
                     jdeps = [artifact_location.from_file(jo.jdeps) for jo in target[JavaInfo].java_outputs if jo.jdeps != None],
                     javac_opts = _get_javacopts(target, ctx),
                 ),
