@@ -146,7 +146,7 @@ def _get_associates(target, ctx):
     return associates_labels + additional_associates
 
 def _get_generated_jars(target, ctx):
-    if hasattr(target[KtJvmInfo], "annotation_processing") and target[KtJvmInfo].annotation_processing and target[KtJvmInfo].annotation_processing.enabled:
+    if getattr(target[KtJvmInfo], "annotation_processing", None) and target[KtJvmInfo].annotation_processing.enabled:
         class_jars = [jar for jar in target[KtJvmInfo].annotation_processing.class_jar if jar != None]
         source_jars = [jar for jar in target[KtJvmInfo].annotation_processing.source_jar if jar != None]
         if hasattr(target[KtJvmInfo], "additional_generated_source_jars"):
