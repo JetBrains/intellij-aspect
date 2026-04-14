@@ -60,7 +60,7 @@ def _source_jars(output):
         return [output.source_jar]
     return []
 
-def _get_jvm_outputs(target, ctx):
+def _get_jvm_outputs(target):
     return [
         intellij_common.struct(
             binary_jars = [artifact_location.from_file(output.class_jar)] if output.class_jar else [],
@@ -70,7 +70,7 @@ def _get_jvm_outputs(target, ctx):
         for output in target[JavaInfo].java_outputs
     ]
 
-def _has_api_generating_plugins(target, ctx):
+def _has_api_generating_plugins(target):
     return len(target[JavaInfo].api_generating_plugins.processor_classes.to_list()) > 0
 
 def _get_generated_jars(target):
@@ -93,7 +93,7 @@ def _aspect_impl(target, ctx):
             provider = intellij_provider.JavaInfo,
             value = intellij_common.struct(
                 full_compile_jars = artifact_location.from_depset(target[JavaInfo].full_compile_jars),
-                has_api_generating_plugins = _has_api_generating_plugins(target, ctx),
+                has_api_generating_plugins = _has_api_generating_plugins(target),
             ),
             dependencies = {
                 intellij_deps.COMPILE_TIME: intellij_deps.collect(
@@ -105,7 +105,7 @@ def _aspect_impl(target, ctx):
             toolchains = intellij_deps.find_toolchains(ctx, JAVA_TOOLCHAIN_TYPE),
             internal_value = intellij_common.struct(
                 java_common = intellij_common.struct(
-                    jars = _get_jvm_outputs(target, ctx),
+                    jars = _get_jvm_outputs(target),
                     generated_jars = _get_generated_jars(target),
                     jdeps = [artifact_location.from_file(jo.jdeps) for jo in target[JavaInfo].java_outputs if jo.jdeps != None],
                     javac_opts = _get_javacopts(target, ctx),
