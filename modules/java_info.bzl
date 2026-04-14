@@ -27,6 +27,8 @@ COMPILE_TIME_DEPS = [
     "runtime_jdk",
 ]
 
+IMPORT_RULE_KIND = ["java_import", "jvm_import", "kt_jvm_import"]
+
 def _get_javacopts_from_context(ctx):
     javacopts_raw = getattr(ctx.rule.attr, "javacopts", [])
     if javacopts_raw == None:  # "javacopts" might exist in ctx.rule.attr as None
@@ -83,6 +85,43 @@ def _get_generated_jars(target):
         if (output != None) and (output.generated_class_jar != None)
     ]
 
+def _runtime_jars(target):
+    compilation_info = getattr(target[JavaInfo], "compilation_info", None)
+    if compilation_info:
+        return compilation_info.runtime_classpath
+    return getattr(target[JavaInfo], "transitive_runtime_jars", depset())
+
+def _compile_jars(target):
+    compilation_info = getattr(target[JavaInfo], "compilation_info", None)
+    return compilation_info.compilation_classpath if compilation_info else depset()
+
+def _get_outputs(target, ctx):
+    resolve_files = []
+    resolve_transitives = []
+    for out in target[JavaInfo].java_outputs:
+        if getattr(out, "compile_jar", None):
+            resolve_files += [out.compile_jar]
+        elif getattr(out, "ijar", None):
+            resolve_files += [out.ijar]
+        if getattr(out, "class_jar", None):
+            resolve_files += [out.class_jar]
+        if getattr(out, "source_jars", None):
+            if type(out.source_jars) == "depset":
+                resolve_transitives += [out.source_jars]
+            else:
+                resolve_files += out.source_jars
+    if intellij_common.label_is_external(target.label) or (ctx.rule.kind in IMPORT_RULE_KIND):
+        return {"intellij-sync-java": depset(resolve_files, transitive = resolve_transitives + [
+            _runtime_jars(target),
+            _compile_jars(target),
+            target[JavaInfo].transitive_source_jars,
+        ])}
+    else:
+        return {"intellij-build-java": depset(
+            resolve_files + [jo.jdeps for jo in target[JavaInfo].java_outputs if jo.jdeps != None],
+            transitive = resolve_transitives,
+        )}
+
 def _aspect_impl(target, ctx):
     if not JavaInfo in target:
         return [
@@ -91,6 +130,7 @@ def _aspect_impl(target, ctx):
     return [
         intellij_provider.create(
             provider = intellij_provider.JavaInfo,
+            outputs = _get_outputs(target, ctx),
             value = intellij_common.struct(
                 full_compile_jars = artifact_location.from_depset(target[JavaInfo].full_compile_jars),
                 has_api_generating_plugins = _has_api_generating_plugins(target),
