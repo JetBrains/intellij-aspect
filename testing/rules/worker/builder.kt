@@ -30,7 +30,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 
-private val OUTPUT_GROUPS = listOf("intellij-info")
+private val INTELLIJ_INFO = "intellij-info"
 
 private val ASPECT_PREFIX = mapOf(
   AspectDeployment.BCR to "@intellij_aspect//",
@@ -72,14 +72,14 @@ fun main(args: Array<String>) {
       version,
       targets = input.targetsList,
       aspects = aspects,
-      outputGroups = OUTPUT_GROUPS,
+      outputGroups = listOf(INTELLIJ_INFO),
       profile = Path.of(input.outputProfile),
     )
     require(files.isNotEmpty()) { "no files were generated" }
 
     val builder = TestFixture.newBuilder()
     builder.config = input.config
-    files.map(::readInfoFile).forEach(builder::addTargets)
+    (files[INTELLIJ_INFO] ?: emptyList()).map(::readInfoFile).forEach(builder::addTargets)
 
     Files.newOutputStream(Path.of(input.outputProto)).use { outputStream ->
       builder.build().writeTo(outputStream)

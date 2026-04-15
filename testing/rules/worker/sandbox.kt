@@ -16,7 +16,7 @@
 
 package com.intellij.aspect.testing.rules.worker
 
-import com.intellij.aspect.private.lib.utils.parseBepFile
+import com.intellij.aspect.private.lib.utils.parseBepOutputGroups
 import com.intellij.aspect.private.lib.utils.unzip
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.BazelModule
 import java.io.IOException
@@ -60,7 +60,7 @@ class Sandbox(
     outputGroups: List<String> = emptyList(),
     flags: List<String> = emptyList(),
     profile: Path? = null,
-  ): List<Path> {
+  ): Map<String, Set<Path>> {
     val cmd = mutableListOf<String>()
     cmd.add(server.sharedResources.bazeliskBinary.toAbsolutePath().toString())
     cmd.add("--output_user_root=" + server.outputRootDirectory)
@@ -104,7 +104,7 @@ class Sandbox(
       throw IOException("Bazel build failed: ${cmd.joinToString(" ")}")
     }
 
-    return parseBepFile(bepFile)
+    return parseBepOutputGroups(bepFile)
   }
 
   @Throws(IOException::class)

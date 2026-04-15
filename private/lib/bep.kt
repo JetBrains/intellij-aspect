@@ -16,32 +16,79 @@
 
 package com.intellij.aspect.private.lib.utils
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.io.IOException
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.toPath
+import kotlin.let
 
 private val MAPPER = ObjectMapper()
 
 /**
- * Parses a single BEP JSON event and extracts file URIs from the
- * namedSetOfFiles.files array.
+ * Collect all output groups mentioned in a sequence of BEP events.
+ *
+ * As we only use this parser for small examples, we can afford to materialize the intermediate sets.
  */
-fun parseBepEvent(event: String): List<Path> {
+private class OutputGroupParser() {
+  private val outputGroups = mutableMapOf<String, Set<Path>>()
+  private val namedSets = mutableMapOf<String, Set<Path>>()
+
+  fun noteEvent(event: String) {
+    val root = MAPPER.readTree(event)
+
+    root.get("id", "namedSet", "id")?.let { id ->
+      val files = root.get("namedSetOfFiles", "files") ?: emptyList()
+      var paths = files.mapNotNull { it.get("uri")?.asText() }.map { URI(it).toPath() }.toSet()
+      root.get("namedSetOfFiles", "fileSets")?.mapNotNull { it.get("id") }?.forEach {
+        paths = paths union (namedSets[it.asText()] ?: emptySet())
+      }
+      namedSets[id.asText()] = paths
+    }
+
+    root.get("completed", "outputGroup")?.forEach { outputGroup ->
+      val name = outputGroup.get("name")?.asText() ?: ""
+      var entries = outputGroups[name] ?: emptySet()
+      outputGroup.get("fileSets")?.mapNotNull { it.get("id") }?.forEach {
+        entries = entries union (namedSets[it.asText()] ?: emptySet())
+      }
+      outputGroups[name] = entries
+    }
+  }
+
+  fun build(): Map<String, Set<Path>> = outputGroups
+}
+
+private fun JsonNode.get(vararg path: String): JsonNode? {
+  return path.fold(this) { node, element -> node.get(element) ?: return null }
+}
+
+/**
+ * Parses an entire BEP file and extract output groups.
+ */
+@Throws(IOException::class)
+fun parseBepOutputGroups(bepFile: Path): Map<String, Set<Path>> {
+  val parser = OutputGroupParser()
+  Files.newBufferedReader(bepFile).use { reader ->
+    reader.lineSequence().forEach { parser.noteEvent(it) }
+  }
+  return parser.build()
+}
+
+private fun parseBepFileEvent(event: String): List<Path> {
   val root = MAPPER.readTree(event)
   val files = root.get("namedSetOfFiles")?.get("files") ?: return emptyList()
-
   return files.mapNotNull { it.get("uri")?.asText() }.map { URI(it).toPath() }
 }
 
 /**
- * Parses an entire BEP file and extracts all file URIs.
+ * Parses an entire BEP file and extracts all file URIs mentioned.
  */
 @Throws(IOException::class)
-fun parseBepFile(bepFile: Path): List<Path> {
+fun parseBepFileForFiles(bepFile: Path): List<Path> {
   return Files.newBufferedReader(bepFile).use { reader ->
-    reader.lineSequence().flatMap(::parseBepEvent).distinct().toList()
+    reader.lineSequence().flatMap(::parseBepFileEvent).distinct().toList()
   }
 }
