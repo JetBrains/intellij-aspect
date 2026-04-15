@@ -22,6 +22,7 @@ import com.intellij.aspect.lib.deployAspectZip
 import com.intellij.aspect.private.lib.utils.unzip
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.AspectDeployment
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.BazelModule
+import com.intellij.aspect.testing.rules.fixture.FixtureProto.OutputGroup
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.TestFixture
 import java.io.IOException
 import java.io.InputStreamReader
@@ -72,7 +73,7 @@ fun main(args: Array<String>) {
       version,
       targets = input.targetsList,
       aspects = aspects,
-      outputGroups = listOf(INTELLIJ_INFO),
+      outputGroups = listOf(INTELLIJ_INFO) + input.outputGroupsList,
       profile = Path.of(input.outputProfile),
     )
     require(files.isNotEmpty()) { "no files were generated" }
@@ -80,6 +81,12 @@ fun main(args: Array<String>) {
     val builder = TestFixture.newBuilder()
     builder.config = input.config
     (files[INTELLIJ_INFO] ?: emptyList()).map(::readInfoFile).forEach(builder::addTargets)
+    files.forEach { (name, files) ->
+      builder.addOutputs(
+        OutputGroup.newBuilder().setName(name)
+          .addAllFiles(files.map(::relativeToOutputBase)),
+      )
+    }
 
     Files.newOutputStream(Path.of(input.outputProto)).use { outputStream ->
       builder.build().writeTo(outputStream)

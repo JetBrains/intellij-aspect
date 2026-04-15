@@ -50,7 +50,7 @@ def test_module_deps(module_name, versions, **kwargs):
         actual = "%s_%s" % (module_name, versions[-1].replace(".", "_")),
     )
 
-def test_fixture(name, srcs, modules, aspects, targets, bazel = None, builtin = False, strip_prefix = ""):
+def test_fixture(name, srcs, modules, aspects, targets, output_groups = [], bazel = None, builtin = False, strip_prefix = ""):
     """Creates a test fixture with the result of the IntelliJ aspect applied to the project.
 
     Packages a small Bazel project, builds it with the aspect across multiple
@@ -139,6 +139,7 @@ def test_fixture(name, srcs, modules, aspects, targets, bazel = None, builtin = 
         project = name + "_project",
         testonly = 1,
         targets = targets,
+        output_groups = output_groups,
     )
 
 def _derive_test_class(test):

@@ -39,7 +39,13 @@ message TestConfig {
   string bazel_version = 4;
 }
 
+message OutputGroup {
+  string name = 1;
+  repeated string files = 2;
+}
+
 message TestFixture {
   TestConfig config = 1;
   repeated TargetIdeInfo targets = 2;
+  repeated OutputGroup outputs = 3;
 }

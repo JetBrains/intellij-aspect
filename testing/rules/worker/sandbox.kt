@@ -18,14 +18,13 @@ package com.intellij.aspect.testing.rules.worker
 
 import com.intellij.aspect.private.lib.utils.parseBepOutputGroups
 import com.intellij.aspect.private.lib.utils.unzip
-import com.intellij.aspect.testing.rules.fixture.FixtureProto.BazelModule
 import java.io.IOException
 import java.io.OutputStream
 import java.io.PrintStream
 import java.lang.AutoCloseable
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.StandardOpenOption
+import kotlin.io.path.relativeTo
 
 private const val PATH = "/usr/bin:/bin:/usr/local/bin"
 
@@ -111,6 +110,8 @@ class Sandbox(
   fun deployProject(archive: String) {
     unzip(Path.of(archive), projectDirectory)
   }
+
+  fun relativeToOutputBase(absolute: Path): String = absolute.relativeTo(server.outputBaseDirectory).toString()
 
   override fun close() {
     err.close()
