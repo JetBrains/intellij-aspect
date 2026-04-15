@@ -18,6 +18,8 @@ load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load(":provider.bzl", "intellij_provider")
 
+IMPORT_RULE_KIND = ["kt_jvm_import"]
+
 def _get_additional_javac_options(ctx):
     if TOOLCHAIN_TYPE not in ctx.toolchains:
         return []
@@ -161,6 +163,28 @@ def _get_generated_jars(target, ctx):
         ]
     return []
 
+def _get_outputs(target, ctx):
+    resolve_files = []
+    resolve_transitives = []
+    for out in target[KtJvmInfo].outputs.jars:
+        if getattr(out, "compile_jar", None):
+            resolve_files += [out.compile_jar]
+        elif getattr(out, "ijar", None):
+            resolve_files += [out.ijar]
+        if getattr(out, "class_jar", None):
+            resolve_files += [out.class_jar]
+        if getattr(out, "source_jars", None):
+            if type(out.source_jars) == "depset":
+                resolve_transitives += [out.source_jars]
+            else:
+                resolve_files += out.source_jars
+    if intellij_common.label_is_external(target.label) or (ctx.rule.kind in IMPORT_RULE_KIND):
+        return {"intellij-sync-java": depset(resolve_files, transitive = resolve_transitives + [
+            getattr(target[KtJvmInfo], "transitive_source_jars", depset()),
+        ])}
+    else:
+        return {"intellij-build-java": depset(resolve_files, transitive = resolve_transitives)}
+
 def _aspect_impl(target, ctx):
     if not KtJvmInfo in target:
         return [
@@ -181,6 +205,7 @@ def _aspect_impl(target, ctx):
     return [
         intellij_provider.create(
             provider = intellij_provider.KotlinInfo,
+            outputs = _get_outputs(target, ctx),
             value = intellij_common.struct(
                 language_version = getattr(target[KtJvmInfo], "language_version", None),
                 api_version = getattr(target[KtJvmInfo], "language_version", None),  # API version currently not exposed
