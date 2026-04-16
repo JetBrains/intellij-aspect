@@ -87,4 +87,15 @@ class SimpleTest {
     assertThat(target.kotlinTargetInfo.stdlibsList).isNotEmpty()
     assertThat(target.kotlinTargetInfo.languageVersion).isNotEmpty()
   }
+
+  @Test
+  fun testOutputs() {
+    val syncFiles = aspect.findOutputGroup("intellij-sync-java")
+    assertThat(syncFiles.filter { it.endsWith("/kotlin-stdlib.jar") }).isNotEmpty()
+    assertThat(syncFiles.filter { it.endsWith("/main.jar") }).isEmpty()
+
+    val buildFiles = aspect.findOutputGroup("intellij-build-java")
+    assertThat(buildFiles.filter { it.endsWith("/main.jar") }).isNotEmpty()
+    assertThat(buildFiles.filter { it.endsWith("/lib/util.jar") }).isNotEmpty()
+  }
 }
