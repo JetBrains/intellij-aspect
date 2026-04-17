@@ -15,6 +15,12 @@
  */
 package com.intellij.aspect.testing.tests.lib
 
+import com.google.common.truth.Correspondence
+import com.google.common.truth.IterableSubject
+import com.google.devtools.intellij.aspect.Common.ArtifactLocation
+import com.google.devtools.intellij.ideinfo.IdeInfo.Dependency
+import com.google.devtools.intellij.ideinfo.IdeInfo.Dependency.DependencyType
+
 inline fun <reified T : Any> assertNotNull(value: T?): T {
   return value ?: throw AssertionError("value of type ${T::class} is null")
 }
@@ -24,3 +30,19 @@ fun isMacOS(): Boolean = System.getProperty("os.name").lowercase().contains("mac
 fun isLinux(): Boolean = System.getProperty("os.name").lowercase().contains("linux")
 
 fun isWindows(): Boolean = System.getProperty("os.name").lowercase().contains("windows")
+
+fun IterableSubject.relativeArtifactPath(relativePath: String? = null): IterableSubject.UsingCorrespondence<ArtifactLocation, String> {
+  val predicate = Correspondence.BinaryPredicate<ArtifactLocation, String> { location, path ->
+    location.relativePath == path && (relativePath == null || location.relativePath == relativePath)
+  }
+
+  return comparingElementsUsing(Correspondence.from(predicate, "artifact relative path"))
+}
+
+fun IterableSubject.dependencyLabels(type: DependencyType): IterableSubject.UsingCorrespondence<Dependency, String> {
+  val predicate = Correspondence.BinaryPredicate<Dependency, String> { dependency, label ->
+    dependency.dependencyType == type && dependency.target.label == label
+  }
+
+  return comparingElementsUsing(Correspondence.from(predicate, "dependency label"))
+}

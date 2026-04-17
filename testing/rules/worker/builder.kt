@@ -31,7 +31,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 
-private val INTELLIJ_INFO = "intellij-info"
+private const val INTELLIJ_INFO = "intellij-info"
 
 private val ASPECT_PREFIX = mapOf(
   AspectDeployment.BCR to "@intellij_aspect//",
@@ -78,14 +78,11 @@ fun main(args: Array<String>) {
     )
     require(files.isNotEmpty()) { "no files were generated" }
 
-    val builder = TestFixture.newBuilder()
-    builder.config = input.config
-    (files[INTELLIJ_INFO] ?: emptyList()).map(::readInfoFile).forEach(builder::addTargets)
-    files.forEach { (name, files) ->
-      builder.addOutputs(
-        OutputGroup.newBuilder().setName(name)
-          .addAllFiles(files.map(::relativeToOutputBase)),
-      )
+    val builder = TestFixture.newBuilder().apply {
+      config = input.config
+
+      files[INTELLIJ_INFO]?.map(::readInfoFile)?.forEach(::addTargets)
+      files.entries.map(::createOutputGroup).forEach(::addOutputs)
     }
 
     Files.newOutputStream(Path.of(input.outputProto)).use { outputStream ->
@@ -102,6 +99,13 @@ private fun readInfoFile(path: Path): TargetIdeInfo {
 
     return builder.build()
   }
+}
+
+private fun Sandbox.createOutputGroup(entry: Map.Entry<String, Set<Path>>): OutputGroup {
+  return OutputGroup.newBuilder().apply {
+    name = entry.key
+    addAllFiles(entry.value.map(::relativeToOutputBase))
+  }.build()
 }
 
 @Throws(IOException::class)
