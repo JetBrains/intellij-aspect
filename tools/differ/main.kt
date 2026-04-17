@@ -56,13 +56,6 @@ fun main(args: Array<String>) {
     description = "Show detailed progress and stack traces",
   ).default(false)
 
-  val showFiltered by parser.option(
-    ArgType.Boolean,
-    shortName = "f",
-    fullName = "show-filtered",
-    description = "Show differences that were filtered by exception rules",
-  ).default(false)
-
   parser.parse(args)
 
   try {
