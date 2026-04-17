@@ -22,10 +22,10 @@ jobs:
         repository-cache: true
 
     - name: Build all targets
-      run: bazel build //... --lockfile_mode=error
+      run: bazel build //... --lockfile_mode=error --//testing/rules:repo_cache=~/.cache/bazel-repo
 
     - name: Test all targets
-      run: bazel test //... --test_output=errors
+      run: bazel test //... --test_output=errors --//testing/rules:repo_cache=~/.cache/bazel-repo
 
   format-check:
     runs-on: ubuntu-latest
