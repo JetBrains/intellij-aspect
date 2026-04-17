@@ -6,3 +6,6 @@ bazel-*
 .clwb/
 .idea/
 .bazelbsp/
+
+# user-specific configuration
+user.bazelrc

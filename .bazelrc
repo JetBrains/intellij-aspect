@@ -11,3 +11,6 @@ common --repo_env=ANDROID_HOME=""
 common --repo_env=ANDROID_SDK_ROOT=""
 common --repo_env=ANDROID_NDK_HOME=""
 common --repo_env=ANDROID_NDK_ROOT=""
+
+# User-specific .bazelrc
+try-import %workspace%/user.bazelrc
