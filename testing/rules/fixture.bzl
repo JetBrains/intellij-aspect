@@ -31,6 +31,7 @@ def _test_fixture_impl(ctx):
             bazelisk = ctx.file._bazelisk.path,
             registry_file = ctx.file._registry_file.path,
             max_servers = ctx.attr._max_servers[BuildSettingInfo].value,
+            repo_cache = ctx.attr._repo_cache[BuildSettingInfo].value,
         ))
 
         work_arguments = proto.encode_text(struct(
@@ -117,6 +118,9 @@ test_fixture = rule(
         ),
         "_max_servers": attr.label(
             default = Label("//testing/rules:max_servers"),
+        ),
+        "_repo_cache": attr.label(
+            default = Label("//testing/rules:repo_cache"),
         ),
     },
     implementation = _test_fixture_impl,

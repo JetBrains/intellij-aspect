@@ -30,6 +30,9 @@ message WorkerOptions {
 
   // Maximum number of concurrent Bazel servers per version.
   int32 max_servers = 3;
+
+  // The location of the shared repo cache. May be located in user defined location.
+  string repo_cache = 4;
 }
 
 // An input file.
