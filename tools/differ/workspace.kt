@@ -54,8 +54,8 @@ private val CURRENT_ASPECT = Aspect(
   deployDirectory = ASPECTS_DIRECTORY.resolve("current"),
   runfilesLocation = "archive_ide.zip",
   aspectTargets = listOf(
-    "/modules:cc_info.bzl%intellij_cc_info_aspect",
-    "/intellij:aspect.bzl%intellij_info_aspect",
+    "modules:cc_info.bzl%intellij_cc_info_aspect",
+    "intellij:aspect.bzl%intellij_info_aspect",
   ),
   outputGroups = listOf("intellij-info"),
 )
@@ -127,7 +127,7 @@ class TemporaryWorkspace(private val workspace: Path, private val bazelExecutabl
     workspaceRoot = workspace,
     bazelExecutable = bazelExecutable,
     outputGroups = config.outputGroups,
-    aspects = config.aspectTargets.map { "//${config.deployDirectory}$it" },
+    aspects = config.aspectTargets.map { "//${config.deployDirectory}/$it" },
     targets = listOf(target),
   )
 
