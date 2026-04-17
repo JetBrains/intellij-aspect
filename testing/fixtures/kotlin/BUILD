@@ -19,11 +19,17 @@ _ASPECTS = [
     "intellij:aspect.bzl%intellij_info_aspect",
 ]
 
+_OUTPUT_GROUPS = [
+    "intellij-sync-java",
+    "intellij-build-java",
+]
+
 test_fixture(
     name = "simple",
     srcs = glob(["simple/**"]),
     aspects = _ASPECTS,
     modules = _MODULES,
+    output_groups = _OUTPUT_GROUPS,
     targets = [
         "//:main",
     ],

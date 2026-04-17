@@ -22,6 +22,7 @@ import com.intellij.aspect.lib.deployAspectZip
 import com.intellij.aspect.private.lib.utils.unzip
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.AspectDeployment
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.BazelModule
+import com.intellij.aspect.testing.rules.fixture.FixtureProto.OutputGroup
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.TestFixture
 import java.io.IOException
 import java.io.InputStreamReader
@@ -30,7 +31,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 
-private val OUTPUT_GROUPS = listOf("intellij-info")
+private val INTELLIJ_INFO = "intellij-info"
 
 private val ASPECT_PREFIX = mapOf(
   AspectDeployment.BCR to "@intellij_aspect//",
@@ -72,14 +73,20 @@ fun main(args: Array<String>) {
       version,
       targets = input.targetsList,
       aspects = aspects,
-      outputGroups = OUTPUT_GROUPS,
+      outputGroups = listOf(INTELLIJ_INFO) + input.outputGroupsList,
       profile = Path.of(input.outputProfile),
     )
     require(files.isNotEmpty()) { "no files were generated" }
 
     val builder = TestFixture.newBuilder()
     builder.config = input.config
-    files.map(::readInfoFile).forEach(builder::addTargets)
+    (files[INTELLIJ_INFO] ?: emptyList()).map(::readInfoFile).forEach(builder::addTargets)
+    files.forEach { (name, files) ->
+      builder.addOutputs(
+        OutputGroup.newBuilder().setName(name)
+          .addAllFiles(files.map(::relativeToOutputBase)),
+      )
+    }
 
     Files.newOutputStream(Path.of(input.outputProto)).use { outputStream ->
       builder.build().writeTo(outputStream)

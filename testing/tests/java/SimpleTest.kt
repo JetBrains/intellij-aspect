@@ -113,4 +113,17 @@ class SimpleTest {
     assertThat(target.envInheritList).isEqualTo(listOf("PROPERTIES"))
     assertThat(target.envMap).isEqualTo(mapOf("PATH" to "/opt/test/bin:/bin:/usr/bin"))
   }
+
+  @Test
+  fun testOutputGroups() {
+    val syncFiles = aspect.findOutputGroup("intellij-sync-java")
+    assertThat(syncFiles).isNotEmpty() // contains at least the test runner
+    assertThat(syncFiles.filter { it.endsWith("main.jar") }).isEmpty()
+
+    val buildFiles = aspect.findOutputGroup("intellij-build-java")
+    assertThat(buildFiles.filter { it.endsWith("main.jar") }).isNotEmpty()
+    assertThat(buildFiles.filter { it.endsWith("main.jdeps") }).isNotEmpty()
+    assertThat(buildFiles.filter { it.endsWith("lib/libutil.jar") }).isNotEmpty()
+    assertThat(buildFiles.filter { it.endsWith("lib/libutil.jdeps") }).isNotEmpty()
+  }
 }

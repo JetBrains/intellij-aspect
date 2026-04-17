@@ -41,6 +41,7 @@ def _test_fixture_impl(ctx):
             aspect_ide_archive = ctx.file._aspect_ide.path,
             config = serialize_test_config(config),
             targets = ctx.attr.targets,
+            output_groups = ctx.attr.output_groups,
         ))
 
         flagfile = ctx.actions.declare_file("%s-%s_flagfile" % (ctx.label.name, unique_hash))
@@ -88,6 +89,9 @@ test_fixture = rule(
         "targets": attr.string_list(
             mandatory = True,
             doc = "list of targets to build for the fixture; do not use patterns",
+        ),
+        "output_groups": attr.string_list(
+            doc = "list of additional output groups to request",
         ),
         "_aspect_bcr": attr.label(
             allow_single_file = [".zip"],

@@ -128,4 +128,5 @@ message WorkArguments {
   // The fixture configuration and what targets to build.
   TestConfig config = 6;
   repeated string targets = 7;
+  repeated string output_groups = 8;
 }

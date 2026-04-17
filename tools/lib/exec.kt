@@ -15,7 +15,8 @@
  */
 package com.intellij.aspect.tools.lib
 
-import com.intellij.aspect.private.lib.utils.parseBepFile
+import com.intellij.aspect.private.lib.utils.parseBepFileForFiles
+import com.intellij.aspect.private.lib.utils.parseBepOutputGroups
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -71,7 +72,7 @@ fun executeBuild(
       throw IOException("BEP file was not created")
     }
 
-    return parseBepFile(bepFile)
+    return parseBepFileForFiles(bepFile)
   } finally {
     Files.delete(bepFile)
   }

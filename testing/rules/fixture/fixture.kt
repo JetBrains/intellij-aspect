@@ -73,6 +73,14 @@ class AspectFixture : ExternalResource() {
     }
   }
 
+  fun findOutputGroup(
+    group: String,
+  ): List<String> {
+    return requireNotNull(output.outputsList.firstOrNull { it.name == group }?.filesList) {
+      "Output group $group not present"
+    }
+  }
+
   fun findCIdeInfo(
     label: String,
     externalRepo: String? = null,

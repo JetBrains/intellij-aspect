@@ -16,16 +16,15 @@
 
 package com.intellij.aspect.testing.rules.worker
 
-import com.intellij.aspect.private.lib.utils.parseBepFile
+import com.intellij.aspect.private.lib.utils.parseBepOutputGroups
 import com.intellij.aspect.private.lib.utils.unzip
-import com.intellij.aspect.testing.rules.fixture.FixtureProto.BazelModule
 import java.io.IOException
 import java.io.OutputStream
 import java.io.PrintStream
 import java.lang.AutoCloseable
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.StandardOpenOption
+import kotlin.io.path.relativeTo
 
 private const val PATH = "/usr/bin:/bin:/usr/local/bin"
 
@@ -60,7 +59,7 @@ class Sandbox(
     outputGroups: List<String> = emptyList(),
     flags: List<String> = emptyList(),
     profile: Path? = null,
-  ): List<Path> {
+  ): Map<String, Set<Path>> {
     val cmd = mutableListOf<String>()
     cmd.add(server.sharedResources.bazeliskBinary.toAbsolutePath().toString())
     cmd.add("--output_user_root=" + server.outputRootDirectory)
@@ -104,13 +103,15 @@ class Sandbox(
       throw IOException("Bazel build failed: ${cmd.joinToString(" ")}")
     }
 
-    return parseBepFile(bepFile)
+    return parseBepOutputGroups(bepFile)
   }
 
   @Throws(IOException::class)
   fun deployProject(archive: String) {
     unzip(Path.of(archive), projectDirectory)
   }
+
+  fun relativeToOutputBase(absolute: Path): String = absolute.relativeTo(server.outputBaseDirectory).toString()
 
   override fun close() {
     err.close()
