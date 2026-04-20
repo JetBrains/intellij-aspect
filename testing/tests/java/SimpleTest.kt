@@ -54,11 +54,11 @@ class SimpleTest {
 
     // The toolchain dependency is reported
     val toolchains =
-      target.depsList.map { aspect.findTarget(it.target.label) }.filter { it.hasJavaToolchainIdeInfo() }
+      target.depsList.map { aspect.findTarget(it.target.label) }.filter { it.hasJavaToolchainInfo() }
     assertThat(toolchains).isNotEmpty()
-    assertThat(toolchains.first().javaToolchainIdeInfo.sourceVersion).isEqualTo("21")
-    assertThat(toolchains.first().javaToolchainIdeInfo.javaHome.relativePath).isNotEmpty()
-    assertThat(toolchains.first().javaToolchainIdeInfo.bootClasspathJavaHome.relativePath).contains("remotejdk")
+    assertThat(toolchains.first().javaToolchainInfo.sourceVersion).isEqualTo("21")
+    assertThat(toolchains.first().javaToolchainInfo.javaHome.relativePath).isNotEmpty()
+    assertThat(toolchains.first().javaToolchainInfo.bootClasspathJavaHome.relativePath).contains("remotejdk")
   }
 
   @Test
@@ -92,10 +92,10 @@ class SimpleTest {
 
     // The toolchain dependency is reported
     val toolchains =
-      target.depsList.map { aspect.findTarget(it.target.label) }.filter { it.hasJavaToolchainIdeInfo() }
+      target.depsList.map { aspect.findTarget(it.target.label) }.filter { it.hasJavaToolchainInfo() }
     assertThat(toolchains).isNotEmpty()
-    assertThat(toolchains.first().javaToolchainIdeInfo.sourceVersion).isEqualTo("21")
-    assertThat(toolchains.first().javaToolchainIdeInfo.javaHome.relativePath).isNotEmpty()
+    assertThat(toolchains.first().javaToolchainInfo.sourceVersion).isEqualTo("21")
+    assertThat(toolchains.first().javaToolchainInfo.javaHome.relativePath).isNotEmpty()
   }
 
   @Test

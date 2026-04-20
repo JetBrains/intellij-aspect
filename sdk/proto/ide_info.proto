@@ -214,7 +214,7 @@ message TargetIdeInfo {
 
   JvmTargetInfo jvm_target_info = 182;
   JavaProviderInfo java_provider = 180;
-  JavaToolchainInfo java_toolchain_ide_info = 181;
+  JavaToolchainInfo java_toolchain_info = 181;
   JavaCommonInfo java_common = 183;
 
 
