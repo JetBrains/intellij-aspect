@@ -22,9 +22,12 @@ load(":provider.bzl", "intellij_provider")
 
 COMPILE_TIME_DEPS = [
     "jars",
-    "_java_toolchain",
     "_jvm",
     "runtime_jdk",
+]
+
+TOOLCHAIN_DEPS = [
+    "_java_toolchain",
 ]
 
 IMPORT_RULE_KIND = ["java_import", "jvm_import", "kt_jvm_import"]
@@ -139,6 +142,10 @@ def _aspect_impl(target, ctx):
                 intellij_deps.COMPILE_TIME: intellij_deps.collect(
                     ctx,
                     attributes = COMPILE_TIME_DEPS,
+                ),
+                intellij_deps.TOOLCHAIN: intellij_deps.collect(
+                    ctx,
+                    attributes = TOOLCHAIN_DEPS,
                     toolchain_types = [JAVA_TOOLCHAIN_TYPE],
                 ),
             },
