@@ -225,6 +225,7 @@ def _aspect_impl(target, ctx):
                     jars = _get_jvm_outputs(target),
                     generated_jars = _get_generated_jars(target, ctx),
                     javac_opts = _get_additional_javac_options(ctx),
+                    jvm_target = True,
                 ),
                 exports = intellij_common.attr_as_label_list(ctx, "exports"),
             ),

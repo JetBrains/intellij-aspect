@@ -149,6 +149,7 @@ def _aspect_impl(target, ctx):
                     generated_jars = _get_generated_jars(target),
                     jdeps = [artifact_location.from_file(jo.jdeps) for jo in target[JavaInfo].java_outputs if jo.jdeps != None],
                     javac_opts = _get_javacopts(target, ctx),
+                    jvm_target = True,
                 ),
                 exports = intellij_common.attr_as_label_list(ctx, "exports"),
             ),
