@@ -18,6 +18,7 @@ package com.intellij.aspect.tools.differ
 import com.google.devtools.intellij.ideinfo.IdeInfo.TargetIdeInfo
 import com.google.devtools.intellij.ideinfo.IdeInfo.TargetKey
 import com.google.protobuf.Descriptors
+import com.google.protobuf.MapEntry
 import com.google.protobuf.Message
 import com.google.protobuf.TextFormat
 import java.nio.file.Path
@@ -74,6 +75,7 @@ private fun compare(legacy: Any, current: Any): List<Difference> {
 
   return when (legacy) {
     is TargetKey -> compareField(legacy, current as TargetKey, "label")
+    is MapEntry<*, *> -> compareDefault(legacy, current)
     is Message -> compareMessage(legacy, current as Message)
     else -> compareDefault(legacy, current)
   }
