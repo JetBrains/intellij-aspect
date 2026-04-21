@@ -70,11 +70,18 @@ private fun Message.getDescriptor(): Descriptors.Descriptor {
   return requireNotNull(javaClass.getMethod("getDescriptor").invoke(null) as? Descriptors.Descriptor)
 }
 
+fun normaliseLabel(label: String): String {
+  if (label.startsWith("@//") or label.startsWith("@@//")) {
+    return label.trimStart { it == '@' }
+  }
+  return label
+}
+
 private fun compare(legacy: Any, current: Any): List<Difference> {
   require(legacy.javaClass == current.javaClass)
 
   return when (legacy) {
-    is TargetKey -> compareField(legacy, current as TargetKey, "label")
+    is TargetKey -> compare(normaliseLabel(legacy.label), normaliseLabel((current as TargetKey).label))
     is MapEntry<*, *> -> compareDefault(legacy, current)
     is Message -> compareMessage(legacy, current as Message)
     else -> compareDefault(legacy, current)
@@ -82,10 +89,6 @@ private fun compare(legacy: Any, current: Any): List<Difference> {
 }
 
 private fun areEqual(legacy: Any, current: Any): Boolean = compare(legacy, current).isEmpty()
-
-private fun compareField(legacy: Message, current: Message, name: String): List<Difference> {
-  return compareField(legacy, current, legacy.getDescriptor().findFieldByName(name))
-}
 
 /**
  * Bidirectional list comparison: checks that every legacy item exists in
