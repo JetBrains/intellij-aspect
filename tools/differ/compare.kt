@@ -15,6 +15,7 @@
  */
 package com.intellij.aspect.tools.differ
 
+import com.google.devtools.intellij.aspect.Common.ArtifactLocation
 import com.google.devtools.intellij.ideinfo.IdeInfo.TargetIdeInfo
 import com.google.devtools.intellij.ideinfo.IdeInfo.TargetKey
 import com.google.protobuf.Descriptors
@@ -77,12 +78,17 @@ fun normaliseLabel(label: String): String {
   return label
 }
 
+fun dropIsExternal(artifact: ArtifactLocation): ArtifactLocation {
+  return artifact.toBuilder().clearIsExternal().build()
+}
+
 private fun compare(legacy: Any, current: Any): List<Difference> {
   require(legacy.javaClass == current.javaClass)
 
   return when (legacy) {
     is TargetKey -> compare(normaliseLabel(legacy.label), normaliseLabel((current as TargetKey).label))
     is MapEntry<*, *> -> compareDefault(legacy, current)
+    is ArtifactLocation -> compareMessage(dropIsExternal(legacy), dropIsExternal(current as ArtifactLocation))
     is Message -> compareMessage(legacy, current as Message)
     else -> compareDefault(legacy, current)
   }
