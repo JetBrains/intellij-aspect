@@ -26,6 +26,10 @@ COMPILE_TIME_DEPS = [
     "runtime_jdk",
 ]
 
+EXPORTED_COMPILE_TIME_DEPS = [
+    "exports",
+]
+
 TOOLCHAIN_DEPS = [
     "_java_toolchain",
 ]
@@ -142,6 +146,10 @@ def _aspect_impl(target, ctx):
                 intellij_deps.COMPILE_TIME: intellij_deps.collect(
                     ctx,
                     attributes = COMPILE_TIME_DEPS,
+                ),
+                intellij_deps.EXPORTED_COMPILE_TIME: intellij_deps.collect(
+                    ctx,
+                    attributes = EXPORTED_COMPILE_TIME_DEPS,
                 ),
                 intellij_deps.TOOLCHAIN: intellij_deps.collect(
                     ctx,
