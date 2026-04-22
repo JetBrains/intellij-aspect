@@ -156,6 +156,15 @@ message KotlinTargetInfo {
   repeated string exported_compiler_plugin_targets_from_deps = 601;
 }
 
+message ProtobufSourceMapping {
+  string import_path = 1;
+  ArtifactLocation proto_file = 2;
+}
+
+message ProtobufTargetInfo {
+  repeated ProtobufSourceMapping source_mappings = 1;
+}
+
 message TestInfo {
   string size = 1;
 }
@@ -218,6 +227,7 @@ message TargetIdeInfo {
   JavaToolchainInfo java_toolchain_info = 181;
   JavaCommonInfo java_common = 183;
 
-
   KotlinTargetInfo kotlin_target_info = 190;
+
+  ProtobufTargetInfo protobuf_target_info = 200;
 }

@@ -20,11 +20,13 @@ enum class Languages {
   CC,
   JAVA,
   KOTLIN,
+  PROTO,
 }
 
 // Aspects in correct (topological) order together with the languages for which they should be present.
 private val aspectsWithLanguages =
   listOf(
+    "modules:protobuf_info.bzl%intellij_protobuf_info_aspect" to setOf(Languages.PROTO),
     "modules:cc_info.bzl%intellij_cc_info_aspect" to setOf(Languages.CC),
     "modules:java_info.bzl%intellij_java_info_aspect" to setOf(Languages.JAVA),
     "modules:kotlin_info.bzl%intellij_kotlin_info_aspect" to setOf(Languages.KOTLIN),

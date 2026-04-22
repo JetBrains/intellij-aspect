@@ -32,6 +32,7 @@ _IntelliJJvmInfo = _intellij_module_provider()
 _IntelliJJavaInfo = _intellij_module_provider()
 _IntelliJKotlinInfo = _intellij_module_provider()
 _IntelliJTestInfo = _intellij_module_provider()
+_IntelliJProtoInfo = _intellij_module_provider()
 
 _MODULE_PROVIDERS = {
     "c_ide_info": _IntelliJCcInfo,
@@ -41,6 +42,7 @@ _MODULE_PROVIDERS = {
     "java_provider": _IntelliJJavaInfo,
     "kotlin_target_info": _IntelliJKotlinInfo,
     "test_info": _IntelliJTestInfo,
+    "protobuf_target_info": _IntelliJProtoInfo,
 }
 
 # Modules implying that jvm_info should run on the respective targets to obtain
@@ -121,6 +123,7 @@ intellij_provider = struct(
     KotlinInfo = _IntelliJKotlinInfo,
     PyInfo = _IntelliJPyInfo,
     TestInfo = _IntelliJTestInfo,
+    ProtoInfo = _IntelliJProtoInfo,
     JVM_MODULES = _JVM_MODULES,
     MODULE_MAP = _MODULE_PROVIDERS,
     TOOLCHAINS = _TOOLCHAIN_PROVIDERS,
