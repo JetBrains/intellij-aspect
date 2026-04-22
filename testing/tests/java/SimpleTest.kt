@@ -57,8 +57,9 @@ class SimpleTest {
       target.depsList.map { aspect.findTarget(it.target.label) }.filter { it.hasJavaToolchainInfo() }
     assertThat(toolchains).isNotEmpty()
     assertThat(toolchains.first().javaToolchainInfo.sourceVersion).isEqualTo("21")
-    assertThat(toolchains.first().javaToolchainInfo.javaHome.relativePath).isNotEmpty()
-    assertThat(toolchains.first().javaToolchainInfo.bootClasspathJavaHome.relativePath).contains("remotejdk")
+    assertThat(toolchains.first().javaToolchainInfo.javaHome.rootPath).isNotEmpty()
+    assertThat(toolchains.first().javaToolchainInfo.javaHome.isExternal).isTrue()
+    assertThat(toolchains.first().javaToolchainInfo.bootClasspathJavaHome.rootPath).contains("remotejdk")
   }
 
   @Test
@@ -95,7 +96,7 @@ class SimpleTest {
       target.depsList.map { aspect.findTarget(it.target.label) }.filter { it.hasJavaToolchainInfo() }
     assertThat(toolchains).isNotEmpty()
     assertThat(toolchains.first().javaToolchainInfo.sourceVersion).isEqualTo("21")
-    assertThat(toolchains.first().javaToolchainInfo.javaHome.relativePath).isNotEmpty()
+    assertThat(toolchains.first().javaToolchainInfo.javaHome.rootPath).isNotEmpty()
   }
 
   @Test
