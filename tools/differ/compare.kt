@@ -144,8 +144,8 @@ data class Comparison(
 )
 
 fun compareTargets(legacy: List<TargetIdeInfo>, current: List<TargetIdeInfo>): Comparison {
-  val legacyByKey = legacy.associateBy { it.key.label }
-  val currentByKey = current.associateBy { it.key.label }
+  val legacyByKey = legacy.associateBy { it.key }
+  val currentByKey = current.associateBy { it.key }
 
   val commonKeys = legacyByKey.keys.intersect(currentByKey.keys)
 
@@ -155,7 +155,7 @@ fun compareTargets(legacy: List<TargetIdeInfo>, current: List<TargetIdeInfo>): C
     val diffs = compare(legacyByKey[key]!!, currentByKey[key]!!)
 
     if (diffs.isNotEmpty()) {
-      differences[key] = diffs
+      differences[key.toString()] = diffs
     }
   }
 
