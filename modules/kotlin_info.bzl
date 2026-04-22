@@ -20,6 +20,7 @@ load("//common:dependencies.bzl", "intellij_deps")
 load(":provider.bzl", "intellij_provider")
 
 IMPORT_RULE_KIND = ["kt_jvm_import"]
+COMPILE_DEPS = ["associates"]
 EXPORTED_COMPILE_TIME_DEPS = ["exports"]
 
 def _get_additional_javac_options(ctx):
@@ -223,6 +224,10 @@ def _aspect_impl(target, ctx):
                 module_name = getattr(target[KtJvmInfo], "module_name", None),
             ),
             dependencies = {
+                intellij_deps.COMPILE_TIME: intellij_deps.collect(
+                    ctx,
+                    attributes = COMPILE_DEPS,
+                ),
                 intellij_deps.EXPORTED_COMPILE_TIME: intellij_deps.collect(
                     ctx,
                     attributes = EXPORTED_COMPILE_TIME_DEPS,
