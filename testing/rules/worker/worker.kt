@@ -17,6 +17,7 @@
 package com.intellij.aspect.testing.rules.worker
 
 import com.intellij.aspect.private.lib.utils.parseTextProto
+import com.intellij.aspect.private.lib.utils.resolvePath
 import com.intellij.aspect.private.lib.utils.tee
 import com.intellij.aspect.private.lib.utils.unzip
 import com.intellij.aspect.testing.rules.worker.WorkerProto.*
@@ -139,7 +140,7 @@ private fun createResources(cwd: Path, options: WorkerOptions): SharedResources 
   unzip(Path.of(options.registryFile), registryDirectory, stripPrefix = 1)
 
   val repoCacheDirectory = options.repoCache.takeIf { it.isNotBlank() }
-    ?.let(Path::of)
+    ?.let(::resolvePath)
     ?: cwd.resolve("repo_cache")
 
   return SharedResources(
