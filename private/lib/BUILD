@@ -24,6 +24,11 @@ kt_jvm_library(
 )
 
 kt_jvm_library(
+    name = "path",
+    srcs = ["path.kt"],
+)
+
+kt_jvm_library(
     name = "bep",
     srcs = ["bep.kt"],
     deps = ["@maven//:com_fasterxml_jackson_core_jackson_databind"],

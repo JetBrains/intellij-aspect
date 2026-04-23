@@ -25,6 +25,7 @@ kt_jvm_library(
     deps = [
         ":worker_java_proto",
         "//private/lib:bep",
+        "//private/lib:path",
         "//private/lib:proto",
         "//private/lib:tee",
         "//private/lib:zip",
