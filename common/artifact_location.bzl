@@ -70,7 +70,7 @@ def _from_execpath(exec_path):
     return _create(
         root_path = root_exec_path_fragment,
         relative_path = relative_path,
-        is_external = root_exec_path_fragment.startswith("external/"),
+        is_external = root_exec_path_fragment.startswith("external/") or root_exec_path_fragment.startswith("../"),
         is_source = False,
     )
 
@@ -83,7 +83,7 @@ def _strip_root_path(path, root_path):
 
 def _strip_external_workspace_prefix(path):
     """Strips '../workspace_name/' prefix."""
-    if path.startswith("../"):
+    if path.startswith("../") or path.startswith("external/"):
         return "/".join(path.split("/")[2:])
     else:
         return path

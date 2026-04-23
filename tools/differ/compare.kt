@@ -15,9 +15,11 @@
  */
 package com.intellij.aspect.tools.differ
 
+import com.google.devtools.intellij.aspect.Common.ArtifactLocation
 import com.google.devtools.intellij.ideinfo.IdeInfo.TargetIdeInfo
 import com.google.devtools.intellij.ideinfo.IdeInfo.TargetKey
 import com.google.protobuf.Descriptors
+import com.google.protobuf.MapEntry
 import com.google.protobuf.Message
 import com.google.protobuf.TextFormat
 import java.nio.file.Path
@@ -69,21 +71,30 @@ private fun Message.getDescriptor(): Descriptors.Descriptor {
   return requireNotNull(javaClass.getMethod("getDescriptor").invoke(null) as? Descriptors.Descriptor)
 }
 
+fun normaliseLabel(label: String): String {
+  if (label.startsWith("@//") or label.startsWith("@@//")) {
+    return label.trimStart { it == '@' }
+  }
+  return label
+}
+
+fun dropIsExternal(artifact: ArtifactLocation): ArtifactLocation {
+  return artifact.toBuilder().clearIsExternal().build()
+}
+
 private fun compare(legacy: Any, current: Any): List<Difference> {
   require(legacy.javaClass == current.javaClass)
 
   return when (legacy) {
-    is TargetKey -> compareField(legacy, current as TargetKey, "label")
+    is TargetKey -> compare(normaliseLabel(legacy.label), normaliseLabel((current as TargetKey).label))
+    is MapEntry<*, *> -> compareDefault(legacy, current)
+    is ArtifactLocation -> compareMessage(dropIsExternal(legacy), dropIsExternal(current as ArtifactLocation))
     is Message -> compareMessage(legacy, current as Message)
     else -> compareDefault(legacy, current)
   }
 }
 
 private fun areEqual(legacy: Any, current: Any): Boolean = compare(legacy, current).isEmpty()
-
-private fun compareField(legacy: Message, current: Message, name: String): List<Difference> {
-  return compareField(legacy, current, legacy.getDescriptor().findFieldByName(name))
-}
 
 /**
  * Bidirectional list comparison: checks that every legacy item exists in
@@ -144,8 +155,8 @@ data class Comparison(
 )
 
 fun compareTargets(legacy: List<TargetIdeInfo>, current: List<TargetIdeInfo>): Comparison {
-  val legacyByKey = legacy.associateBy { it.key.label }
-  val currentByKey = current.associateBy { it.key.label }
+  val legacyByKey = legacy.associateBy { it.key }
+  val currentByKey = current.associateBy { it.key }
 
   val commonKeys = legacyByKey.keys.intersect(currentByKey.keys)
 
@@ -155,7 +166,7 @@ fun compareTargets(legacy: List<TargetIdeInfo>, current: List<TargetIdeInfo>): C
     val diffs = compare(legacyByKey[key]!!, currentByKey[key]!!)
 
     if (diffs.isNotEmpty()) {
-      differences[key] = diffs
+      differences[key.toString()] = diffs
     }
   }
 
