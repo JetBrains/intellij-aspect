@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Free disk space
+      uses: jlumbroso/free-disk-space@v1.3.1
+
     - name: Checkout code
       uses: actions/checkout@v4
 
@@ -22,10 +25,19 @@ jobs:
         repository-cache: true
 
     - name: Build all targets
-      run: bazel build //... --lockfile_mode=error --//testing/rules:repo_cache=~/.cache/bazel-repo
+      run: bazel build //... --lockfile_mode=error --//testing/rules:repo_cache=~/.cache/bazel-repo --execution_log_binary_file=/tmp/build_exec.log
 
     - name: Test all targets
-      run: bazel test //... --test_output=errors --//testing/rules:repo_cache=~/.cache/bazel-repo
+      run: bazel test //... --test_output=errors --//testing/rules:repo_cache=~/.cache/bazel-repo --execution_log_binary_file=/tmp/test_exec.log
+
+    - name: Upload execution logs
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: execution-logs
+        path: |
+          /tmp/build_exec.log
+          /tmp/test_exec.log
 
   format-check:
     runs-on: ubuntu-latest
