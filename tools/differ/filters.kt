@@ -51,7 +51,11 @@ object DefaultFilters {
    * These are new fields introduced by the new aspect which are not required in CLwB.
    */
   val NEW_FIELDS: DifferenceFilter = { diff ->
-    diff.path.equals("workspace_name") || diff.path.equals("executable")
+    (
+      diff.path.equals("workspace_name") || diff.path.equals("executable") ||
+        diff.path.startsWith("build_file_artifact_location")
+    ) &&
+      (diff.expected in setOf("", "false"))
   }
 
   /**
