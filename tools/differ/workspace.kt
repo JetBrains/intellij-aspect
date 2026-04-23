@@ -38,24 +38,38 @@ private val ASPECTS_DIRECTORY: Path = Path.of(".aspect")
  */
 private data class Aspect(
   val deployDirectory: Path,
-  val runfilesLocation: String,
+  val runfilesLocation: String?,
   val aspectTargets: List<String>,
   val outputGroups: List<String>,
 )
 
-private val CLWB_ASPECT = Aspect(
-  deployDirectory = ASPECTS_DIRECTORY.resolve("clwb"),
-  runfilesLocation = "tools/differ/clwb_aspect.zip",
-  aspectTargets = listOf(":intellij_info_bundled.bzl%intellij_info_aspect"),
-  outputGroups = listOf("intellij-info-generic", "intellij-info-cpp"),
+data class AspectOverride(
+  val deployDirectory: Path? = null,
+  val aspectTargets: List<String>? = null,
+  val outputGroups: List<String>? = null,
+)
+
+private fun Aspect.overrideWith(override: AspectOverride): Aspect {
+  return Aspect(
+    deployDirectory = override.deployDirectory ?: deployDirectory,
+    runfilesLocation = runfilesLocation,
+    aspectTargets = override.aspectTargets ?: aspectTargets,
+    outputGroups = override.outputGroups ?: outputGroups,
+  )
+}
+
+private val REFERENCE_ASPECT = Aspect(
+  deployDirectory = ASPECTS_DIRECTORY.resolve("reference"),
+  runfilesLocation = null,
+  aspectTargets = listOf(),
+  outputGroups = listOf(),
 )
 
 private val CURRENT_ASPECT = Aspect(
   deployDirectory = ASPECTS_DIRECTORY.resolve("current"),
   runfilesLocation = "archive_ide.zip",
   aspectTargets = listOf(
-    "/modules:cc_info.bzl%intellij_cc_info_aspect",
-    "/intellij:aspect.bzl%intellij_info_aspect",
+    "intellij:aspect.bzl%intellij_info_aspect",
   ),
   outputGroups = listOf("intellij-info"),
 )
@@ -67,14 +81,19 @@ private val CURRENT_ASPECT = Aspect(
 class TemporaryWorkspace(private val workspace: Path, private val bazelExecutable: String) : AutoCloseable {
 
   /**
-   * Extracts the CLwB aspect from the zip file and copies it into the
+   * Extracts the aspect from the zip file and copies it into the
    * workspace.
    */
   @Throws(IOException::class)
-  fun deployClwbAspect() {
-    val archive = RunfilesRepo.rlocation(CLWB_ASPECT.runfilesLocation)
+  fun deployReferenceAspect(
+    zipFile: String? = null,
+    deployDirectory: Path? = null,
+  ) {
+    val archive =
+      zipFile?.let { Path.of(it) } ?: RunfilesRepo.rlocation(REFERENCE_ASPECT.runfilesLocation)
+        ?: throw IllegalStateException("Reference aspect zip file has to be specified")
 
-    val destination = workspace.resolve(CLWB_ASPECT.deployDirectory)
+    val destination = workspace.resolve(deployDirectory ?: REFERENCE_ASPECT.deployDirectory)
     Files.createDirectories(destination)
 
     ZipFile(archive.toFile()).use { zip ->
@@ -117,17 +136,23 @@ class TemporaryWorkspace(private val workspace: Path, private val bazelExecutabl
   }
 
   @Throws(IOException::class)
-  fun runClwbAspect(target: String): List<Path> = runAspect(CLWB_ASPECT, target)
+  fun runReferenceAspect(
+    target: String,
+    override: AspectOverride,
+  ): List<Path> = runAspect(REFERENCE_ASPECT.overrideWith(override), target)
 
   @Throws(IOException::class)
-  fun runCurrentAspect(target: String): List<Path> = runAspect(CURRENT_ASPECT, target)
+  fun runCurrentAspect(
+    target: String,
+    override: AspectOverride,
+  ): List<Path> = runAspect(CURRENT_ASPECT.overrideWith(override), target)
 
   @Throws(IOException::class)
   private fun runAspect(config: Aspect, target: String): List<Path> = executeBuild(
     workspaceRoot = workspace,
     bazelExecutable = bazelExecutable,
     outputGroups = config.outputGroups,
-    aspects = config.aspectTargets.map { "//${config.deployDirectory}$it" },
+    aspects = config.aspectTargets.map { "//${config.deployDirectory}/$it" },
     targets = listOf(target),
   )
 

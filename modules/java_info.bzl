@@ -22,9 +22,16 @@ load(":provider.bzl", "intellij_provider")
 
 COMPILE_TIME_DEPS = [
     "jars",
-    "_java_toolchain",
     "_jvm",
     "runtime_jdk",
+]
+
+EXPORTED_COMPILE_TIME_DEPS = [
+    "exports",
+]
+
+TOOLCHAIN_DEPS = [
+    "_java_toolchain",
 ]
 
 IMPORT_RULE_KIND = ["java_import", "jvm_import", "kt_jvm_import"]
@@ -139,6 +146,14 @@ def _aspect_impl(target, ctx):
                 intellij_deps.COMPILE_TIME: intellij_deps.collect(
                     ctx,
                     attributes = COMPILE_TIME_DEPS,
+                ),
+                intellij_deps.EXPORTED_COMPILE_TIME: intellij_deps.collect(
+                    ctx,
+                    attributes = EXPORTED_COMPILE_TIME_DEPS,
+                ),
+                intellij_deps.TOOLCHAIN: intellij_deps.collect(
+                    ctx,
+                    attributes = TOOLCHAIN_DEPS,
                     toolchain_types = [JAVA_TOOLCHAIN_TYPE],
                 ),
             },
@@ -149,6 +164,7 @@ def _aspect_impl(target, ctx):
                     generated_jars = _get_generated_jars(target),
                     jdeps = [artifact_location.from_file(jo.jdeps) for jo in target[JavaInfo].java_outputs if jo.jdeps != None],
                     javac_opts = _get_javacopts(target, ctx),
+                    jvm_target = True,
                 ),
                 exports = intellij_common.attr_as_label_list(ctx, "exports"),
             ),

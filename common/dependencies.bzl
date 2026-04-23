@@ -16,6 +16,7 @@ load(":common.bzl", "intellij_common")
 
 # DependencyType enum; must match Dependency.DependencyType
 _COMPILE_TIME = 0
+_EXPORTED_COPILE_TIME = 3
 _RUNTIME = 1
 _TOOLCHAIN = 2
 
@@ -65,6 +66,7 @@ def _find_toolchains(ctx, *args):
 
 intellij_deps = struct(
     COMPILE_TIME = _COMPILE_TIME,
+    EXPORTED_COMPILE_TIME = _EXPORTED_COPILE_TIME,
     RUNTIME = _RUNTIME,
     TOOLCHAIN = _TOOLCHAIN,
     collect = _collect,

@@ -18,7 +18,6 @@ kt_jvm_library(
 java_binary(
     name = "differ",
     data = [
-        ":clwb_aspect.zip",
         "//:archive_ide",
     ],
     main_class = "com.intellij.aspect.tools.differ.MainKt",

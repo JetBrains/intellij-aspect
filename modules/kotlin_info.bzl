@@ -16,9 +16,11 @@ load("@rules_kotlin//kotlin/internal:defs.bzl", "KtCompilerPluginInfo", "KtJvmIn
 load("@rules_kotlin//kotlin/internal:opts.bzl", "JavacOptions", "KotlincOptions", "javac_options_to_flags", "kotlinc_options_to_flags")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
+load("//common:dependencies.bzl", "intellij_deps")
 load(":provider.bzl", "intellij_provider")
 
 IMPORT_RULE_KIND = ["kt_jvm_import"]
+EXPORTED_COMPILE_TIME_DEPS = ["exports"]
 
 def _get_additional_javac_options(ctx):
     if TOOLCHAIN_TYPE not in ctx.toolchains:
@@ -220,11 +222,18 @@ def _aspect_impl(target, ctx):
                 exported_compiler_plugin_targets_from_deps = [str(plugin.label) for plugin in plugins],
                 module_name = getattr(target[KtJvmInfo], "module_name", None),
             ),
+            dependencies = {
+                intellij_deps.EXPORTED_COMPILE_TIME: intellij_deps.collect(
+                    ctx,
+                    attributes = EXPORTED_COMPILE_TIME_DEPS,
+                ),
+            },
             internal_value = intellij_common.struct(
                 java_common = intellij_common.struct(
                     jars = _get_jvm_outputs(target),
                     generated_jars = _get_generated_jars(target, ctx),
                     javac_opts = _get_additional_javac_options(ctx),
+                    jvm_target = True,
                 ),
                 exports = intellij_common.attr_as_label_list(ctx, "exports"),
             ),

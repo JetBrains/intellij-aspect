@@ -175,6 +175,7 @@ message TargetKey {
 message Dependency {
   enum DependencyType {
     COMPILE_TIME = 0;
+    EXPORTED_COMPILE_TIME =3;
     RUNTIME = 1;
     TOOLCHAIN = 2;
   }
@@ -214,7 +215,7 @@ message TargetIdeInfo {
 
   JvmTargetInfo jvm_target_info = 182;
   JavaProviderInfo java_provider = 180;
-  JavaToolchainInfo java_toolchain_ide_info = 181;
+  JavaToolchainInfo java_toolchain_info = 181;
   JavaCommonInfo java_common = 183;
 
 

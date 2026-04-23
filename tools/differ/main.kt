@@ -17,6 +17,8 @@ package com.intellij.aspect.tools.differ
 
 import com.google.devtools.intellij.ideinfo.IdeInfo.TargetIdeInfo
 import com.google.protobuf.TextFormat
+import com.intellij.aspect.lib.Languages
+import com.intellij.aspect.lib.aspectsForLanguages
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.default
@@ -56,36 +58,79 @@ fun main(args: Array<String>) {
     description = "Show detailed progress and stack traces",
   ).default(false)
 
-  val showFiltered by parser.option(
-    ArgType.Boolean,
-    shortName = "f",
-    fullName = "show-filtered",
-    description = "Show differences that were filtered by exception rules",
-  ).default(false)
+  val referenceZipFile by parser.option(
+    ArgType.String,
+    shortName = "z",
+    fullName = "zipfile",
+    description = "Path to the zip file to compare the aspect against",
+  )
+
+  val deployDirectory by parser.option(
+    ArgType.String,
+    shortName = "d",
+    fullName = "deploy",
+    description = "Path to the directory to deploy the aspect to",
+  )
+
+  val referenceAspects by parser.option(
+    ArgType.String,
+    shortName = "a",
+    fullName = "aspects",
+    description = "Aspects to include in the reference aspect",
+  )
+
+  val referenceOutputGroups by parser.option(
+    ArgType.String,
+    shortName = "g",
+    fullName = "groups",
+    description = "Output groups to include in the reference aspect",
+  )
+
+  val deployLanguages by parser.option(
+    ArgType.String,
+    shortName = "l",
+    fullName = "languages",
+    description = "Languages to deploy the current aspect for",
+  )
 
   parser.parse(args)
 
   try {
+    val currentAspectsToRun = deployLanguages?.let { parseLanguages(it) }?.let { aspectsForLanguages(it.toSet()) }
     System.err.println("Running differ on project: $projectPath")
 
     // set up the temporary workspace
     TemporaryWorkspace(Path.of(projectPath), bazelExecutable).use { workspace ->
-      System.err.println("Deploying CLwB aspect...")
-      workspace.deployClwbAspect()
+      System.err.println("Deploying reference aspect...")
+      workspace.deployReferenceAspect(
+        zipFile = referenceZipFile,
+        deployDirectory = deployDirectory?.let {
+          Path.of(it)
+        },
+      )
 
-      val clwbFiles = workspace.runClwbAspect(targetPattern)
-      val clwbTargets = loadTargets(clwbFiles)
-      System.err.println("CLwB aspect generated: ${clwbFiles.size} files")
+      val referenceFiles = workspace.runReferenceAspect(
+        targetPattern,
+        AspectOverride(
+          deployDirectory = deployDirectory?.let {
+            Path.of(it)
+          },
+          aspectTargets = referenceAspects?.split(","),
+          outputGroups = referenceOutputGroups?.split(","),
+        ),
+      )
+      val referenceTargets = loadTargets(referenceFiles).map { normalizeTargetKeyLabel(it) }
+      System.err.println("Reference aspect generated: ${referenceFiles.size} files")
 
       System.err.println("Deploying current aspect...")
       workspace.deployCurrentAspect()
 
-      val currentFiles = workspace.runCurrentAspect(targetPattern)
+      val currentFiles = workspace.runCurrentAspect(targetPattern, AspectOverride(aspectTargets = currentAspectsToRun))
       val currentTargets = loadTargets(currentFiles)
       System.err.println("Current aspect generated: ${currentFiles.size} files")
 
       System.err.println("Comparing...")
-      val rawResult = compareTargets(clwbTargets, currentTargets)
+      val rawResult = compareTargets(referenceTargets, currentTargets)
 
       // Apply exception filters to suppress known benign differences
       val filterResult = filterDifferences(rawResult.differences, DefaultFilters.ALL)
@@ -124,3 +169,32 @@ fun loadTargets(files: List<Path>): List<TargetIdeInfo> {
     }
   }
 }
+
+// Normalize target key label to match the way our aspect represents targets
+// (without qualified name for the main repository).
+fun normalizeTargetKeyLabel(target: TargetIdeInfo): TargetIdeInfo {
+  return target.toBuilder()
+    .setKey(
+      target.key.toBuilder().setLabel(
+        if (target.key.label.startsWith("@@//") ||
+          target.key.label.startsWith("@//")
+        ) {
+          target.key.label.trimStart { it == '@' }
+        } else {
+          target.key.label
+        },
+      ).build(),
+    )
+    .build()
+}
+
+private fun stringToLangue(s: String): Languages {
+  return when (s) {
+    "cc" -> Languages.CC
+    "java" -> Languages.JAVA
+    "kotlin" -> Languages.KOTLIN
+    else -> throw IllegalArgumentException("Unknown language: $s")
+  }
+}
+
+fun parseLanguages(s: String) = s.split(",").map(::stringToLangue)
