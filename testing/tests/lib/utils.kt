@@ -31,18 +31,20 @@ fun isLinux(): Boolean = System.getProperty("os.name").lowercase().contains("lin
 
 fun isWindows(): Boolean = System.getProperty("os.name").lowercase().contains("windows")
 
-fun IterableSubject.relativeArtifactPath(relativePath: String? = null): IterableSubject.UsingCorrespondence<ArtifactLocation, String> {
+fun IterableSubject.relativeArtifactPath(
+  relativePath: String? = null,
+): IterableSubject.UsingCorrespondence<ArtifactLocation, String> {
   val predicate = Correspondence.BinaryPredicate<ArtifactLocation, String> { location, path ->
     location.relativePath == path && (relativePath == null || location.relativePath == relativePath)
   }
-
   return comparingElementsUsing(Correspondence.from(predicate, "artifact relative path"))
 }
 
-fun IterableSubject.dependencyLabels(type: DependencyType): IterableSubject.UsingCorrespondence<Dependency, String> {
+fun IterableSubject.dependencyLabels(
+  type: DependencyType,
+): IterableSubject.UsingCorrespondence<Dependency, String> {
   val predicate = Correspondence.BinaryPredicate<Dependency, String> { dependency, label ->
     dependency.dependencyType == type && dependency.target.label == label
   }
-
   return comparingElementsUsing(Correspondence.from(predicate, "dependency label"))
 }

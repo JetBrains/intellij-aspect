@@ -61,7 +61,9 @@ class AbseilTest {
   @Test
   fun testDeps() {
     val target = aspect.findTarget("//absl/algorithm:algorithm", externalRepo = "abseil-cpp")
-    assertThat(target.depsList).dependencyLabels(DependencyType.COMPILE_TIME).contains("@@abseil-cpp+//absl/base:config")
+    assertThat(target.depsList)
+      .dependencyLabels(DependencyType.COMPILE_TIME)
+      .contains("@@abseil-cpp+//absl/base:config")
   }
 
   @Test
