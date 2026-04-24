@@ -65,6 +65,21 @@ object DefaultFilters {
   }
 
   /**
+   * Filter to ignore a set of path prefixes (i.e., message subtrees) unconditionally.
+   * This can be useful for fields where the semantics changed deliberately (e.g., by expanding
+   * shell variables).
+   */
+  fun ignoreFields(pathPrefixString: String): DifferenceFilter {
+    val prefixStrings = pathPrefixString.split(",")
+    val pathPrefixes = prefixStrings.map {
+      it.split("/").fold(Path.of("")) { acc, fragment -> acc.resolve(fragment) }
+    }
+    return { diff ->
+      pathPrefixes.any { diff.path.startsWith(it) }
+    }
+  }
+
+  /**
    * All active filters. Add new filters to this list to enable them.
    */
   val ALL = listOf(

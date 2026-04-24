@@ -100,6 +100,13 @@ fun main(args: Array<String>) {
     description = "Path prefixes (i.e., message subtrees) to consider new in the current aspect",
   ).default("workspace_name,build_file_artifact_location")
 
+  val ignoreFields by parser.option(
+    ArgType.String,
+    shortName = "I",
+    fullName = "ignore-fields",
+    description = "Path prefixes (i.e., message subtrees) to ignore, regardless of the value in the reference aspect",
+  ).default("workspace_name,build_file_artifact_location")
+
   parser.parse(args)
 
   try {
@@ -140,7 +147,10 @@ fun main(args: Array<String>) {
       val rawResult = compareTargets(referenceTargets, currentTargets)
 
       // Apply exception filters to suppress known benign differences
-      val filters = DefaultFilters.ALL + listOf(DefaultFilters.newFields(newFields))
+      val filters = DefaultFilters.ALL + listOf(
+        DefaultFilters.newFields(newFields),
+        DefaultFilters.ignoreFields(ignoreFields),
+      )
       val filterResult = filterDifferences(rawResult.differences, filters)
       System.err.println("Filtered ${filterResult.filtered.values.sumOf { it.size }} benign differences")
 
