@@ -39,6 +39,13 @@ test_module_deps(
 )
 
 test_module_deps(
+    module_name = "protobuf",
+    versions = [
+        "34.1",
+    ],
+)
+
+test_module_deps(
     module_name = "rules_python",
     versions = [
         "1.4.0",
