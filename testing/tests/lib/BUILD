@@ -5,6 +5,11 @@ kt_jvm_library(
     name = "utils",
     srcs = ["utils.kt"],
     visibility = ["//testing/tests:__subpackages__"],
+    deps = [
+        "//sdk/proto:ide_info_java_proto",
+        "@maven//:com_google_truth_truth",
+        "@maven//:junit_junit",
+    ],
 )
 
 junit_test(

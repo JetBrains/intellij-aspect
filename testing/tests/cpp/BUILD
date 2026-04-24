@@ -24,3 +24,8 @@ test_runner(
     fixture = "//testing/fixtures/cpp:simple",
     test = "TestInfoTest.kt",
 )
+
+test_runner(
+    fixture = "//testing/fixtures/cpp:abseil",
+    test = "AbseilTest.kt",
+)
