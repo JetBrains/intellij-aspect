@@ -18,6 +18,7 @@ package com.intellij.aspect.testing.tests.cpp
 
 import com.google.common.truth.Truth.assertThat
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
+import com.intellij.aspect.testing.tests.lib.relativeArtifactPath
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,13 +34,13 @@ class InfoTest {
   @Test
   fun testSourcesList() {
     val info = aspect.findTarget("//lib:lib")
-    assertThat(info.srcsList.map { it.relativePath }).contains("lib/source.cc")
+    assertThat(info.srcsList).relativeArtifactPath().contains("lib/source.cc")
   }
 
   @Test
   fun testHeadersList() {
     val info = aspect.findCIdeInfo("//lib:lib")
-    assertThat(info.ruleContext.headersList.map { it.relativePath }).contains("lib/header.h")
+    assertThat(info.ruleContext.headersList).relativeArtifactPath().contains("lib/header.h")
   }
 
   @Test

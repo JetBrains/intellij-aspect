@@ -19,6 +19,7 @@ import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IdeInfo.PyIdeInfo.PythonSrcsVersion
 import com.google.devtools.intellij.ideinfo.IdeInfo.PyIdeInfo.PythonVersion
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
+import com.intellij.aspect.testing.tests.lib.relativeArtifactPath
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,7 +38,7 @@ class PyLibraryTest {
     assertThat(target.hasPyIdeInfo()).isTrue()
 
     assertThat(target.kind).isEqualTo("py_library")
-    assertThat(target.srcsList.map { it.relativePath }).containsExactly("lib.py")
+    assertThat(target.srcsList).relativeArtifactPath().containsExactly("lib.py")
     assertThat(target.pyIdeInfo.srcsVersion).isEqualTo(PythonSrcsVersion.SRC_PY3)
     assertThat(target.pyIdeInfo.pythonVersion).isEqualTo(PythonVersion.PY3)
   }
