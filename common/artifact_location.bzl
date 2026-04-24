@@ -32,7 +32,7 @@ def _from_file(file):
     if file == None:
         return None
 
-    relative_path = _strip_external_workspace_prefix(file.short_path)
+    relative_path = _strip_external_workspace_prefix(file.path)
     relative_path = _strip_root_path(relative_path, file.root.path)
 
     root_path = file.path[:-(len("/" + relative_path))]
