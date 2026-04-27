@@ -156,7 +156,7 @@ class TemporaryWorkspace(private val workspace: Path, private val bazelExecutabl
     outputGroups = config.outputGroups,
     aspects = config.aspectTargets.map { "//${config.deployDirectory}/$it" },
     targets = listOf(target),
-    verbose = verbose
+    verbose = verbose,
   )
 
   @OptIn(ExperimentalPathApi::class)

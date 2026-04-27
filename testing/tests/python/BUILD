@@ -14,3 +14,13 @@ test_runner(
     fixture = "//testing/fixtures/python:simple",
     test = "PyTestTest.kt",
 )
+
+test_runner(
+    fixture = "//testing/fixtures/python:simple",
+    test = "SimpleTest.kt",
+)
+
+test_runner(
+    fixture = "//testing/fixtures/python:withImports",
+    test = "WithImportsTest.kt",
+)
