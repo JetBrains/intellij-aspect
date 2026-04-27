@@ -26,7 +26,8 @@ def _intellij_module_provider():
     )
 
 _IntelliJCcInfo = _intellij_module_provider()
-_IntelliJPyInfo = _intellij_module_provider()
+_IntelliJPyInfo = _intellij_module_provider()  # rules_python-related information, as used by the CLion plugin
+_IntellijPythonInfo = _intellij_module_provider()  # rules_python-related information, as used by the IJ plugin
 _IntelliJJavaCommonInfo = _intellij_module_provider()
 _IntelliJJvmInfo = _intellij_module_provider()
 _IntelliJJavaInfo = _intellij_module_provider()
@@ -37,6 +38,7 @@ _IntelliJProtoInfo = _intellij_module_provider()
 _MODULE_PROVIDERS = {
     "c_ide_info": _IntelliJCcInfo,
     "py_ide_info": _IntelliJPyInfo,
+    "python_target_info": _IntellijPythonInfo,
     "jvm_target_info": _IntelliJJvmInfo,
     "java_common": _IntelliJJavaCommonInfo,
     "java_provider": _IntelliJJavaInfo,
@@ -122,6 +124,7 @@ intellij_provider = struct(
     JavaToolchainInfo = _IntelliJJavaToolchainInfo,
     KotlinInfo = _IntelliJKotlinInfo,
     PyInfo = _IntelliJPyInfo,
+    PythonInfo = _IntellijPythonInfo,
     TestInfo = _IntelliJTestInfo,
     ProtoInfo = _IntelliJProtoInfo,
     JVM_MODULES = _JVM_MODULES,

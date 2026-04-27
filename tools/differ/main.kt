@@ -214,6 +214,7 @@ fun normalizeTargetKeyLabel(target: TargetIdeInfo): TargetIdeInfo {
 private fun stringToLangue(s: String): Languages {
   return when (s) {
     "cc" -> Languages.CC
+    "python" -> Languages.PYTHON
     "java" -> Languages.JAVA
     "kotlin" -> Languages.KOTLIN
     "proto" -> Languages.PROTO
