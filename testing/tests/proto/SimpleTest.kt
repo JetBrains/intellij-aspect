@@ -17,7 +17,9 @@
 package com.intellij.aspect.testing.tests.proto
 
 import com.google.common.truth.Truth.assertThat
+import com.google.devtools.intellij.ideinfo.IdeInfo
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
+import com.intellij.aspect.testing.tests.lib.dependencyLabels
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,7 +36,8 @@ class SimpleTest {
   fun testConsumer() {
     val target = aspect.findTarget("//consumerJava:main")
     assertThat(target.kind).isEqualTo("java_binary")
-    assertThat(target.depsList.map { it.target.label }).contains("//libB:lib_b_java")
+    assertThat(target.depsList).dependencyLabels(IdeInfo.Dependency.DependencyType.COMPILE_TIME)
+      .contains("//libB:lib_b_java")
   }
 
   @Test
