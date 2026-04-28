@@ -2,7 +2,7 @@ module(name = "intellij_aspect_sdk")
 
 bazel_dep(name = "bazel_skylib", version = "1.9.0")
 bazel_dep(name = "rules_pkg", version = "1.2.0")
-bazel_dep(name = "protobuf", version = "34.1")
+bazel_dep(name = "protobuf", version = "35.0-rc1")
 bazel_dep(name = "rules_jvm_external", version = "6.10")
 bazel_dep(name = "aspect_rules_lint", version = "2.5.0")
 bazel_dep(name = "buildifier_prebuilt", version = "8.0.3")
