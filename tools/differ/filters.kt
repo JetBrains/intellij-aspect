@@ -15,6 +15,8 @@
  */
 package com.intellij.aspect.tools.differ
 
+import java.nio.file.Path
+
 /**
  * Filter that can suppress differences.
  * Simple predicate that takes a difference and returns true if it should be filtered out.
@@ -48,14 +50,33 @@ object DefaultFilters {
   }
 
   /**
-   * These are new fields introduced by the new aspect which are not required in CLwB.
+   * Filter to ignore a set of path prefixes (i.e., message subtrees) that are not
+   * provided by the current reference aspect. To ensure that those messages really
+   * are new, we enforce that the value read from the reference aspect is a default value.
    */
-  val NEW_FIELDS: DifferenceFilter = { diff ->
-    (
-      diff.path.equals("workspace_name") || diff.path.equals("executable") ||
-        diff.path.startsWith("build_file_artifact_location")
-    ) &&
-      (diff.expected in setOf("", "false"))
+  fun newFields(pathPrefixString: String): DifferenceFilter {
+    val prefixStrings = pathPrefixString.split(",")
+    val pathPrefixes = prefixStrings.map {
+      it.split("/").fold(Path.of("")) { acc, fragment -> acc.resolve(fragment) }
+    }
+    return { diff ->
+      pathPrefixes.any { diff.path.startsWith(it) } && (diff.expected in setOf("", "false"))
+    }
+  }
+
+  /**
+   * Filter to ignore a set of path prefixes (i.e., message subtrees) unconditionally.
+   * This can be useful for fields where the semantics changed deliberately (e.g., by expanding
+   * shell variables).
+   */
+  fun ignoreFields(pathPrefixString: String): DifferenceFilter {
+    val prefixStrings = pathPrefixString.split(",")
+    val pathPrefixes = prefixStrings.map {
+      it.split("/").fold(Path.of("")) { acc, fragment -> acc.resolve(fragment) }
+    }
+    return { diff ->
+      pathPrefixes.any { diff.path.startsWith(it) }
+    }
   }
 
   /**
@@ -64,7 +85,6 @@ object DefaultFilters {
   val ALL = listOf(
     ADDITIONAL_TOOLCHAIN,
     BUILD_FILE_NAME,
-    NEW_FIELDS,
   )
 }
 
