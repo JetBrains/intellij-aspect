@@ -171,6 +171,7 @@ def test_runner(test, fixture, deps = None, env = None):
         name = name + "_lib",
         srcs = [test],
         deps = (deps or []) + [
+            "//private/lib:platform",
             "//testing/rules/fixture:fixture_lib",
             "//testing/tests/lib:utils",
             "//sdk",

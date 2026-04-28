@@ -15,6 +15,7 @@
  */
 package com.intellij.aspect.lib
 
+import com.intellij.aspect.private.lib.utils.asBazelPath
 import java.nio.file.Path
 
 private val ALLOWED_BUILTIN_LOADS = listOf("@bazel_tools")
@@ -32,7 +33,7 @@ class TransformRelativePaths(private val prefix: Path) : Transformer {
       if (stmt.repository != Repository.Absolute) {
         stmt
       } else {
-        stmt.copy(path = prefix.resolve(stmt.path).toString())
+        stmt.copy(path = "${asBazelPath(prefix)}/${stmt.path}")
       }
     }
   }

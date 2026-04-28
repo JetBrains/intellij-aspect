@@ -16,12 +16,10 @@
 
 package com.intellij.aspect.testing.rules.worker
 
-import com.intellij.aspect.private.lib.utils.parseTextProto
-import com.intellij.aspect.private.lib.utils.resolvePath
-import com.intellij.aspect.private.lib.utils.tee
-import com.intellij.aspect.private.lib.utils.unzip
+import com.intellij.aspect.private.lib.utils.*
 import com.intellij.aspect.testing.rules.worker.WorkerProto.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
@@ -32,8 +30,6 @@ import java.nio.file.Path
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.ConcurrentLinkedQueue
-import kotlin.io.path.ExperimentalPathApi
-import kotlin.io.path.deleteRecursively
 
 fun worker(
   args: Array<String>,
@@ -55,69 +51,77 @@ fun worker(
   // keep track of fixed number of bazel servers per version
   val pools = mutableMapOf<String, ServerPool>()
 
-  while (true) {
-    val request = WorkRequest.parseDelimitedFrom(System.`in`) ?: break
-    val input = parseTextProto<WorkArguments>(request.argumentsList.joinToString(separator = "\n"))
+  coroutineScope {
+    while (true) {
+      val request = WorkRequest.parseDelimitedFrom(System.`in`) ?: break
+      val input = parseTextProtoResponseFile<WorkArguments>(request.argumentsList[0])
 
-    val pool = pools.getOrPut(input.config.bazelVersion) { ServerPool(input.config.bazelVersion, options.maxServers) }
+      val pool = pools.getOrPut(input.config.bazelVersion) { ServerPool(input.config.bazelVersion, options.maxServers) }
 
-    launch(Dispatchers.IO) {
-      val server = pool.acquireOrCreate { createServer(cwd, input.config.bazelVersion, shared) }
-      val sandbox = Files.createTempDirectory(cwd, "sandbox_").toAbsolutePath()
+      launch(Dispatchers.IO) {
+        val server = pool.acquireOrCreate { createServer(cwd, input.config.bazelVersion, shared) }
+        val sandbox = Files.createTempDirectory(cwd, "sandbox_").toAbsolutePath()
 
-      val stdout = ByteArrayOutputStream()
-      val stderr = ByteArrayOutputStream()
-
-      try {
-        Sandbox(
-          server = server,
-          sandboxRoot = sandbox,
-          stdout = tee(stdout, stderr),
-          stderr = stderr,
-        ).use { ctx -> body(ctx, input) }
-
-        if (request.verbosity > 0) {
-          System.err.write(stderr.toByteArray())
-        }
-
-        synchronized(System.out) {
-          WorkResponse.newBuilder()
-            .setExitCode(0)
-            .setRequestId(request.requestId)
-            .setOutput(stdout.toString())
-            .build()
-            .writeDelimitedTo(System.out)
-        }
-      } catch (e: Throwable) {
-        val builder = StringBuilder()
-        builder.appendLine(stderr.toString())
-        builder.appendLine()
-        builder.appendLine(e.stackTraceToString())
-
-        synchronized(System.out) {
-          WorkResponse.newBuilder()
-            .setExitCode(1)
-            .setRequestId(request.requestId)
-            .setOutput(builder.toString())
-            .build()
-            .writeDelimitedTo(System.out)
-        }
-      } finally {
-        pool.release(server)
+        val stdout = ByteArrayOutputStream()
+        val stderr = ByteArrayOutputStream()
 
         try {
-          @OptIn(ExperimentalPathApi::class)
-          sandbox.deleteRecursively()
-        } catch (_: IOException) {
-          // best effort cleanup during
+          Sandbox(
+            server = server,
+            sandboxRoot = sandbox,
+            stdout = tee(stdout, stderr),
+            stderr = stderr,
+          ).use { ctx -> body(ctx, input) }
+
+          if (request.verbosity > 0) {
+            System.err.write(stderr.toByteArray())
+          }
+
+          synchronized(System.out) {
+            WorkResponse.newBuilder()
+              .setExitCode(0)
+              .setRequestId(request.requestId)
+              .setOutput(stdout.toString())
+              .build()
+              .writeDelimitedTo(System.out)
+          }
+        } catch (e: Throwable) {
+          val builder = StringBuilder()
+          builder.appendLine(stderr.toString())
+          builder.appendLine()
+          builder.appendLine(e.stackTraceToString())
+
+          synchronized(System.out) {
+            WorkResponse.newBuilder()
+              .setExitCode(1)
+              .setRequestId(request.requestId)
+              .setOutput(builder.toString())
+              .build()
+              .writeDelimitedTo(System.out)
+          }
+        } finally {
+          pool.release(server)
+
+          try {
+            deleteRecursive(sandbox)
+          } catch (_: IOException) {
+            // best effort cleanup during
+          }
         }
       }
     }
   }
 
+  for (server in pools.values.flatMap { it.peakAvailable() }) {
+    try {
+      server.shutdown()
+    } catch (_: IOException) {
+      // best effort shutdown
+    }
+  }
+
   try {
-    @OptIn(ExperimentalPathApi::class)
-    cwd.deleteRecursively()
+    deleteRecursive(cwd)
   } catch (_: IOException) {
     // best effort cleanup during
   }
@@ -186,9 +190,29 @@ private class ServerPool(private val version: String, maxServers: Int) {
     available.add(server)
     semaphore.release()
   }
+
+  /** Unsafe access to all currently available servers. */
+  fun peakAvailable(): Iterable<BazelServer> = available
 }
 
 private fun log(message: String) {
   val time = LocalTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME)
   System.err.println("[$time] $message")
+}
+
+@Throws(IOException::class)
+private fun BazelServer.shutdown() {
+  val cmd = mutableListOf<String>()
+  cmd.add("--output_user_root=$outputRootDirectory")
+  cmd.add("--output_base=$outputBaseDirectory")
+  cmd.add("shutdown")
+
+  val process = ProcessBuilder(cmd)
+    .directory(outputBaseDirectory.toFile())
+    .redirectErrorStream(true)
+    .start()
+
+  if (process.waitFor() != 0) {
+    process.inputStream.transferTo(System.err)
+  }
 }

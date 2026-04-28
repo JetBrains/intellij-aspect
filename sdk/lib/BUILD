@@ -10,4 +10,5 @@ kt_jvm_library(
         "transformers.kt",
     ],
     visibility = ["//visibility:public"],
+    deps = ["//private/lib:path"],
 )

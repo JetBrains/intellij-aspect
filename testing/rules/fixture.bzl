@@ -45,12 +45,16 @@ def _test_fixture_impl(ctx):
             output_groups = ctx.attr.output_groups,
         ))
 
+        response_file = ctx.actions.declare_file("%s-%s_work_arguments.textproto" % (ctx.label.name, unique_hash))
+        ctx.actions.write(response_file, work_arguments)
+
         flagfile = ctx.actions.declare_file("%s-%s_flagfile" % (ctx.label.name, unique_hash))
-        ctx.actions.write(flagfile, work_arguments)
+        ctx.actions.write(flagfile, "PROTO:%s\n" % response_file.path)
 
         ctx.actions.run(
             inputs = [
                 flagfile,
+                response_file,
                 ctx.file._bazelisk,
                 ctx.file._registry_file,
                 ctx.file.project,

@@ -18,7 +18,7 @@ package com.intellij.aspect.testing.rules.fixture
 
 import com.google.devtools.intellij.ideinfo.IdeInfo.TargetIdeInfo
 import com.google.protobuf.TextFormat
-import com.intellij.aspect.private.lib.utils.parseTextProto
+import com.intellij.aspect.private.lib.utils.parseTextProtoResponseFile
 import com.intellij.aspect.testing.rules.fixture.BuilderProto.BuilderArguments
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.AspectDeployment
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.TestFixture
@@ -32,7 +32,7 @@ import kotlin.collections.map
 private const val INTELLIJ_INFO = "intellij-info"
 
 fun main(args: Array<String>) {
-  val arguments = parseTextProto<BuilderArguments>(args[0])
+  val arguments = parseTextProtoResponseFile<BuilderArguments>(args[0])
 
   val builder = TestFixture.newBuilder().apply {
     addAllOutputs(arguments.outputGroupsList)

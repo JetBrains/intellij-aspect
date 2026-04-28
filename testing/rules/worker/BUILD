@@ -26,6 +26,7 @@ kt_jvm_library(
         ":worker_java_proto",
         "//private/lib:bep",
         "//private/lib:path",
+        "//private/lib:platform",
         "//private/lib:proto",
         "//private/lib:tee",
         "//private/lib:zip",

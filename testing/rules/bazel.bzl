@@ -65,4 +65,4 @@ def resolve(spec):
             t = int(spec[len(op):])
             return [_VERSIONS[m] for m in sorted(_VERSIONS.keys()) if fn(m, t)]
 
-    return [resolve(int(spec))]
+    return [_VERSIONS[int(spec)]]

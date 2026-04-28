@@ -47,16 +47,25 @@ def _serialize_output_groups(targets):
 def _intellij_aspect_build_impl(ctx):
     output_proto = ctx.actions.declare_file("%s.intellij-aspect-fixture" % ctx.label.name)
 
-    builder_arguments = proto.encode_text(struct(
+    info_files = [
+        file
+        for dep in ctx.attr.deps
+        for file in dep[OutputGroupInfo]["intellij-info"].to_list()
+    ]
+
+    arguments = proto.encode_text(struct(
         output_proto = output_proto.path,
         output_groups = _serialize_output_groups(ctx.attr.deps),
         bazel_version = config.bazel_version,
     ))
 
+    response_file = ctx.actions.declare_file("%s_builder_arguments.textproto" % ctx.label.name)
+    ctx.actions.write(response_file, arguments)
+
     ctx.actions.run(
-        inputs = [file for dep in ctx.attr.deps for file in dep[OutputGroupInfo]["intellij-info"].to_list()],
+        inputs = [response_file] + info_files,
         executable = ctx.executable._builder,
-        arguments = [builder_arguments],
+        arguments = ["PROTO:" + response_file.path],
         outputs = [output_proto],
         mnemonic = "LocalFixtureBuilder",
         progress_message = "Building test fixture for %{label} [local build]",

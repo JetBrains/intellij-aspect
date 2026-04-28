@@ -1,5 +1,17 @@
 build --@protobuf//bazel/toolchains:prefer_prebuilt_protoc
 
+build --java_runtime_version=remotejdk_21 --java_language_version=21
+build --tool_java_runtime_version=remotejdk_21 --tool_java_language_version=21
+
+common --enable_platform_specific_config
+
+# pass the host's MSYS2 installation to the nested Bazel server
+build:windows --action_env=BAZEL_SH
+
+# avoid self-extracting Python zip launchers on Windows; their runfiles extraction can exceed MAX_PATH
+build --build_python_zip=no
+build --enable_runfiles
+
 # disallow network access by default to make sure our bazel caches work as intended
 build --sandbox_default_allow_network=false
 
