@@ -102,7 +102,7 @@ def _compile_jars(target):
     compilation_info = getattr(target[JavaInfo], "compilation_info", None)
     return compilation_info.compilation_classpath if compilation_info else depset()
 
-def _get_outputs(target, ctx):
+def _get_outputs(target, ctx, jdeps):
     resolve_files = []
     resolve_transitives = []
     for out in target[JavaInfo].java_outputs:
@@ -125,19 +125,40 @@ def _get_outputs(target, ctx):
         ])}
     else:
         return {"intellij-build-java": depset(
-            resolve_files + [jo.jdeps for jo in target[JavaInfo].java_outputs if jo.jdeps != None],
+            resolve_files + jdeps,
             transitive = resolve_transitives,
         )}
+
+def _get_jdeps(target, ctx):
+    jdeps = [jo.jdeps for jo in target[JavaInfo].java_outputs if jo.jdeps != None]
+
+    # See https://github.com/bazelbuild/bazel/pull/26898
+    # --experimental_inmemory_jdeps_files is true by default, which means jdeps won't be stored on disk with remote execution.
+    # So we just "materialize" the in-memory file by copying it onto disk.
+    materialized_jdeps = []
+    for raw_jdeps_file in jdeps:
+        materialized_jdeps_file = ctx.actions.declare_file("materialized_" + raw_jdeps_file.basename)
+        ctx.actions.run_shell(
+            inputs = [raw_jdeps_file],
+            outputs = [materialized_jdeps_file],
+            progress_message = "(IntelliJ Bazel plugin) Materializing jdeps %s" % raw_jdeps_file,
+            mnemonic = "IJBazelPluginMaterializeJdeps",
+            command = "cp '%s' '%s'" % (raw_jdeps_file.path, materialized_jdeps_file.path),
+            use_default_shell_env = True,
+        )
+        materialized_jdeps.append(materialized_jdeps_file)
+    return materialized_jdeps
 
 def _aspect_impl(target, ctx):
     if not JavaInfo in target:
         return [
             intellij_provider.JavaInfo(present = False),
         ]
+    jdeps = _get_jdeps(target, ctx)
     return [
         intellij_provider.create(
             provider = intellij_provider.JavaInfo,
-            outputs = _get_outputs(target, ctx),
+            outputs = _get_outputs(target, ctx, jdeps),
             value = intellij_common.struct(
                 full_compile_jars = artifact_location.from_depset(target[JavaInfo].full_compile_jars),
                 has_api_generating_plugins = _has_api_generating_plugins(target),
@@ -162,7 +183,7 @@ def _aspect_impl(target, ctx):
                 java_common = intellij_common.struct(
                     jars = _get_jvm_outputs(target),
                     generated_jars = _get_generated_jars(target),
-                    jdeps = [artifact_location.from_file(jo.jdeps) for jo in target[JavaInfo].java_outputs if jo.jdeps != None],
+                    jdeps = [artifact_location.from_file(jdep) for jdep in jdeps],
                     javac_opts = _get_javacopts(target, ctx),
                     jvm_target = True,
                 ),
