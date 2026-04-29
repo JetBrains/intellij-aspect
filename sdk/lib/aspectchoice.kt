@@ -18,6 +18,7 @@ package com.intellij.aspect.lib
 
 enum class Languages {
   CC,
+  PYTHON,
   JAVA,
   KOTLIN,
   PROTO,
@@ -28,11 +29,14 @@ private val aspectsWithLanguages =
   listOf(
     "modules:protobuf_info.bzl%intellij_protobuf_info_aspect" to setOf(Languages.PROTO),
     "modules:cc_info.bzl%intellij_cc_info_aspect" to setOf(Languages.CC),
+    "modules:py_info.bzl%intellij_py_info_aspect" to setOf(Languages.PYTHON),
+    "modules:python_info.bzl%intellij_python_info_aspect" to setOf(Languages.PYTHON),
     "modules:java_info.bzl%intellij_java_info_aspect" to setOf(Languages.JAVA),
     "modules:kotlin_info.bzl%intellij_kotlin_info_aspect" to setOf(Languages.KOTLIN),
     "modules:jvm_info.bzl%intellij_jvm_info_aspect" to setOf(Languages.JAVA, Languages.KOTLIN),
     "modules:java_common_info.bzl%intellij_java_common_info_aspect" to setOf(Languages.JAVA, Languages.KOTLIN),
-    "intellij:aspect.bzl%intellij_info_aspect" to setOf(Languages.CC, Languages.JAVA, Languages.KOTLIN),
+    "intellij:aspect.bzl%intellij_info_aspect" to
+      setOf(Languages.CC, Languages.PYTHON, Languages.JAVA, Languages.KOTLIN),
   )
 
 // For the specified languages, return the list of aspects to be run in correct order.

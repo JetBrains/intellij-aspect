@@ -64,6 +64,8 @@ def _from_attr(ctx, name):
     return _from_list(getattr(ctx.rule.attr, name, []))
 
 def _from_execpath(exec_path):
+    if exec_path == None:
+        return None
     relative_path = _strip_external_workspace_prefix(exec_path)
     root_exec_path_fragment = exec_path[:-(len("/" + relative_path))] if relative_path != "" else exec_path
 

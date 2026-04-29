@@ -81,6 +81,15 @@ message PyIdeInfo {
   bool is_code_generator = 7;
 }
 
+message PythonTargetInfo {
+  ArtifactLocation interpreter = 1;
+  string version = 2;
+  repeated string imports = 3;
+  repeated ArtifactLocation generated_sources = 5;
+  ArtifactLocation main = 6;
+  string main_module = 7;
+}
+
 message JsIdeInfo {
 }
 
@@ -218,6 +227,7 @@ message TargetIdeInfo {
   XcodeIdeInfo xcode_ide_info = 122;
 
   PyIdeInfo py_ide_info = 130;
+  PythonTargetInfo python_target_info = 131;
   JsIdeInfo js_ide_info = 150;
   TsIdeInfo ts_ide_info = 160;
   DartIdeInfo dart_ide_info = 170;

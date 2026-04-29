@@ -50,6 +50,7 @@ fun executeBuild(
   aspects: List<String>,
   targets: List<String>,
   startupFlags: List<String> = emptyList(),
+  verbose: Boolean = false,
 ): List<Path> {
   // create temp file in current workspace, deleted once the function returns
   val bepFile = Files.createTempFile(workspaceRoot, "bazel-build-", ".bep.json").toAbsolutePath()
@@ -65,6 +66,9 @@ fun executeBuild(
       *targets.toTypedArray(),
     )
 
+    if (verbose) {
+      println("Executing Bazel build command: ${cmd.joinToString(" ")}")
+    }
     // execute the build command in the current workspace root
     executeCommand(*cmd.toTypedArray(), pwd = workspaceRoot)
 
