@@ -139,21 +139,24 @@ class TemporaryWorkspace(private val workspace: Path, private val bazelExecutabl
   fun runReferenceAspect(
     target: String,
     override: AspectOverride,
-  ): List<Path> = runAspect(REFERENCE_ASPECT.overrideWith(override), target)
+    verbose: Boolean,
+  ): List<Path> = runAspect(REFERENCE_ASPECT.overrideWith(override), target, verbose)
 
   @Throws(IOException::class)
   fun runCurrentAspect(
     target: String,
     override: AspectOverride,
-  ): List<Path> = runAspect(CURRENT_ASPECT.overrideWith(override), target)
+    verbose: Boolean,
+  ): List<Path> = runAspect(CURRENT_ASPECT.overrideWith(override), target, verbose)
 
   @Throws(IOException::class)
-  private fun runAspect(config: Aspect, target: String): List<Path> = executeBuild(
+  private fun runAspect(config: Aspect, target: String, verbose: Boolean): List<Path> = executeBuild(
     workspaceRoot = workspace,
     bazelExecutable = bazelExecutable,
     outputGroups = config.outputGroups,
     aspects = config.aspectTargets.map { "//${config.deployDirectory}/$it" },
     targets = listOf(target),
+    verbose = verbose,
   )
 
   @OptIn(ExperimentalPathApi::class)

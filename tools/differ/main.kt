@@ -132,6 +132,7 @@ fun main(args: Array<String>) {
           aspectTargets = referenceAspects?.split(","),
           outputGroups = referenceOutputGroups?.split(","),
         ),
+        verbose,
       )
       val referenceTargets = loadTargets(referenceFiles).map { normalizeTargetKeyLabel(it) }
       System.err.println("Reference aspect generated: ${referenceFiles.size} files")
@@ -139,7 +140,11 @@ fun main(args: Array<String>) {
       System.err.println("Deploying current aspect...")
       workspace.deployCurrentAspect()
 
-      val currentFiles = workspace.runCurrentAspect(targetPattern, AspectOverride(aspectTargets = currentAspectsToRun))
+      val currentFiles = workspace.runCurrentAspect(
+        targetPattern,
+        AspectOverride(aspectTargets = currentAspectsToRun),
+        verbose,
+      )
       val currentTargets = loadTargets(currentFiles)
       System.err.println("Current aspect generated: ${currentFiles.size} files")
 
@@ -209,6 +214,7 @@ fun normalizeTargetKeyLabel(target: TargetIdeInfo): TargetIdeInfo {
 private fun stringToLangue(s: String): Languages {
   return when (s) {
     "cc" -> Languages.CC
+    "python" -> Languages.PYTHON
     "java" -> Languages.JAVA
     "kotlin" -> Languages.KOTLIN
     "proto" -> Languages.PROTO
