@@ -217,6 +217,7 @@ private fun stringToLangue(s: String): Languages {
     "python" -> Languages.PYTHON
     "java" -> Languages.JAVA
     "kotlin" -> Languages.KOTLIN
+    "go" -> Languages.GO
     "proto" -> Languages.PROTO
     else -> throw IllegalArgumentException("Unknown language: $s")
   }

@@ -32,6 +32,7 @@ _IntelliJJavaCommonInfo = _intellij_module_provider()
 _IntelliJJvmInfo = _intellij_module_provider()
 _IntelliJJavaInfo = _intellij_module_provider()
 _IntelliJKotlinInfo = _intellij_module_provider()
+_IntelliJGoInfo = _intellij_module_provider()
 _IntelliJTestInfo = _intellij_module_provider()
 _IntelliJProtoInfo = _intellij_module_provider()
 
@@ -43,6 +44,7 @@ _MODULE_PROVIDERS = {
     "java_common": _IntelliJJavaCommonInfo,
     "java_provider": _IntelliJJavaInfo,
     "kotlin_target_info": _IntelliJKotlinInfo,
+    "go_target_info": _IntelliJGoInfo,
     "test_info": _IntelliJTestInfo,
     "protobuf_target_info": _IntelliJProtoInfo,
 }
@@ -123,6 +125,7 @@ intellij_provider = struct(
     JavaInfo = _IntelliJJavaInfo,
     JavaToolchainInfo = _IntelliJJavaToolchainInfo,
     KotlinInfo = _IntelliJKotlinInfo,
+    GoInfo = _IntelliJGoInfo,
     PyInfo = _IntelliJPyInfo,
     PythonInfo = _IntellijPythonInfo,
     TestInfo = _IntelliJTestInfo,
