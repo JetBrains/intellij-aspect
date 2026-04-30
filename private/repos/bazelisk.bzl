@@ -20,7 +20,7 @@ package(default_visibility = ["//visibility:public"])
 exports_files(["{executable}"])
 
 filegroup(
-    name = "bazelisk",
+    name = "executable",
     srcs = ["{executable}"],
 )
 """

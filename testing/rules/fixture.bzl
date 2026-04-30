@@ -115,7 +115,7 @@ test_fixture = rule(
         "_bazelisk": attr.label(
             allow_single_file = True,
             cfg = "exec",
-            default = Label("@bazelisk//:bazelisk"),
+            default = Label("@bazelisk//:executable"),
         ),
         "_builder": attr.label(
             cfg = "exec",
