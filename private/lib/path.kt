@@ -41,21 +41,24 @@ fun resolvePath(path: String): Path {
  */
 @Throws(IOException::class)
 fun deleteRecursive(directory: Path) {
-  Files.walkFileTree(directory, object : SimpleFileVisitor<Path>() {
-    override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
-      if (attrs.isSymbolicLink || attrs.isOther || !attrs.isDirectory) {
-        Files.deleteIfExists(dir) // remove the symlink or junction
-        return FileVisitResult.SKIP_SUBTREE
+  Files.walkFileTree(
+    directory,
+    object : SimpleFileVisitor<Path>() {
+      override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
+        if (attrs.isSymbolicLink || attrs.isOther || !attrs.isDirectory) {
+          Files.deleteIfExists(dir) // remove the symlink or junction
+          return FileVisitResult.SKIP_SUBTREE
+        }
+
+        return FileVisitResult.CONTINUE
       }
 
-      return FileVisitResult.CONTINUE
-    }
-
-    override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
-      Files.deleteIfExists(file)
-      return FileVisitResult.CONTINUE
-    }
-  })
+      override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
+        Files.deleteIfExists(file)
+        return FileVisitResult.CONTINUE
+      }
+    },
+  )
 }
 
 fun asBazelPath(path: Path): String {

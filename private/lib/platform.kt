@@ -21,4 +21,3 @@ fun isMacOS(): Boolean = System.getProperty("os.name").lowercase().contains("mac
 fun isLinux(): Boolean = System.getProperty("os.name").lowercase().contains("linux")
 
 fun isWindows(): Boolean = System.getProperty("os.name").lowercase().contains("windows")
-
