@@ -81,7 +81,7 @@ def test_fixture(
         builtin: If True, also tests the builtin aspect deployment mode.
         strip_prefix: Optional. Prefix to strip from source file paths when creating
             the project archive. Defaults to the fixture name if not specified.
-        use_msys2: If True, the BAZEL_SH environment veriable is forwarded fromt the host
+        use_msys2: If True, the BAZEL_SH environment variable is forwarded from the host
             to the nested Bazel invocations.
 
     Example:
