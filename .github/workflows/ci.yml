@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  linux-build-and-test:
+  linux-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +25,7 @@ jobs:
         repository-cache: true
 
     - name: Build all targets
-      run: bazel build //... --lockfile_mode=error --//testing/rules:repo_cache=~/.cache/bazel-repo --execution_log_binary_file="${{ runner.temp }}/build_exec.log"
+      run: bazel build //... --//testing/rules:repo_cache=~/.cache/bazel-repo --execution_log_binary_file="${{ runner.temp }}/build_exec.log"
 
     - name: Test all targets
       run: bazel test //... --test_output=errors --//testing/rules:repo_cache=~/.cache/bazel-repo --execution_log_binary_file="${{ runner.temp }}/test_exec.log"
@@ -39,7 +39,7 @@ jobs:
           ${{ runner.temp }}/build_exec.log
           ${{ runner.temp }}/test_exec.log
 
-  windows-build-and-test:
+  windows-test:
     runs-on: windows-latest
 
     steps:
@@ -63,7 +63,7 @@ jobs:
     - name: Build all targets
       env:
         BAZEL_SH: ${{ steps.msys2.outputs.msys2-location }}\usr\bin\bash.exe
-      run: bazel build //... --lockfile_mode=error --//testing/rules:repo_cache=~/.cache/bazel-repo --execution_log_binary_file="${{ runner.temp }}/build_exec.log"
+      run: bazel build //... --//testing/rules:repo_cache=~/.cache/bazel-repo --execution_log_binary_file="${{ runner.temp }}/build_exec.log"
 
     - name: Test all targets
       env:
