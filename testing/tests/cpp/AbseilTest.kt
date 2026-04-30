@@ -18,6 +18,7 @@ package com.intellij.aspect.testing.tests.cpp
 
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IdeInfo.Dependency.DependencyType
+import com.intellij.aspect.private.lib.utils.isWindows
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import com.intellij.aspect.testing.tests.lib.dependencyLabels
 import com.intellij.aspect.testing.tests.lib.relativeArtifactPath
@@ -75,6 +76,10 @@ class AbseilTest {
   @Test
   fun testCopts() {
     val target = aspect.findTarget("//absl/algorithm:algorithm", externalRepo = "abseil-cpp")
-    assertThat(target.cIdeInfo.ruleContext.coptsList).containsAtLeast("-Wall", "-Wextra", "-DNOMINMAX")
+    if (isWindows()) {
+      assertThat(target.cIdeInfo.ruleContext.coptsList).containsAtLeast("/W3", "/wd4005", "/DNOMINMAX")
+    } else {
+      assertThat(target.cIdeInfo.ruleContext.coptsList).containsAtLeast("-Wall", "-Wextra", "-DNOMINMAX")
+    }
   }
 }

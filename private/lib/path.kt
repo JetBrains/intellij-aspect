@@ -16,7 +16,12 @@
 
 package com.intellij.aspect.private.lib.utils
 
+import java.io.IOException
+import java.nio.file.FileVisitResult
+import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.SimpleFileVisitor
+import java.nio.file.attribute.BasicFileAttributes
 
 /**
  * Resolves a path string, expanding a leading `~` to the user's home directory.
@@ -29,4 +34,33 @@ fun resolvePath(path: String): Path {
     return Path.of(System.getProperty("user.home"))
   }
   return Path.of(path)
+}
+
+/**
+ * Deletes a directory recursively, correctly handling symbolic links and junctions.
+ */
+@Throws(IOException::class)
+fun deleteRecursive(directory: Path) {
+  Files.walkFileTree(
+    directory,
+    object : SimpleFileVisitor<Path>() {
+      override fun preVisitDirectory(dir: Path, attrs: BasicFileAttributes): FileVisitResult {
+        if (attrs.isSymbolicLink || attrs.isOther || !attrs.isDirectory) {
+          Files.deleteIfExists(dir) // remove the symlink or junction
+          return FileVisitResult.SKIP_SUBTREE
+        }
+
+        return FileVisitResult.CONTINUE
+      }
+
+      override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
+        Files.deleteIfExists(file)
+        return FileVisitResult.CONTINUE
+      }
+    },
+  )
+}
+
+fun asBazelPath(path: Path): String {
+  return path.toString().replace('\\', '/').removeSuffix("/")
 }

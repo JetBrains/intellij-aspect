@@ -43,7 +43,7 @@ bazel_registry.bcr(
     commit = "25f0437e6a09e68e4d10fafe2151e3a9ae6eb815",
     sha256 = "5e68f1f72e94e1f986cebaf390e3d02f186ec3931d143a287d8c0e0aba070389",
 )
-use_repo(bazel_registry, "bazelisk", "bcr_archive")
+use_repo(bazel_registry, "bazel_env", "bazelisk", "bcr_archive")
 
 config = use_extension("//config:extension.bzl", "config")
 use_repo(config, "intellij_config")

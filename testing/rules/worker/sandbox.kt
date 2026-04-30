@@ -16,14 +16,18 @@
 
 package com.intellij.aspect.testing.rules.worker
 
+import com.intellij.aspect.private.lib.utils.asBazelPath
+import com.intellij.aspect.private.lib.utils.isWindows
 import com.intellij.aspect.private.lib.utils.parseBepOutputGroups
 import com.intellij.aspect.private.lib.utils.unzip
 import java.io.IOException
 import java.io.OutputStream
 import java.io.PrintStream
 import java.lang.AutoCloseable
+import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.collections.set
 import kotlin.io.path.relativeTo
 
 private const val PATH = "/usr/bin:/bin:/usr/local/bin"
@@ -67,7 +71,7 @@ class Sandbox(
     cmd.add("build")
     cmd.add("--disk_cache=" + server.sharedResources.diskCacheDirectory)
     cmd.add("--repository_cache=" + server.sharedResources.repoCacheDirectory)
-    cmd.add("--registry=file://" + server.sharedResources.registryDirectory)
+    cmd.add("--registry=" + server.sharedResources.registryDirectory.toUri())
 
     if (aspects.isNotEmpty()) {
       cmd.add("--aspects=" + aspects.joinToString(","))
@@ -91,19 +95,29 @@ class Sandbox(
     val process = ProcessBuilder(cmd)
       .directory(projectDirectory.toFile())
       .redirectErrorStream(true)
-      .apply {
-        environment()["PATH"] = PATH
-        environment()["USE_BAZEL_VERSION"] = version
-        environment()["BAZELISK_HOME"] = server.sharedResources.bazeliskHomeDirectory.toString()
-      }
+      .apply { environment().putAll(createEnvironment(version)) }
       .start()
 
+    process.inputStream.transferTo(stderr)
+
     if (process.waitFor() != 0) {
-      process.inputStream.transferTo(stderr)
       throw IOException("Bazel build failed: ${cmd.joinToString(" ")}")
     }
 
     return parseBepOutputGroups(bepFile)
+  }
+
+  private fun createEnvironment(version: String): Map<String, String> {
+    val env = mutableMapOf<String, String>()
+    env["PATH"] = PATH
+    env["USE_BAZEL_VERSION"] = version
+    env["BAZELISK_HOME"] = server.sharedResources.bazeliskHomeDirectory.toString()
+
+    if (isWindows()) {
+      System.getenv("BAZEL_SH")?.let { env["BAZEL_SH"] = it }
+    }
+
+    return env
   }
 
   @Throws(IOException::class)
@@ -111,7 +125,9 @@ class Sandbox(
     unzip(Path.of(archive), projectDirectory)
   }
 
-  fun relativeToOutputBase(absolute: Path): String = absolute.relativeTo(server.outputBaseDirectory).toString()
+  fun relativeToOutputBase(absolute: Path): String {
+    return asBazelPath(absolute.relativeTo(server.outputBaseDirectory))
+  }
 
   override fun close() {
     err.close()

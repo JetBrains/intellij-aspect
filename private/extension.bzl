@@ -14,6 +14,7 @@
 
 load("//private/repos:bazelisk.bzl", "bazelisk")
 load("//private/repos:bcr_archive.bzl", "bcr_archive")
+load("//private/repos:environment.bzl", "environment")
 
 _bazelisk = tag_class(attrs = {
     "version": attr.string(mandatory = True),
@@ -56,6 +57,11 @@ def _bazel_registry_impl(mctx):
         name = "bcr_archive",
         commit = bcr_config.commit,
         sha256 = bcr_config.sha256,
+    )
+
+    environment(
+        name = "bazel_env",
+        vars = ["BAZEL_SH"],
     )
 
 bazel_registry = module_extension(

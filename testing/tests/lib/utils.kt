@@ -25,12 +25,6 @@ inline fun <reified T : Any> assertNotNull(value: T?): T {
   return value ?: throw AssertionError("value of type ${T::class} is null")
 }
 
-fun isMacOS(): Boolean = System.getProperty("os.name").lowercase().contains("mac")
-
-fun isLinux(): Boolean = System.getProperty("os.name").lowercase().contains("linux")
-
-fun isWindows(): Boolean = System.getProperty("os.name").lowercase().contains("windows")
-
 fun IterableSubject.relativeArtifactPath(
   relativePath: String? = null,
 ): IterableSubject.UsingCorrespondence<ArtifactLocation, String> {

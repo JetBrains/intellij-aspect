@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@bazel_env//:environment.bzl", _bazel_env = "environment")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load(":config.bzl", "TestMatrix", "config_hash", "config_name", "merge_matrixes", "serialize_test_config")
 
@@ -45,12 +46,21 @@ def _test_fixture_impl(ctx):
             output_groups = ctx.attr.output_groups,
         ))
 
+        response_file = ctx.actions.declare_file("%s-%s_work_arguments.textproto" % (ctx.label.name, unique_hash))
+        ctx.actions.write(response_file, work_arguments)
+
         flagfile = ctx.actions.declare_file("%s-%s_flagfile" % (ctx.label.name, unique_hash))
-        ctx.actions.write(flagfile, work_arguments)
+        ctx.actions.write(flagfile, "PROTO:%s\n" % response_file.path)
+
+        env = {}
+
+        if ctx.attr.use_msys2:
+            env["BAZEL_SH"] = _bazel_env.get("BAZEL_SH", default = "")
 
         ctx.actions.run(
             inputs = [
                 flagfile,
+                response_file,
                 ctx.file._bazelisk,
                 ctx.file._registry_file,
                 ctx.file.project,
@@ -67,6 +77,7 @@ def _test_fixture_impl(ctx):
                 "requires-worker-protocol": "proto",
                 "requires-network": "1",
             },
+            env = env,
         )
 
         output_protos.append(output_proto)
@@ -94,6 +105,10 @@ test_fixture = rule(
         "output_groups": attr.string_list(
             doc = "list of additional output groups to request",
         ),
+        "use_msys2": attr.bool(
+            default = False,
+            doc = "whether to enable MSYS2 when building on Windows",
+        ),
         "_aspect_bcr": attr.label(
             allow_single_file = [".zip"],
             default = Label("//:archive_test"),
@@ -109,7 +124,7 @@ test_fixture = rule(
         "_bazelisk": attr.label(
             allow_single_file = True,
             cfg = "exec",
-            default = Label("@bazelisk//:bazelisk"),
+            default = Label("@bazelisk//:executable"),
         ),
         "_builder": attr.label(
             cfg = "exec",

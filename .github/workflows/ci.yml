@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build-and-test:
+  linux-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,23 +21,63 @@ jobs:
       uses: bazel-contrib/setup-bazel@0.18.0
       with:
         bazelisk-cache: true
-        disk-cache: ${{ github.workflow }}
+        disk-cache: ${{ github.workflow }}-linux
         repository-cache: true
 
     - name: Build all targets
-      run: bazel build //... --lockfile_mode=error --//testing/rules:repo_cache=~/.cache/bazel-repo --execution_log_binary_file=/tmp/build_exec.log
+      run: bazel build //... --//testing/rules:repo_cache=~/.cache/bazel-repo --execution_log_binary_file="${{ runner.temp }}/build_exec.log"
 
     - name: Test all targets
-      run: bazel test //... --test_output=errors --//testing/rules:repo_cache=~/.cache/bazel-repo --execution_log_binary_file=/tmp/test_exec.log
+      run: bazel test //... --test_output=errors --//testing/rules:repo_cache=~/.cache/bazel-repo --execution_log_binary_file="${{ runner.temp }}/test_exec.log"
 
     - name: Upload execution logs
       if: always()
       uses: actions/upload-artifact@v7
       with:
-        name: execution-logs
+        name: linux-execution-logs
         path: |
-          /tmp/build_exec.log
-          /tmp/test_exec.log
+          ${{ runner.temp }}/build_exec.log
+          ${{ runner.temp }}/test_exec.log
+
+  windows-test:
+    runs-on: windows-latest
+
+    steps:
+    - name: Configure Git line endings
+      run: git config --global core.autocrlf input
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup MSYS2
+      id: msys2
+      uses: msys2/setup-msys2@v2
+
+    - name: Setup Bazel
+      uses: bazel-contrib/setup-bazel@0.18.0
+      with:
+        bazelisk-cache: true
+        disk-cache: ${{ github.workflow }}-windows
+        repository-cache: true
+
+    - name: Build all targets
+      env:
+        BAZEL_SH: ${{ steps.msys2.outputs.msys2-location }}\usr\bin\bash.exe
+      run: bazel build //... --//testing/rules:repo_cache=~/.cache/bazel-repo --execution_log_binary_file="${{ runner.temp }}/build_exec.log"
+
+    - name: Test all targets
+      env:
+        BAZEL_SH: ${{ steps.msys2.outputs.msys2-location }}\usr\bin\bash.exe
+      run: bazel test //... --test_output=errors --//testing/rules:repo_cache=~/.cache/bazel-repo --execution_log_binary_file="${{ runner.temp }}/test_exec.log"
+
+    - name: Upload execution logs
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: windows-execution-logs
+        path: |
+          ${{ runner.temp }}/build_exec.log
+          ${{ runner.temp }}/test_exec.log
 
   format-check:
     runs-on: ubuntu-latest

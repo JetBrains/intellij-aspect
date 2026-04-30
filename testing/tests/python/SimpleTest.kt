@@ -18,6 +18,7 @@ package com.intellij.aspect.testing.tests.python
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IdeInfo.PyIdeInfo.PythonSrcsVersion
 import com.google.devtools.intellij.ideinfo.IdeInfo.PyIdeInfo.PythonVersion
+import com.intellij.aspect.private.lib.utils.isWindows
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import com.intellij.aspect.testing.tests.lib.relativeArtifactPath
 import org.junit.Rule
@@ -41,7 +42,8 @@ class SimpleTest {
     assertThat(target.hasPythonTargetInfo()).isTrue()
     assertThat(target.pythonTargetInfo.version).isEqualTo("PY3")
     assertThat(target.pythonTargetInfo.interpreter.rootPath).containsMatch("rules_python")
-    assertThat(target.pythonTargetInfo.interpreter.relativePath).endsWith("python3")
+    assertThat(target.pythonTargetInfo.interpreter.relativePath)
+      .endsWith(if (isWindows()) "python.exe" else "python3")
   }
 
   @Test
@@ -53,7 +55,7 @@ class SimpleTest {
     assertThat(target.hasPythonTargetInfo()).isTrue()
     assertThat(target.pythonTargetInfo.version).isEqualTo("PY3")
     assertThat(target.pythonTargetInfo.interpreter.rootPath).containsMatch("rules_python")
-    assertThat(target.pythonTargetInfo.interpreter.relativePath).endsWith("python3")
+    assertThat(target.pythonTargetInfo.interpreter.relativePath).containsMatch("python(3|\\.exe)$")
   }
 
   @Test
@@ -65,6 +67,6 @@ class SimpleTest {
     assertThat(target.hasPythonTargetInfo()).isTrue()
     assertThat(target.pythonTargetInfo.version).isEqualTo("PY3")
     assertThat(target.pythonTargetInfo.interpreter.rootPath).containsMatch("rules_python")
-    assertThat(target.pythonTargetInfo.interpreter.relativePath).endsWith("python3")
+    assertThat(target.pythonTargetInfo.interpreter.relativePath).containsMatch("python(3|\\.exe)$")
   }
 }

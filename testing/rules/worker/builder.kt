@@ -19,6 +19,7 @@ import com.google.devtools.intellij.ideinfo.IdeInfo.TargetIdeInfo
 import com.google.protobuf.TextFormat
 import com.intellij.aspect.lib.AspectConfig
 import com.intellij.aspect.lib.deployAspectZip
+import com.intellij.aspect.private.lib.utils.asBazelPath
 import com.intellij.aspect.private.lib.utils.unzip
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.AspectDeployment
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.BazelModule
@@ -147,7 +148,7 @@ fun Sandbox.writeModules(modules: List<BazelModule>, aspect: Path? = null) {
 
     if (aspect != null) {
       writer.appendLine("bazel_dep(name = 'intellij_aspect')")
-      writer.appendLine("local_path_override(module_name = 'intellij_aspect', path = '$aspect')")
+      writer.appendLine("local_path_override(module_name = 'intellij_aspect', path = '${asBazelPath(aspect)}')")
     }
   }
 
