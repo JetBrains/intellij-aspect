@@ -5,8 +5,8 @@ build --tool_java_runtime_version=remotejdk_21 --tool_java_language_version=21
 
 common --enable_platform_specific_config
 
-# pass the host's MSYS2 installation to the nested Bazel server
-build:windows --action_env=BAZEL_SH
+# pass the host's MSYS2 installation through the test environment repository
+build:windows --repo_env=BAZEL_SH
 
 # avoid self-extracting Python zip launchers on Windows; their runfiles extraction can exceed MAX_PATH
 build --build_python_zip=no

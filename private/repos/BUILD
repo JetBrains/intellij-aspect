@@ -1,5 +1,6 @@
 exports_files([
-    "bazel_versions.bzl",
+    "bazelisk.bzl",
     "bcr_archive.bzl",
     "common.bzl",
+    "test_environment.bzl",
 ])

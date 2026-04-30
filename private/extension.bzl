@@ -14,6 +14,7 @@
 
 load("//private/repos:bazelisk.bzl", "bazelisk")
 load("//private/repos:bcr_archive.bzl", "bcr_archive")
+load("//private/repos:environment.bzl", "environment")
 
 _bazelisk = tag_class(attrs = {
     "version": attr.string(mandatory = True),
@@ -37,6 +38,19 @@ def _collect_bcr_config(mctx):
             return struct(commit = tag.commit, sha256 = tag.sha256)
     return None
 
+def _collect_test_environment_variables(mctx):
+    variables = []
+    seen = {}
+
+    for mod in mctx.modules:
+        for tag in mod.tags.variables:
+            for name in tag.names:
+                if name not in seen:
+                    variables.append(name)
+                    seen[name] = True
+
+    return variables
+
 def _bazel_registry_impl(mctx):
     bazelisk_config = _collect_bazelisk_config(mctx)
     if not bazelisk_config:
@@ -56,6 +70,11 @@ def _bazel_registry_impl(mctx):
         name = "bcr_archive",
         commit = bcr_config.commit,
         sha256 = bcr_config.sha256,
+    )
+
+    environment(
+        name = "bazel_env",
+        vars = ["BAZEL_SH"],
     )
 
 bazel_registry = module_extension(

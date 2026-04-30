@@ -16,6 +16,7 @@
 
 package com.intellij.aspect.testing.rules.worker
 
+import com.intellij.aspect.private.lib.utils.asBazelPath
 import com.intellij.aspect.private.lib.utils.isWindows
 import com.intellij.aspect.private.lib.utils.parseBepOutputGroups
 import com.intellij.aspect.private.lib.utils.unzip
@@ -97,8 +98,9 @@ class Sandbox(
       .apply { environment().putAll(createEnvironment(version)) }
       .start()
 
+    process.inputStream.transferTo(stderr)
+
     if (process.waitFor() != 0) {
-      process.inputStream.transferTo(stderr)
       throw IOException("Bazel build failed: ${cmd.joinToString(" ")}")
     }
 
@@ -112,7 +114,7 @@ class Sandbox(
     env["BAZELISK_HOME"] = server.sharedResources.bazeliskHomeDirectory.toString()
 
     if (isWindows()) {
-      env["BAZEL_SH"] = requireNotNull(System.getenv("BAZEL_SH"))
+      env["BAZEL_SH"] = System.getenv("BAZEL_SH").apply { require(isNotBlank()) }
     }
 
     return env
@@ -123,7 +125,9 @@ class Sandbox(
     unzip(Path.of(archive), projectDirectory)
   }
 
-  fun relativeToOutputBase(absolute: Path): String = absolute.relativeTo(server.outputBaseDirectory).toString()
+  fun relativeToOutputBase(absolute: Path): String {
+    return asBazelPath(absolute.relativeTo(server.outputBaseDirectory))
+  }
 
   override fun close() {
     err.close()

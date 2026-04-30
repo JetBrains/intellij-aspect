@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@bazel_env//:environment.bzl", _bazel_env = "environment")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load(":config.bzl", "TestMatrix", "config_hash", "config_name", "merge_matrixes", "serialize_test_config")
 
@@ -71,6 +72,7 @@ def _test_fixture_impl(ctx):
                 "requires-worker-protocol": "proto",
                 "requires-network": "1",
             },
+            env = _bazel_env,
         )
 
         output_protos.append(output_proto)
