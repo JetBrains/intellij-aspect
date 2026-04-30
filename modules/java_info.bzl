@@ -34,6 +34,10 @@ TOOLCHAIN_DEPS = [
     "_java_toolchain",
 ]
 
+RUNTIME_DEPS = [
+    "runtime_deps",
+]
+
 IMPORT_RULE_KIND = ["java_import", "jvm_import", "kt_jvm_import"]
 
 def _get_javacopts_from_context(ctx):
@@ -150,6 +154,10 @@ def _aspect_impl(target, ctx):
                 intellij_deps.EXPORTED_COMPILE_TIME: intellij_deps.collect(
                     ctx,
                     attributes = EXPORTED_COMPILE_TIME_DEPS,
+                ),
+                intellij_deps.RUNTIME: intellij_deps.collect(
+                    ctx,
+                    attributes = RUNTIME_DEPS,
                 ),
                 intellij_deps.TOOLCHAIN: intellij_deps.collect(
                     ctx,
