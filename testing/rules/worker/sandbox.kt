@@ -114,7 +114,7 @@ class Sandbox(
     env["BAZELISK_HOME"] = server.sharedResources.bazeliskHomeDirectory.toString()
 
     if (isWindows()) {
-      env["BAZEL_SH"] = System.getenv("BAZEL_SH").apply { require(isNotBlank()) }
+      System.getenv("BAZEL_SH")?.let { env["BAZEL_SH"] = it }
     }
 
     return env

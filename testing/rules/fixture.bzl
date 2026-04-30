@@ -52,6 +52,11 @@ def _test_fixture_impl(ctx):
         flagfile = ctx.actions.declare_file("%s-%s_flagfile" % (ctx.label.name, unique_hash))
         ctx.actions.write(flagfile, "PROTO:%s\n" % response_file.path)
 
+        env = {}
+
+        if ctx.attr.use_msys2:
+            env["BAZEL_SH"] = _bazel_env.get("BAZEL_SH", default = "")
+
         ctx.actions.run(
             inputs = [
                 flagfile,
@@ -72,7 +77,7 @@ def _test_fixture_impl(ctx):
                 "requires-worker-protocol": "proto",
                 "requires-network": "1",
             },
-            env = _bazel_env,
+            env = env,
         )
 
         output_protos.append(output_proto)
@@ -99,6 +104,10 @@ test_fixture = rule(
         ),
         "output_groups": attr.string_list(
             doc = "list of additional output groups to request",
+        ),
+        "use_msys2": attr.bool(
+            default = False,
+            doc = "whether to enable MSYS2 when building on Windows",
         ),
         "_aspect_bcr": attr.label(
             allow_single_file = [".zip"],

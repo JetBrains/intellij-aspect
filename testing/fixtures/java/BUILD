@@ -34,6 +34,7 @@ test_fixture(
         "//:main",
         "//test/...",
     ],
+    use_msys2 = True,
 )
 
 test_fixture(

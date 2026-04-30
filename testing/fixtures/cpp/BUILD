@@ -24,6 +24,7 @@ test_fixture(
     aspects = _ASPECTS,
     modules = _MODULES,
     targets = ["//:all"],
+    use_msys2 = True,
 )
 
 test_fixture(

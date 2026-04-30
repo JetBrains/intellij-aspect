@@ -53,7 +53,17 @@ def test_module_deps(module_name, versions, **kwargs):
         actual = "%s_%s" % (module_name, versions[-1].replace(".", "_")),
     )
 
-def test_fixture(name, srcs, modules, aspects, targets, output_groups = [], bazel = None, builtin = False, strip_prefix = ""):
+def test_fixture(
+        name,
+        srcs,
+        modules,
+        aspects,
+        targets,
+        output_groups = [],
+        bazel = None,
+        builtin = False,
+        strip_prefix = "",
+        use_msys2 = False):
     """Creates a test fixture with the result of the IntelliJ aspect applied to the project.
 
     Packages a small Bazel project, builds it with the aspect across multiple
@@ -71,6 +81,8 @@ def test_fixture(name, srcs, modules, aspects, targets, output_groups = [], baze
         builtin: If True, also tests the builtin aspect deployment mode.
         strip_prefix: Optional. Prefix to strip from source file paths when creating
             the project archive. Defaults to the fixture name if not specified.
+        use_msys2: If True, the BAZEL_SH environment veriable is forwarded fromt the host
+            to the nested Bazel invocations.
 
     Example:
         test_module_dep(name = "rules_cc", version = "0.2.14")
@@ -143,6 +155,7 @@ def test_fixture(name, srcs, modules, aspects, targets, output_groups = [], baze
         testonly = 1,
         targets = targets,
         output_groups = output_groups,
+        use_msys2 = use_msys2,
     )
 
 def _derive_test_class(test):

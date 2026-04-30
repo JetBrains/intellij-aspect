@@ -9,8 +9,7 @@ _MODULES = [
     "//testing/fixtures:rules_kotlin_2_3_20",
     "//testing/fixtures:toolchains_llvm_latest",
 ] + select({
-    # rules_kotlin 2.2.x can fail on Windows with:
-    # LAUNCHER ERROR: Rlocation failed on ... annotations-13.0.jar
+    # rules_kotlin 2.2.x can fail on Windows with: LAUNCHER ERROR: Rlocation failed on ... annotations-13.0.jar
     # https://github.com/bazel-contrib/rules_kotlin/issues/1300
     "@bazel_tools//src/conditions:windows": [],
     "//conditions:default": ["//testing/fixtures:rules_kotlin_2_2_0"],
