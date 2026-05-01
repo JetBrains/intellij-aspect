@@ -43,6 +43,14 @@ jobs:
     runs-on: macos-latest
 
     steps:
+    - name: Free disk space                                                                                             
+      run: |                                                                                                            
+        sudo rm -rf ~/Library/Android /Users/runner/Library/Android                                                     
+        sudo rm -rf ~/.dotnet /usr/local/share/dotnet                                                                   
+        sudo rm -rf /usr/local/share/boost                                                                              
+        sudo rm -rf ~/Library/Developer/CoreSimulator/Caches                                                            
+        df -h /                                                                                                         
+
     - name: Checkout code
       uses: actions/checkout@v4
 
