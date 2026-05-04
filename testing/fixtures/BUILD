@@ -54,6 +54,13 @@ test_module_deps(
     ],
 )
 
+test_module_deps(
+    module_name = "rules_go",
+    versions = [
+        "0.60.0",
+    ],
+)
+
 _TOOLCHAINS_LLVM_CONFIG = """
 llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm")
 llvm.toolchain(llvm_version = "16.0.0")
