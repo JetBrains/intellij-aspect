@@ -34,7 +34,13 @@ TOOLCHAIN_DEPS = [
     "_java_toolchain",
 ]
 
+RUNTIME_DEPS = [
+    "runtime_deps",
+]
+
 IMPORT_RULE_KIND = ["java_import", "jvm_import", "kt_jvm_import"]
+
+PROVIDERLESS_JAVA_RULES = ["java_binary", "java_test"]
 
 def _get_javacopts_from_context(ctx):
     javacopts_raw = getattr(ctx.rule.attr, "javacopts", [])
@@ -131,6 +137,35 @@ def _get_outputs(target, ctx):
 
 def _aspect_impl(target, ctx):
     if not JavaInfo in target:
+        if ctx.rule.kind in PROVIDERLESS_JAVA_RULES:
+            # While we cannot obtain any information from the provider, we still have to
+            # mark this target as a java target and take dependencies into account.
+            return [
+                intellij_provider.create(
+                    provider = intellij_provider.JavaInfo,
+                    value = intellij_common.struct(),
+                    dependencies = {
+                        intellij_deps.COMPILE_TIME: intellij_deps.collect(
+                            ctx,
+                            attributes = COMPILE_TIME_DEPS,
+                        ),
+                        intellij_deps.EXPORTED_COMPILE_TIME: intellij_deps.collect(
+                            ctx,
+                            attributes = EXPORTED_COMPILE_TIME_DEPS,
+                        ),
+                        intellij_deps.RUNTIME: intellij_deps.collect(
+                            ctx,
+                            attributes = RUNTIME_DEPS,
+                        ),
+                        intellij_deps.TOOLCHAIN: intellij_deps.collect(
+                            ctx,
+                            attributes = TOOLCHAIN_DEPS,
+                            toolchain_types = [JAVA_TOOLCHAIN_TYPE],
+                        ),
+                    },
+                ),
+            ]
+
         return [
             intellij_provider.JavaInfo(present = False),
         ]
@@ -150,6 +185,10 @@ def _aspect_impl(target, ctx):
                 intellij_deps.EXPORTED_COMPILE_TIME: intellij_deps.collect(
                     ctx,
                     attributes = EXPORTED_COMPILE_TIME_DEPS,
+                ),
+                intellij_deps.RUNTIME: intellij_deps.collect(
+                    ctx,
+                    attributes = RUNTIME_DEPS,
                 ),
                 intellij_deps.TOOLCHAIN: intellij_deps.collect(
                     ctx,
