@@ -125,8 +125,8 @@ class SimpleTest {
 
     val buildFiles = aspect.findOutputGroup("intellij-build-java")
     assertThat(buildFiles.filter { it.endsWith("main.jar") }).isNotEmpty()
-    assertThat(buildFiles.filter { it.endsWith("main.jdeps") }).isNotEmpty()
+    assertThat(buildFiles.filter { it.endsWith("materialized_main.jdeps") }).isNotEmpty()
     assertThat(buildFiles.filter { it.endsWith("lib/libutil.jar") }).isNotEmpty()
-    assertThat(buildFiles.filter { it.endsWith("lib/libutil.jdeps") }).isNotEmpty()
+    assertThat(buildFiles.filter { it.endsWith("lib/materialized_libutil.jdeps") }).isNotEmpty()
   }
 }

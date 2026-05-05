@@ -18,6 +18,7 @@ package com.intellij.aspect.lib
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.Locale
 
 /**
  * Creates the config directory and writes the config file as well as the
@@ -40,5 +41,6 @@ private fun generateConfigStruct(config: AspectConfig) = """
 
 config = struct(
 	bazel_version = "${config.bazelVersion}",
+  os = "${System.getProperty("os.name").lowercase(Locale.ROOT)}",
 )
 """
