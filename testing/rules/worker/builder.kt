@@ -76,6 +76,7 @@ fun main(args: Array<String>) {
       aspects = aspects,
       outputGroups = listOf(INTELLIJ_INFO) + input.outputGroupsList,
       profile = Path.of(input.outputProfile),
+      flags = input.extraFlagsList,
     )
     require(files.isNotEmpty()) { "no files were generated" }
 
@@ -84,6 +85,8 @@ fun main(args: Array<String>) {
 
       files[INTELLIJ_INFO]?.map(::readInfoFile)?.forEach(::addTargets)
       files.entries.map(::createOutputGroup).forEach(::addOutputs)
+
+      addAllExtraFlags(input.extraFlagsList)
     }
 
     Files.newOutputStream(Path.of(input.outputProto)).use { outputStream ->

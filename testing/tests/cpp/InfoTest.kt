@@ -84,4 +84,13 @@ class InfoTest {
     val info = aspect.findCIdeInfo("//:main")
     assertThat(info.compilationContext.definesList).doesNotContain("LOCAL_DEFINE")
   }
+
+  @Test
+  fun testBuildFileLocation() {
+    val libInfo = aspect.findTarget("//lib:lib")
+    assertThat(libInfo.buildFileArtifactLocation.relativePath).isEqualTo("lib/BUILD")
+
+    val mainInfo = aspect.findTarget("//:main")
+    assertThat(mainInfo.buildFileArtifactLocation.relativePath).isEqualTo("BUILD")
+  }
 }

@@ -48,4 +48,5 @@ message TestFixture {
   TestConfig config = 1;
   repeated TargetIdeInfo targets = 2;
   repeated OutputGroup outputs = 3;
+  repeated string extra_flags = 4;
 }

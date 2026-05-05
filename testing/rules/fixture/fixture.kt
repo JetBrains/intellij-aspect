@@ -15,9 +15,10 @@
  */
 package com.intellij.aspect.testing.rules.fixture
 
+import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.assertWithMessage
 import com.google.devtools.build.runfiles.Runfiles
 import com.google.devtools.intellij.ideinfo.IdeInfo.*
-import com.intellij.aspect.testing.rules.fixture.FixtureProto.TestConfig
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.TestFixture
 import org.junit.AssumptionViolatedException
 import org.junit.rules.ExternalResource
@@ -46,7 +47,7 @@ class AspectFixture : ExternalResource() {
           try {
             base.evaluate()
           } catch (e: AssertionError) {
-            throw AssertionError("test failed in configuration: [${configString(output.config)}]", e)
+            throw AssertionError("test failed in configuration: [${configString(output)}]", e)
           } catch (_: AssumptionViolatedException) {
             continue
           }
@@ -68,17 +69,19 @@ class AspectFixture : ExternalResource() {
     externalRepo: String? = null,
     fractionalAspectIds: List<String> = emptyList(),
   ): TargetIdeInfo {
-    return requireNotNull(findTargets(label, externalRepo, fractionalAspectIds).firstOrNull()) {
-      "target not found: $label"
-    }
+    val targets = findTargets(label, externalRepo, fractionalAspectIds)
+    assertWithMessage("target not found: $label").that(targets).isNotEmpty()
+
+    return targets.first()
   }
 
   fun findOutputGroup(
     group: String,
   ): List<String> {
-    return requireNotNull(output.outputsList.firstOrNull { it.name == group }?.filesList) {
-      "Output group $group not present"
-    }
+    val groups = output.outputsList.filter { it.name == group }
+    assertWithMessage("output group not found: $group").that(groups).isNotEmpty()
+
+    return groups.first().filesList
   }
 
   fun findCIdeInfo(
@@ -87,7 +90,7 @@ class AspectFixture : ExternalResource() {
     fractionalAspectIds: List<String> = emptyList(),
   ): CIdeInfo {
     val target = findTarget(label, externalRepo, fractionalAspectIds)
-    require(target.hasCIdeInfo()) { "target has no c_ide_info: $label" }
+    assertThat(target.hasCIdeInfo()).isTrue()
 
     return target.cIdeInfo
   }
@@ -98,7 +101,7 @@ class AspectFixture : ExternalResource() {
     fractionalAspectIds: List<String> = emptyList(),
   ): PyIdeInfo {
     val target = findTarget(label, externalRepo, fractionalAspectIds)
-    require(target.hasPyIdeInfo()) { "target has no py_ide_info: $label" }
+    assertThat(target.hasPyIdeInfo()).isTrue()
 
     return target.pyIdeInfo
   }
@@ -149,7 +152,9 @@ private fun matchLabel(key: TargetKey, label: String, externalRepo: String?): Bo
   }
 
   val (repo, relativeLabel) = key.label.split("//")
-  return repo.trimStart('@').trimEnd('+', '~') == externalRepo && "//$relativeLabel" == label
+  val normalizeRepoName = repo.trimStart('@').replace("local_repository", "").replace("_repo_rules", "").trim('+', '~')
+
+  return normalizeRepoName == externalRepo && "//$relativeLabel" == label
 }
 
 /**
@@ -169,10 +174,17 @@ private fun matchAspectIds(key: TargetKey, fractionalAspectIds: List<String>): B
 /**
  * Returns a string representation of the test configuration.
  */
-private fun configString(config: TestConfig): String {
+private fun configString(fixture: TestFixture): String {
+  val config = fixture.config
+
   return buildMap {
     put("bazel", config.bazelVersion)
     put("deploy", config.aspectDeployment.name.lowercase())
+
     config.modulesList.forEach { put(it.name, it.version) }
+
+    if (fixture.extraFlagsList.isNotEmpty()) {
+      put("flags", fixture.extraFlagsList.joinToString(","))
+    }
   }.entries.joinToString(separator = ", ") { "${it.key}:${it.value}" }
 }

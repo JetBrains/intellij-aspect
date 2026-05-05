@@ -63,7 +63,8 @@ def test_fixture(
         bazel = None,
         builtin = False,
         strip_prefix = "",
-        use_msys2 = False):
+        use_msys2 = False,
+        extra_flags = []):
     """Creates a test fixture with the result of the IntelliJ aspect applied to the project.
 
     Packages a small Bazel project, builds it with the aspect across multiple
@@ -156,6 +157,7 @@ def test_fixture(
         targets = targets,
         output_groups = output_groups,
         use_msys2 = use_msys2,
+        extra_flags = extra_flags,
     )
 
 def _derive_test_class(test):
