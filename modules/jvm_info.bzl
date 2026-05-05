@@ -17,6 +17,14 @@ load("//common:common.bzl", "intellij_common")
 load("//common:make_variables.bzl", "expand_make_variables")
 load(":provider.bzl", "intellij_provider")
 
+def _get_reosource_strip_prefix(ctx):
+    prefix = getattr(ctx.rule.attr, "resource_strip_prefix", None)
+    if type(prefix) == "string":
+        return prefix
+    if type(prefix) == "Target":
+        # special case for rules_kotlin
+        return prefix.label.name
+
 def _get_jvm_info(target, ctx):
     resources_attr = getattr(ctx.rule.attr, "resources", None)
     if resources_attr == None and ctx.rule.kind.endswith("_resources"):
@@ -31,7 +39,7 @@ def _get_jvm_info(target, ctx):
         args = intellij_common.attr_as_list(ctx, "args"),
         main_class = getattr(ctx.rule.attr, "main_class", None),
         jvm_flags = expand_make_variables(ctx, True, intellij_common.attr_as_list(ctx, "jvm_flags")),
-        resource_strip_prefix = getattr(ctx.rule.attr, "resource_strip_prefix", None),
+        resource_strip_prefix = _get_reosource_strip_prefix(ctx),
         resources = resources,
     )
 

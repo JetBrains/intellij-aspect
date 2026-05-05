@@ -65,7 +65,7 @@ def _get_jvm_outputs(target):
             interface_jars = [artifact_location.from_file(output.ijar)] if output.ijar else [],
             source_jars = [artifact_location.from_file(f) for f in _source_jars(output)],
         )
-        for output in target[KtJvmInfo].outputs.jars
+        for output in getattr(getattr(target[KtJvmInfo], "outputs", struct()), "jars", [])
     ]
 
 def _extract_kt_compiler_plugin_option(option):
@@ -169,7 +169,7 @@ def _get_generated_jars(target, ctx):
 def _get_outputs(target, ctx):
     resolve_files = []
     resolve_transitives = []
-    for out in target[KtJvmInfo].outputs.jars:
+    for out in getattr(getattr(target[KtJvmInfo], "outputs", struct()), "jars", []):
         if getattr(out, "compile_jar", None):
             resolve_files += [out.compile_jar]
         elif getattr(out, "ijar", None):
