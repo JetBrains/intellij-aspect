@@ -132,4 +132,5 @@ message WorkArguments {
   TestConfig config = 6;
   repeated string targets = 7;
   repeated string output_groups = 8;
+  repeated string extra_flags = 9;
 }

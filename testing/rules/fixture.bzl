@@ -44,6 +44,7 @@ def _test_fixture_impl(ctx):
             config = serialize_test_config(config),
             targets = ctx.attr.targets,
             output_groups = ctx.attr.output_groups,
+            extra_flags = ctx.attr.extra_flags,
         ))
 
         response_file = ctx.actions.declare_file("%s-%s_work_arguments.textproto" % (ctx.label.name, unique_hash))
@@ -108,6 +109,9 @@ test_fixture = rule(
         "use_msys2": attr.bool(
             default = False,
             doc = "whether to enable MSYS2 when building on Windows",
+        ),
+        "extra_flags": attr.string_list(
+            doc = "additional flags passed to the Bazel build",
         ),
         "_aspect_bcr": attr.label(
             allow_single_file = [".zip"],

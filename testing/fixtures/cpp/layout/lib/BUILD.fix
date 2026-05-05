@@ -1,0 +1,13 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+genrule(
+    name = "genreated",
+    outs = ["generated.h"],
+    cmd = "echo 'inline int greeting() { return 1; }' > $@",
+)
+
+cc_library(
+    name = "lib",
+    hdrs = ["generated.h"],
+    visibility = ["//visibility:public"],
+)

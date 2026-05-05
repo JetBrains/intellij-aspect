@@ -54,6 +54,43 @@ test_fixture(
     targets = ["//:tool"],
 )
 
+test_fixture(
+    name = "layout_default",
+    srcs = glob(["layout/**"]),
+    aspects = _ASPECTS,
+    bazel = ">=8",
+    extra_flags = [
+        "--noexperimental_sibling_repository_layout",
+        "--inject_repository=external_module=module",
+    ],
+    modules = _MODULES,
+    strip_prefix = "layout",
+    targets = ["//main:main"],
+)
+
+test_fixture(
+    name = "layout_sibling",
+    srcs = glob(["layout/**"]),
+    aspects = _ASPECTS,
+    bazel = ">=8",
+    extra_flags = [
+        "--experimental_sibling_repository_layout",
+        "--inject_repository=external_module=module",
+    ],
+    modules = _MODULES,
+    strip_prefix = "layout",
+    targets = ["//main:main"],
+)
+
+filegroup(
+    name = "layout",
+    testonly = 1,
+    srcs = [
+        ":layout_default",
+        ":layout_sibling",
+    ],
+)
+
 local_test_fixture(
     name = "abseil",
     deps = [
