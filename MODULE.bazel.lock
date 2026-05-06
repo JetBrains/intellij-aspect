@@ -351,7 +351,7 @@
   "moduleExtensions": {
     "//config:extension.bzl%config": {
       "general": {
-        "bzlTransitiveDigest": "jjC124h06A3kYV45hhWlmuYI1ss5F64Do1bgUb8lT50=",
+        "bzlTransitiveDigest": "Sv3XD1o1fqglyQKqK8kOexW8EWVo8IBUwYH3wAOlg9w=",
         "usagesDigest": "U1I56OdjfLLiGyS+UpduPWHWkyFiIrdXASFK94jVfCA=",
         "recordedInputs": [],
         "generatedRepoSpecs": {

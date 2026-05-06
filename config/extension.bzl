@@ -15,6 +15,7 @@
 def _config_repo_impl(rctx):
     substitutions = {
         "{BAZEL_VERSION}": native.bazel_version,
+        "{OS}": rctx.os.name.lower(),
     }
 
     rctx.file("BUILD", "")
