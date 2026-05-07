@@ -13,6 +13,7 @@
 # limitations under the License.
 
 load("@rules_java//java:defs.bzl", "JavaInfo")
+load("@rules_java//java/common:java_plugin_info.bzl", "JavaPluginInfo")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//common:copy.bzl", "copy")
@@ -87,7 +88,9 @@ def _get_jvm_outputs(target):
     ]
 
 def _has_api_generating_plugins(target):
-    return len(target[JavaInfo].api_generating_plugins.processor_classes.to_list()) > 0
+    if JavaPluginInfo in target:
+        return len(target[JavaPluginInfo].api_generating_plugins.processor_classes.to_list()) > 0
+    return False
 
 def _get_generated_jars(target):
     return [
