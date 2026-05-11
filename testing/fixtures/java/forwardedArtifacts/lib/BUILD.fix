@@ -1,0 +1,13 @@
+load("@rules_java//java:java_library.bzl", "java_library")
+
+java_library(
+  name = "util",
+  srcs = ["Util.java"],
+  visibility = ["//visibility:public"],
+)
+
+java_library(
+  name = "nested/util",
+  srcs = ["nested/Util.java"],
+  visibility = ["//visibility:public"],
+)

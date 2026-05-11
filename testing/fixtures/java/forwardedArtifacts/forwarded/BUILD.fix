@@ -1,0 +1,13 @@
+load(":forward.bzl", "forward")
+
+forward(
+    name = "fwd",
+    dep = "//lib:util",
+    testonly = 1,
+)
+
+forward(
+    name = "nested/fwd",
+    dep = "//lib:nested/util",
+    testonly = 1,
+)

@@ -53,6 +53,16 @@ test_fixture(
     targets = ["//:java_lib"],
 )
 
+test_fixture(
+    name = "forwardedArtifacts",
+    srcs = glob(["forwardedArtifacts/**"]),
+    aspects = _ASPECTS,
+    modules = _MODULES,
+    output_groups = _OUTPUT_GROUPS,
+    targets = ["//..."],
+    use_msys2 = True,
+)
+
 local_test_fixture(
     name = "maven",
     deps = [
