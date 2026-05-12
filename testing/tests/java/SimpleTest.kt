@@ -37,7 +37,7 @@ class SimpleTest {
     val target = aspect.findTarget("//:main")
     assertThat(target.hasJavaProvider()).isTrue()
     assertThat(target.kind).isEqualTo("java_binary")
-    assertThat(target.executable).isTrue()
+    assertThat(target.hasExecutableInfo()).isTrue()
     assertThat(target.testonly).isFalse()
 
     // Sources are reported correctly
@@ -70,7 +70,7 @@ class SimpleTest {
     val target = aspect.findTarget("//lib:util")
     assertThat(target.hasJavaProvider()).isTrue()
     assertThat(target.kind).isEqualTo("java_library")
-    assertThat(target.executable).isFalse()
+    assertThat(target.hasExecutableInfo()).isFalse()
     assertThat(target.testonly).isFalse()
 
     // Sources are reported correctly
@@ -109,7 +109,7 @@ class SimpleTest {
 
     assertThat(target.hasJavaProvider()).isTrue()
     assertThat(target.kind).isEqualTo("java_test")
-    assertThat(target.executable).isTrue()
+    assertThat(target.hasExecutableInfo()).isTrue()
     assertThat(target.testonly).isTrue()
 
     // Dependencies are reported correctly

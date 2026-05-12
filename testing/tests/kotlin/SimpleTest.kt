@@ -35,7 +35,7 @@ class SimpleTest {
     val target = aspect.findTarget("//:main")
     assertThat(target.hasKotlinTargetInfo()).isTrue()
     assertThat(target.kind).isEqualTo("kt_jvm_binary")
-    assertThat(target.executable).isTrue()
+    assertThat(target.hasExecutableInfo()).isTrue()
 
     // Sources are reported correctly
     assertThat(target.srcsList.size).isEqualTo(1)
@@ -60,7 +60,7 @@ class SimpleTest {
     val target = aspect.findTarget("//lib:util")
     assertThat(target.hasKotlinTargetInfo()).isTrue()
     assertThat(target.kind).isEqualTo("kt_jvm_library")
-    assertThat(target.executable).isFalse()
+    assertThat(target.hasExecutableInfo()).isFalse()
 
     // Sources are reported correctly
     assertThat(target.srcsList.size).isEqualTo(1)

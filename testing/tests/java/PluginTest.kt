@@ -38,7 +38,7 @@ class PluginTest {
     val target = aspect.findTarget("//:java_lib")
     assertThat(target.hasJavaProvider()).isTrue()
     assertThat(target.kind).isEqualTo("java_library")
-    assertThat(target.executable).isFalse()
+    assertThat(target.hasExecutableInfo()).isFalse()
     assertThat(target.srcsList).relativeArtifactPath().containsExactly("JavaLib.java")
     assertThat(target.depsList).dependencyLabels(DependencyType.COMPILE_TIME).contains("//helper:lib")
 
@@ -57,7 +57,7 @@ class PluginTest {
   fun testHelper() {
     val target = aspect.findTarget("//helper:lib")
     assertThat(target.kind).isEqualTo("java_library")
-    assertThat(target.executable).isFalse()
+    assertThat(target.hasExecutableInfo()).isFalse()
     assertThat(target.srcsList).relativeArtifactPath().containsExactly(
       "helper/src/com/example/processor/GenerateHelper.java",
       "helper/src/com/example/processor/HelperProcessor.java",
