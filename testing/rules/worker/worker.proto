@@ -126,7 +126,6 @@ message WorkArguments {
 
   string project_archive = 3;
   string aspect_bcr_archive = 4;
-  string aspect_ide_archive = 5;
 
   // The fixture configuration and what targets to build.
   TestConfig config = 6;

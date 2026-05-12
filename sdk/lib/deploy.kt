@@ -15,12 +15,19 @@
  */
 package com.intellij.aspect.lib
 
+import java.io.FilterInputStream
 import java.io.IOException
+import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
-import java.util.zip.ZipFile
+import java.util.zip.ZipInputStream
 import kotlin.io.path.extension
+
+/**
+ * Location of the bundled aspect archive inside the jar.
+ */
+private const val BUNDLED_ASPECT = "/archive_ide.zip"
 
 data class AspectConfig(
   /**
@@ -41,7 +48,8 @@ data class AspectConfig(
  * Deploy an aspect archive to a workspace directory.
  *
  * Extracts all files from the archive, rewrites their load statements using the
- * provided transformers, and generates the aspect configuration.
+ * provided transformers, and generates the aspect configuration. If the archiveZip
+ * is null, the bundled zip inside the jar will be deployed.
  *
  * @throws IOException if extraction or file operations fail
  */
@@ -49,11 +57,11 @@ data class AspectConfig(
 fun deployAspectZip(
   workspaceRoot: Path,
   relativeDestination: Path,
-  archiveZip: Path,
   config: AspectConfig,
+  archiveZip: Path? = null,
 ) {
   require(!relativeDestination.isAbsolute)
-  require(archiveZip.extension == "zip")
+  require(archiveZip == null || archiveZip.extension == "zip")
 
   val destination = workspaceRoot.resolve(relativeDestination)
   Files.createDirectories(destination)
@@ -68,20 +76,27 @@ fun deployAspectZip(
     transformers.add(TransformBuiltinRules)
   }
 
-  extractZipArchive(destination, archiveZip, transformers)
+  val archiveStream = if (archiveZip == null) {
+    config.javaClass.getResourceAsStream(BUNDLED_ASPECT)
+  } else {
+    Files.newInputStream(archiveZip)
+  }
+  requireNotNull(archiveStream)
+
+  extractZipArchive(destination, archiveStream, transformers)
   writeAspectConfig(destination, config)
 }
 
 @Throws(IOException::class)
 private fun extractZipArchive(
   destination: Path,
-  archiveZip: Path,
+  archiveZip: InputStream,
   transformers: List<Transformer>,
 ) {
   Files.createDirectories(destination)
 
-  ZipFile(archiveZip.toFile()).use { zip ->
-    zip.stream().forEach { entry ->
+  ZipInputStream(archiveZip).use { stream ->
+    generateSequence { stream.nextEntry }.forEach { entry ->
       val target = destination.resolve(entry.name)
 
       if (entry.isDirectory) {
@@ -89,7 +104,7 @@ private fun extractZipArchive(
       } else {
         Files.writeString(
           target,
-          transformFile(zip.getInputStream(entry), transformers),
+          transformFile(stream.nonClosing(), transformers),
           Charsets.UTF_8,
           StandardOpenOption.CREATE,
           StandardOpenOption.TRUNCATE_EXISTING,
@@ -97,4 +112,14 @@ private fun extractZipArchive(
       }
     }
   }
+}
+
+/**
+ * Returns a view of this [InputStream] whose [close] is a no-op.
+ *
+ * Useful when handing the stream to a consumer that closes it, while the caller
+ * needs to keep the underlying stream open (e.g. iterating a [ZipInputStream]).
+ */
+private fun InputStream.nonClosing(): InputStream = object : FilterInputStream(this) {
+  override fun close() { /* no-op */ }
 }
