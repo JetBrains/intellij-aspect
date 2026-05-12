@@ -71,7 +71,7 @@ class Sandbox(
     cmd.add("build")
     cmd.add("--disk_cache=" + server.sharedResources.diskCacheDirectory)
     cmd.add("--repository_cache=" + server.sharedResources.repoCacheDirectory)
-    cmd.add("--registry=" + server.sharedResources.registryDirectory.toUri())
+    cmd.add("--registry=" + registryUri())
 
     if (aspects.isNotEmpty()) {
       cmd.add("--aspects=" + aspects.joinToString(","))
@@ -118,6 +118,13 @@ class Sandbox(
     }
 
     return env
+  }
+
+  private fun registryUri(): String {
+    val uri = server.sharedResources.registryDirectory.toUri()
+
+    // workaround for Bazel 9.1.0 crash on Windows when host is null in file:// URIs
+    return URI(uri.scheme, "localhost", uri.path, uri.fragment).toString()
   }
 
   @Throws(IOException::class)

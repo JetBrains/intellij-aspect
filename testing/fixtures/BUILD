@@ -30,6 +30,8 @@ test_module_deps(
     flags = [
         "build --java_runtime_version=remotejdk_21 --java_language_version=21",
         "build --tool_java_runtime_version=remotejdk_21 --tool_java_language_version=21",
+        # required for implicit dependency on rules go
+        "common --incompatible_autoload_externally=+@rules_cc",
     ],
     module_name = "rules_kotlin",
     versions = [
@@ -39,6 +41,10 @@ test_module_deps(
 )
 
 test_module_deps(
+    flags = [
+        # required for implicit dependency on rules go
+        "common --incompatible_autoload_externally=+@rules_cc",
+    ],
     module_name = "protobuf",
     versions = [
         "34.1",
@@ -55,6 +61,10 @@ test_module_deps(
 )
 
 test_module_deps(
+    flags = [
+        # required for Bazel 9.1.0 compatability
+        "common --incompatible_autoload_externally=+@rules_cc",
+    ],
     module_name = "rules_go",
     versions = [
         "0.60.0",
