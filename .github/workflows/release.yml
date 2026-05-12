@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release Version'
+        required: true
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Setup Bazel
+      uses: bazel-contrib/setup-bazel@0.18.0
+      with:
+        bazelisk-cache: true
+        disk-cache: ${{ github.workflow }}
+        repository-cache: true
+
+    - name: Build release artifacts
+      run: bazel build //:sdk_deploy.jar //:archive_bcr //:archive_ide
+
+    - name: Stage artifacts
+      run: |
+        mkdir -p release
+        cp bazel-bin/sdk_deploy.jar       "release/sdk-${{ inputs.version }}.jar"
+        cp bazel-bin/archive_bcr.tar.gz   "release/archive_bcr-${{ inputs.version }}.tar.gz"
+        cp bazel-bin/archive_ide.zip      "release/archive_ide-${{ inputs.version }}.zip"
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v3
+      with:
+        files: release/*
+        tag_name: v${{ inputs.version }}
+        name: v${{ inputs.version }}
+        fail_on_unmatched_files: true
+        generated_files: true
+        draft: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
