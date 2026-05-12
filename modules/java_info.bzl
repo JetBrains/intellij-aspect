@@ -147,7 +147,9 @@ def _get_jdeps(target, ctx):
     # So we just "materialize" the in-memory file by copying it onto disk.
     materialized_jdeps = []
     for raw_jdeps_file in jdeps:
-        materialized_jdeps_file = ctx.actions.declare_file("materialized_" + raw_jdeps_file.basename)
+        materialized_jdeps_file = ctx.actions.declare_file(
+            "materialized_" + str(abs(hash(raw_jdeps_file.path))) + "_" + raw_jdeps_file.basename,
+        )
         copy(
             ctx,
             raw_jdeps_file,

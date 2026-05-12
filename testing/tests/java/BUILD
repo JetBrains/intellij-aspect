@@ -14,3 +14,8 @@ test_runner(
     fixture = "//testing/fixtures/java:plugin",
     test = "PluginTest.kt",
 )
+
+test_runner(
+    fixture = "//testing/fixtures/java:forwardedArtifacts",
+    test = "ForwardTest.kt",
+)
