@@ -130,8 +130,8 @@ class TemporaryWorkspace(private val workspace: Path, private val bazelExecutabl
     deployAspectZip(
       workspace,
       CURRENT_ASPECT.deployDirectory,
-      archive,
       config,
+      archive,
     )
   }
 
