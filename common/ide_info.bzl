@@ -43,6 +43,7 @@ def _write_info(target, ctx, fields):
         "key": target[intellij_common.TargetInfo].key,
         "workspace_name": ctx.workspace_name,
         "generator_name": getattr(ctx.rule.attr, "generator_name", ""),
+        "testonly": getattr(ctx.rule.attr, "testonly", False),
         "executable": target[DefaultInfo].files_to_run.executable != None,
         "env_inherit": getattr(ctx.rule.attr, "env_inherit", []),
         "env": {
