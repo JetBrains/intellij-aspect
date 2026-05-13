@@ -165,6 +165,12 @@ message KotlinTargetInfo {
   repeated string exported_compiler_plugin_targets_from_deps = 601;
 }
 
+message ScalaTargetInfo {
+  repeated string scalac_opts = 1;
+  repeated ArtifactLocation compiler_classpath = 2;
+  repeated string scalatest_classpath_targets = 4;
+}
+
 message ProtobufSourceMapping {
   string import_path = 1;
   ArtifactLocation proto_file = 2;
@@ -246,6 +252,7 @@ message TargetIdeInfo {
   JavaCommonInfo java_common = 183;
 
   KotlinTargetInfo kotlin_target_info = 190;
+  ScalaTargetInfo scala_target_info = 195;
 
   ProtobufTargetInfo protobuf_target_info = 200;
   GoTargetInfo go_target_info = 210;
