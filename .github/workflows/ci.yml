@@ -15,7 +15,7 @@ jobs:
       uses: jlumbroso/free-disk-space@v1.3.1
 
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Setup Bazel
       uses: bazel-contrib/setup-bazel@0.18.0
@@ -52,7 +52,7 @@ jobs:
         df -h /                                                                                                         
 
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Setup Bazel
       uses: bazel-contrib/setup-bazel@0.18.0
@@ -84,7 +84,7 @@ jobs:
       run: git config --global core.autocrlf input
 
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Setup MSYS2
       id: msys2
@@ -137,7 +137,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Check License Header
       uses: apache/skywalking-eyes/header@v0.8.0

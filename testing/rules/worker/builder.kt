@@ -56,12 +56,12 @@ fun main(args: Array<String>) {
 
       AspectDeployment.MATERIALIZED -> {
         writeModules(input.config.modulesList)
-        deployIdeAspect(input.aspectIdeArchive, version, useBuiltin = false)
+        deployIdeAspect(version, useBuiltin = false)
       }
 
       AspectDeployment.BUILTIN -> {
         writeModules(input.config.modulesList)
-        deployIdeAspect(input.aspectIdeArchive, version, useBuiltin = true)
+        deployIdeAspect(version, useBuiltin = true)
       }
 
       else -> throw IllegalArgumentException("unknown aspect deployment: $deployment")
@@ -121,7 +121,7 @@ private fun Sandbox.deployBcrAspect(archive: String): Path {
 }
 
 @Throws(IOException::class)
-private fun Sandbox.deployIdeAspect(archive: String, bazelVersion: String, useBuiltin: Boolean) {
+private fun Sandbox.deployIdeAspect(bazelVersion: String, useBuiltin: Boolean) {
   val config = AspectConfig(
     bazelVersion = bazelVersion,
     repoMapping = emptyMap(),
@@ -129,7 +129,7 @@ private fun Sandbox.deployIdeAspect(archive: String, bazelVersion: String, useBu
   )
 
   val subdir = if (useBuiltin) "builtin" else "default"
-  deployAspectZip(projectDirectory, Path.of("aspect", subdir), Path.of(archive), config)
+  deployAspectZip(projectDirectory, Path.of("aspect", subdir), config)
 }
 
 @Throws(IOException::class)

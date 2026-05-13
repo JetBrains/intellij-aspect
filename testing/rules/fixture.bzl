@@ -40,7 +40,6 @@ def _test_fixture_impl(ctx):
             output_profile = profile_file.path,
             project_archive = ctx.file.project.path,
             aspect_bcr_archive = ctx.file._aspect_bcr.path,
-            aspect_ide_archive = ctx.file._aspect_ide.path,
             config = serialize_test_config(config),
             targets = ctx.attr.targets,
             output_groups = ctx.attr.output_groups,
@@ -66,7 +65,6 @@ def _test_fixture_impl(ctx):
                 ctx.file._registry_file,
                 ctx.file.project,
                 ctx.file._aspect_bcr,
-                ctx.file._aspect_ide,
             ],
             executable = ctx.executable._builder,
             arguments = [worker_options, "@" + flagfile.path],
@@ -116,10 +114,6 @@ test_fixture = rule(
         "_aspect_bcr": attr.label(
             allow_single_file = [".zip"],
             default = Label("//:archive_test"),
-        ),
-        "_aspect_ide": attr.label(
-            allow_single_file = [".zip"],
-            default = Label("//:archive_ide"),
         ),
         "_registry_file": attr.label(
             allow_single_file = [".zip"],

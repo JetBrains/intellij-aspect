@@ -9,6 +9,7 @@ kt_jvm_library(
         "loads.kt",
         "transformers.kt",
     ],
+    resources = ["//:archive_ide"],
     visibility = ["//visibility:public"],
     deps = ["//private/lib:path"],
 )

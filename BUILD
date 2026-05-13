@@ -1,4 +1,5 @@
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
+load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files")
 load("@rules_pkg//pkg:pkg.bzl", "pkg_tar", "pkg_zip")
 load("//private/rules:local_registry.bzl", "local_registry")
@@ -61,4 +62,14 @@ local_registry(
     module_name = BCR_NAME,
     module_version = BCR_VERSION,
     visibility = ["//visibility:public"],
+)
+
+# the sdk jar, used to interact with the aspect; consumers are expected to provide
+# the kotlin stdlib themselves on their runtime classpath
+java_binary(
+    name = "sdk",
+    create_executable = False,
+    deploy_env = ["//third_party/kotlin:deploy_env"],
+    visibility = ["//visibility:public"],
+    runtime_deps = ["//sdk"],
 )
