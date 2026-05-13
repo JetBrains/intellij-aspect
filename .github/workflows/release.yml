@@ -42,8 +42,7 @@ jobs:
         tag_name: v${{ inputs.version }}
         name: v${{ inputs.version }}
         fail_on_unmatched_files: true
-        generated_files: true
-        draft: false
         generate_release_notes: true
+        draft: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
