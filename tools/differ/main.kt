@@ -93,6 +93,13 @@ fun main(args: Array<String>) {
     description = "Languages to deploy the current aspect for",
   )
 
+  val repoMapping by parser.option(
+    ArgType.String,
+    shortName = "m",
+    fullName = "repo-mapping",
+    description = "Repository mapping for the current (comma-separated assignments)",
+  )
+
   val newFields by parser.option(
     ArgType.String,
     shortName = "n",
@@ -138,7 +145,7 @@ fun main(args: Array<String>) {
       System.err.println("Reference aspect generated: ${referenceFiles.size} files")
 
       System.err.println("Deploying current aspect...")
-      workspace.deployCurrentAspect()
+      workspace.deployCurrentAspect(repoMapping?.let { parseRepoMapping(it) } ?: emptyMap())
 
       val currentFiles = workspace.runCurrentAspect(
         targetPattern,
@@ -224,3 +231,7 @@ private fun stringToLangue(s: String): Languages {
 }
 
 fun parseLanguages(s: String) = s.split(",").map(::stringToLangue)
+
+private fun parseRepoMapping(s: String): Map<String, String> {
+  return s.split(",").map { it.split("=", limit = 2).let { (key, value) -> key to value } }.toMap()
+}
