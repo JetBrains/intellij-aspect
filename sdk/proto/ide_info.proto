@@ -219,6 +219,7 @@ message TargetIdeInfo {
   repeated string features = 6;
   TestInfo test_info = 7;
   string workspace_name = 100;
+  bool testonly = 101;
   string generator_name = 1500;
   map<string, string> env = 70;
   repeated string env_inherit = 80;

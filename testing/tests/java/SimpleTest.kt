@@ -38,6 +38,7 @@ class SimpleTest {
     assertThat(target.hasJavaProvider()).isTrue()
     assertThat(target.kind).isEqualTo("java_binary")
     assertThat(target.executable).isTrue()
+    assertThat(target.testonly).isFalse()
 
     // Sources are reported correctly
     assertThat(target.srcsList.size).isEqualTo(1)
@@ -70,6 +71,7 @@ class SimpleTest {
     assertThat(target.hasJavaProvider()).isTrue()
     assertThat(target.kind).isEqualTo("java_library")
     assertThat(target.executable).isFalse()
+    assertThat(target.testonly).isFalse()
 
     // Sources are reported correctly
     assertThat(target.srcsList.size).isEqualTo(1)
@@ -108,6 +110,7 @@ class SimpleTest {
     assertThat(target.hasJavaProvider()).isTrue()
     assertThat(target.kind).isEqualTo("java_test")
     assertThat(target.executable).isTrue()
+    assertThat(target.testonly).isTrue()
 
     // Dependencies are reported correctly
     assertThat(target.depsList).dependencyLabels(DependencyType.COMPILE_TIME).contains("//lib:util")
