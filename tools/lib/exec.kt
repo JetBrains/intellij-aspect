@@ -67,7 +67,7 @@ fun executeBuild(
     )
 
     if (verbose) {
-      println("Executing Bazel build command: ${cmd.joinToString(" ")}")
+      System.err.println("Executing Bazel build command: ${cmd.joinToString(" ")}")
     }
     // execute the build command in the current workspace root
     executeCommand(*cmd.toTypedArray(), pwd = workspaceRoot)
