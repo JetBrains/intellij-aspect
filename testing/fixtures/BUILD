@@ -40,6 +40,33 @@ test_module_deps(
     ],
 )
 
+_SCALA_CONFIG = """
+scala_config = use_extension(
+    "@rules_scala//scala/extensions:config.bzl",
+    "scala_config",
+)
+scala_config.settings(scala_version = "2.13.17")
+
+scala_deps = use_extension(
+    "@rules_scala//scala/extensions:deps.bzl",
+    "scala_deps",
+)
+scala_deps.scala()
+scala_deps.scalatest()
+"""
+
+test_module_deps(
+    config = _SCALA_CONFIG,
+    flags = [
+        "build --java_runtime_version=remotejdk_21 --java_language_version=21",
+        "build --tool_java_runtime_version=remotejdk_21 --tool_java_language_version=21",
+    ],
+    module_name = "rules_scala",
+    versions = [
+        "7.1.6",
+    ],
+)
+
 test_module_deps(
     flags = [
         # required for implicit dependency on rules go

@@ -118,11 +118,11 @@ class TemporaryWorkspace(private val workspace: Path, private val bazelExecutabl
    * the workspace and generate the configuration.
    */
   @Throws(IOException::class)
-  fun deployCurrentAspect() {
+  fun deployCurrentAspect(repoMapping: Map<String, String>) {
     val version = executeCommand(bazelExecutable, "--version").removePrefix("bazel").trim()
     val config = AspectConfig(
       bazelVersion = version,
-      repoMapping = emptyMap(),
+      repoMapping = repoMapping,
       useBuiltin = false,
     )
 
