@@ -35,6 +35,15 @@ def _write_info(target, ctx, fields):
         is_external = intellij_common.label_is_external(ctx.label),
     )
 
+    files_to_run = target[DefaultInfo].files_to_run or struct()
+
+    # Make executeable_info a struct if and only if files_to_run.executable is present and not None.
+    # This will ensure the correct signal when observing the presence of the executable_info message.
+    executable_info = intellij_common.struct(
+        executable_file = artifact_location.from_file(files_to_run.executable),
+        runfiles_manifest = artifact_location.from_file(getattr(files_to_run, "runfiles_manifest", None)),
+    ) if getattr(files_to_run, "executable", None) != None else None
+
     info = fields | {
         "build_file_artifact_location": build_file_location,
         "features": ctx.features,
@@ -44,7 +53,7 @@ def _write_info(target, ctx, fields):
         "workspace_name": ctx.workspace_name,
         "generator_name": getattr(ctx.rule.attr, "generator_name", ""),
         "testonly": getattr(ctx.rule.attr, "testonly", False),
-        "executable": target[DefaultInfo].files_to_run.executable != None,
+        "executable_info": executable_info,
         "env_inherit": getattr(ctx.rule.attr, "env_inherit", []),
         "env": {
             k: "".join(expand_make_variables(ctx, False, [v]))

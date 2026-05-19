@@ -25,6 +25,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import java.util.Locale
+import java.util.Locale.getDefault
 
 @RunWith(JUnit4::class)
 class SimpleTest {
@@ -38,6 +40,9 @@ class SimpleTest {
     val target = aspect.findTarget("//:main")
     assertThat(target.kind).isEqualTo("py_binary")
     assertThat(target.srcsList).relativeArtifactPath().containsExactly("main.py")
+    assertThat(target.executableInfo.executableFile.relativePath).startsWith("main")
+    assertThat(target.executableInfo.runfilesManifest.relativePath).startsWith("main")
+    assertThat(target.executableInfo.runfilesManifest.relativePath.lowercase(getDefault())).contains("manifest")
 
     assertThat(target.hasPythonTargetInfo()).isTrue()
     assertThat(target.pythonTargetInfo.version).isEqualTo("PY3")
@@ -51,6 +56,8 @@ class SimpleTest {
     val target = aspect.findTarget("//:lib")
     assertThat(target.kind).isEqualTo("py_library")
     assertThat(target.srcsList).relativeArtifactPath().containsExactly("lib.py")
+    assertThat(target.executableInfo.executableFile.relativePath).isEmpty()
+    assertThat(target.executableInfo.runfilesManifest.relativePath).isEmpty()
 
     assertThat(target.hasPythonTargetInfo()).isTrue()
     assertThat(target.pythonTargetInfo.version).isEqualTo("PY3")
@@ -63,6 +70,9 @@ class SimpleTest {
     val target = aspect.findTarget("//:test")
     assertThat(target.kind).isEqualTo("py_test")
     assertThat(target.srcsList).relativeArtifactPath().containsExactly("test.py")
+    assertThat(target.executableInfo.executableFile.relativePath).startsWith("test")
+    assertThat(target.executableInfo.runfilesManifest.relativePath).startsWith("test")
+    assertThat(target.executableInfo.runfilesManifest.relativePath.lowercase(getDefault())).contains("manifest")
 
     assertThat(target.hasPythonTargetInfo()).isTrue()
     assertThat(target.pythonTargetInfo.version).isEqualTo("PY3")
