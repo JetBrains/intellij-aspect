@@ -13,3 +13,15 @@ kt_jvm_library(
     visibility = ["//visibility:public"],
     deps = ["//private/lib:path"],
 )
+
+kt_jvm_library(
+    name = "read",
+    srcs = [
+        "readtarget.kt",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//sdk/proto:ide_info_java_proto",
+        "@protobuf//:protobuf_java",
+    ],
+)
