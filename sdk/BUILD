@@ -5,6 +5,7 @@ java_library(
     visibility = ["//visibility:public"],
     exports = [
         "//sdk/lib:deploy",
+        "//sdk/lib:read",
         "//sdk/proto:common_java_proto",
         "//sdk/proto:ide_info_java_proto",
     ],
