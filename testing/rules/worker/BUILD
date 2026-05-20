@@ -3,6 +3,8 @@ load("@protobuf//bazel:proto_library.bzl", "proto_library")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 
+package(default_testonly = True)
+
 proto_library(
     name = "worker_proto",
     srcs = ["worker.proto"],
@@ -16,6 +18,7 @@ java_proto_library(
 
 kt_jvm_library(
     name = "builder_lib",
+    testonly = 1,
     srcs = [
         "builder.kt",
         "sandbox.kt",
