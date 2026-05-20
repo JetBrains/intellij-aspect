@@ -8,12 +8,9 @@ on:
 
 jobs:
   linux-test:
-    runs-on: ubuntu-latest
+    runs-on: Large-Linux-x64-16-64-for-intellij-aspect-public
 
     steps:
-    - name: Free disk space
-      uses: jlumbroso/free-disk-space@v1.3.1
-
     - name: Checkout code
       uses: actions/checkout@v6
 
