@@ -9,7 +9,7 @@ common --enable_platform_specific_config
 build:windows --repo_env=BAZEL_SH
 
 # avoid self-extracting Python zip launchers on Windows; their runfiles extraction can exceed MAX_PATH
-build --build_python_zip=no
+build --@rules_python//python/config_settings:build_python_zip=false
 build --enable_runfiles
 
 # disallow network access by default to make sure our bazel caches work as intended
