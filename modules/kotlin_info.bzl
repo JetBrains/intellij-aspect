@@ -22,6 +22,7 @@ load(":provider.bzl", "intellij_provider")
 IMPORT_RULE_KIND = ["kt_jvm_import"]
 COMPILE_DEPS = ["associates"]
 EXPORTED_COMPILE_TIME_DEPS = ["exports"]
+RUNTIME_DEPS = ["resource_jars"]
 
 def _get_additional_javac_options(ctx):
     if TOOLCHAIN_TYPE not in ctx.toolchains:
@@ -231,6 +232,10 @@ def _aspect_impl(target, ctx):
                 intellij_deps.EXPORTED_COMPILE_TIME: intellij_deps.collect(
                     ctx,
                     attributes = EXPORTED_COMPILE_TIME_DEPS,
+                ),
+                intellij_deps.RUNTIME: intellij_deps.collect(
+                    ctx,
+                    attributes = RUNTIME_DEPS,
                 ),
             },
             internal_value = intellij_common.struct(

@@ -9,3 +9,8 @@ test_runner(
     fixture = "//testing/fixtures/kotlin:associates",
     test = "AssociatesTest.kt",
 )
+
+test_runner(
+    fixture = "//testing/fixtures/kotlin:resources",
+    test = "ResourcesTest.kt",
+)

@@ -15,7 +15,20 @@ _MODULES = [
     "//conditions:default": ["//testing/fixtures:rules_kotlin_2_2_0"],
 })
 
+_MOUDLES_WITH_JAVA = _MODULES + [
+    "//testing/fixtures:rules_java_9_3_0",
+]
+
 _ASPECTS = [
+    "modules:kotlin_info.bzl%intellij_kotlin_info_aspect",
+    # order is important, run jvm_info and java_common after all JVM-languages
+    "modules:jvm_info.bzl%intellij_jvm_info_aspect",
+    "modules:java_common_info.bzl%intellij_java_common_info_aspect",
+    "intellij:aspect.bzl%intellij_info_aspect",
+]
+
+_ASPECTS_WITH_JAVA = [
+    "modules:java_info.bzl%intellij_java_info_aspect",
     "modules:kotlin_info.bzl%intellij_kotlin_info_aspect",
     # order is important, run jvm_info and java_common after all JVM-languages
     "modules:jvm_info.bzl%intellij_jvm_info_aspect",
@@ -46,5 +59,15 @@ test_fixture(
     modules = _MODULES,
     targets = [
         "//:A",
+    ],
+)
+
+test_fixture(
+    name = "resources",
+    srcs = glob(["resources/**"]),
+    aspects = _ASPECTS_WITH_JAVA,
+    modules = _MOUDLES_WITH_JAVA,
+    targets = [
+        "//module:a-lib",
     ],
 )
