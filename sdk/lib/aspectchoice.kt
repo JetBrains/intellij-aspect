@@ -59,3 +59,8 @@ fun aspectsForLanguages(languages: Set<Languages>): List<String> {
     languages.any { it in runsOnLanguage }
   }.map { it.first }
 }
+
+// If the repository names of the rules for certain languages are known, provide the appropriate
+// repo-mapping to be used in the aspect configuration.
+fun repoMappingForLanguages(mapping: Map<Languages, String>): Map<String, String> =
+  mapping.mapKeys { (language, _) -> RULE_NAMES[language]!! }

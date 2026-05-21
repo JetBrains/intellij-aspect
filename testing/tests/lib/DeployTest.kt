@@ -20,9 +20,11 @@ import com.google.devtools.build.runfiles.Runfiles
 import com.intellij.aspect.lib.AspectConfig
 import com.intellij.aspect.lib.Languages
 import com.intellij.aspect.lib.LoadStatement
+import com.intellij.aspect.lib.RULE_NAMES
 import com.intellij.aspect.lib.Repository
 import com.intellij.aspect.lib.deployAspectZip
 import com.intellij.aspect.lib.parseLoads
+import com.intellij.aspect.lib.repoMappingForLanguages
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -119,5 +121,25 @@ class DeployTest {
     val repos = readLoads(path, "modules/cc_info.bzl").map { it.repository }
     assertThat(repos).contains(Repository.External("@my_rules_cc"))
     assertThat(repos).doesNotContain(Repository.External("@rules_cc"))
+  }
+
+  @Test
+  fun testLanguageRepoMapping() {
+    assertThat(
+      repoMappingForLanguages(
+        mapOf(
+          Languages.PYTHON to "@@rules_python+",
+          Languages.PROTO to "@com_google_protobuf",
+        ),
+      ),
+    ).containsExactly(
+      "@rules_python", "@@rules_python+",
+      "@protobuf", "@com_google_protobuf",
+    )
+
+    // Also verify that all languages are covered.
+    for (language in Languages.entries) {
+      assertThat(repoMappingForLanguages(mapOf(language to "@@canonical+")).values).contains("@@canonical+")
+    }
   }
 }
