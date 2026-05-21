@@ -18,6 +18,7 @@ package com.intellij.aspect.testing.tests.lib
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.build.runfiles.Runfiles
 import com.intellij.aspect.lib.AspectConfig
+import com.intellij.aspect.lib.Languages
 import com.intellij.aspect.lib.LoadStatement
 import com.intellij.aspect.lib.Repository
 import com.intellij.aspect.lib.deployAspectZip
@@ -61,7 +62,7 @@ class DeployTest {
       AspectConfig(
         bazelVersion = "8.5.0",
         repoMapping = emptyMap(),
-        useBuiltin = false,
+        useBuiltin = emptySet(),
       ),
     )
 
@@ -76,7 +77,7 @@ class DeployTest {
       AspectConfig(
         bazelVersion = "8.5.0",
         repoMapping = emptyMap(),
-        useBuiltin = true,
+        useBuiltin = Languages.entries.toSet(),
       ),
     )
 
@@ -88,12 +89,30 @@ class DeployTest {
   }
 
   @Test
+  fun testDeployPartialBuiltinRules() {
+    val path = deployArchive(
+      AspectConfig(
+        bazelVersion = "8.5.0",
+        repoMapping = emptyMap(),
+        useBuiltin = setOf(Languages.PYTHON),
+      ),
+    )
+
+    val reposCC = readLoads(path, "modules/cc_info.bzl").map { it.repository }
+    assertThat(reposCC).contains(Repository.External("@rules_cc"))
+    assertThat(reposCC).contains(Repository.Absolute)
+
+    val reposPython = readLoads(path, "modules/python_info.bzl").map { it.repository }
+    assertThat(reposPython).doesNotContain(Repository.External("@rules_python"))
+  }
+
+  @Test
   fun testDeployRepoMapping() {
     val path = deployArchive(
       AspectConfig(
         bazelVersion = "8.5.0",
         repoMapping = mapOf("@rules_cc" to "@my_rules_cc"),
-        useBuiltin = false,
+        useBuiltin = emptySet(),
       ),
     )
 

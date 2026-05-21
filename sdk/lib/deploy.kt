@@ -39,9 +39,9 @@ data class AspectConfig(
    */
   val repoMapping: Map<String, String>,
   /**
-   * Whether to use builtin rules i.e. whether to strip rule set loads.
+   * Languages for which to use the builtin rule, i.e., for which to strip rule set loads.
    */
-  val useBuiltin: Boolean,
+  val useBuiltin: Set<Languages>,
 )
 
 /**
@@ -71,10 +71,10 @@ fun deployAspectZip(
     TransformExternalRepositories(config.repoMapping),
   )
 
-  if (config.useBuiltin) {
+  if (Languages.CC in config.useBuiltin) {
     transformers.add(TransformCcToolchainType)
-    transformers.add(TransformBuiltinRules)
   }
+  transformers.add(TransformBuiltinRules(config.useBuiltin))
 
   val archiveStream = if (archiveZip == null) {
     config.javaClass.getResourceAsStream(BUNDLED_ASPECT)

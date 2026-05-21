@@ -123,7 +123,7 @@ class TemporaryWorkspace(private val workspace: Path, private val bazelExecutabl
     val config = AspectConfig(
       bazelVersion = version,
       repoMapping = repoMapping,
-      useBuiltin = false,
+      useBuiltin = emptySet(),
     )
 
     val archive = RunfilesRepo.rlocation(CURRENT_ASPECT.runfilesLocation)

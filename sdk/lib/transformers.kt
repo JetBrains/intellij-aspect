@@ -18,8 +18,6 @@ package com.intellij.aspect.lib
 import com.intellij.aspect.private.lib.utils.asBazelPath
 import java.nio.file.Path
 
-private val ALLOWED_BUILTIN_LOADS = listOf("@bazel_tools")
-
 private const val CC_TOOLCHAIN_FIELD = "CC_TOOLCHAIN_TYPE"
 private const val CC_TOOLCHAIN_LABEL = "@bazel_tools//tools/cpp:toolchain_type"
 
@@ -59,11 +57,12 @@ class TransformExternalRepositories(private val mapping: Map<String, String>) : 
  * Removes load statements from external repositories not in the allowed list. Used for removing
  * loads when the user's project uses the builtin rules.
  */
-object TransformBuiltinRules : Transformer {
+class TransformBuiltinRules(useBuiltin: Set<Languages>) : Transformer {
+  val repoNamesToRemove = useBuiltin.map { it.rulesetName }
 
   override fun apply(loads: MutableList<LoadStatement>, lines: MutableList<String>) {
     loads.removeAll { stmt ->
-      stmt.repository is Repository.External && stmt.repository.name !in ALLOWED_BUILTIN_LOADS
+      stmt.repository is Repository.External && stmt.repository.name in repoNamesToRemove
     }
   }
 }

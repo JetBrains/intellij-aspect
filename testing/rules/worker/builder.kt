@@ -18,6 +18,7 @@ package com.intellij.aspect.testing.rules.worker
 import com.google.devtools.intellij.ideinfo.IdeInfo.TargetIdeInfo
 import com.google.protobuf.TextFormat
 import com.intellij.aspect.lib.AspectConfig
+import com.intellij.aspect.lib.Languages
 import com.intellij.aspect.lib.deployAspectZip
 import com.intellij.aspect.private.lib.utils.asBazelPath
 import com.intellij.aspect.private.lib.utils.unzip
@@ -125,7 +126,7 @@ private fun Sandbox.deployIdeAspect(bazelVersion: String, useBuiltin: Boolean) {
   val config = AspectConfig(
     bazelVersion = bazelVersion,
     repoMapping = emptyMap(),
-    useBuiltin = useBuiltin,
+    useBuiltin = if (useBuiltin) Languages.entries.toSet() else emptySet(),
   )
 
   val subdir = if (useBuiltin) "builtin" else "default"

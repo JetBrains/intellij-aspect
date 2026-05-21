@@ -17,6 +17,7 @@
 package com.intellij.aspect.tools.deploy
 
 import com.intellij.aspect.lib.AspectConfig
+import com.intellij.aspect.lib.Languages
 import com.intellij.aspect.lib.deployAspectZip
 import com.intellij.aspect.tools.RunfilesRepo
 import com.intellij.aspect.tools.lib.executeCommand
@@ -99,7 +100,7 @@ private fun deployIde(targetPath: Path, bazelExecutable: String, useBuiltin: Boo
   val config = AspectConfig(
     bazelVersion = version,
     repoMapping = emptyMap(),
-    useBuiltin = useBuiltin,
+    useBuiltin = if (useBuiltin) Languages.entries.toSet() else emptySet(),
   )
 
   deployAspectZip(

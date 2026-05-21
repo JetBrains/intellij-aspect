@@ -26,6 +26,16 @@ enum class Languages {
   PROTO,
 }
 
+val RULE_NAMES = mapOf(
+  Languages.CC to "@rules_cc",
+  Languages.PYTHON to "@rules_python",
+  Languages.JAVA to "@rules_java",
+  Languages.KOTLIN to "@rules_kotlin",
+  Languages.SCALA to "@rules_scala",
+  Languages.GO to "@rules_go",
+  Languages.PROTO to "@protobuf",
+)
+
 // Aspects in correct (topological) order together with the languages for which they should be present.
 private val aspectsWithLanguages =
   listOf(
