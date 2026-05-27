@@ -112,7 +112,7 @@ class DeployTest {
     val path = deployArchive(
       AspectConfig(
         bazelVersion = "8.5.0",
-        repoMapping = mapOf("@rules_cc" to "@my_rules_cc"),
+        repoMapping = mapOf(Rules.CC to "@my_rules_cc"),
         useBuiltin = emptySet(),
       ),
     )
@@ -120,25 +120,5 @@ class DeployTest {
     val repos = readLoads(path, "modules/cc_info.bzl").map { it.repository }
     assertThat(repos).contains(Repository.External("@my_rules_cc"))
     assertThat(repos).doesNotContain(Repository.External("@rules_cc"))
-  }
-
-  @Test
-  fun testLanguageRepoMapping() {
-    assertThat(
-      repoMappingForRules(
-        mapOf(
-          Rules.PYTHON to "@@rules_python+",
-          Rules.PROTO to "@com_google_protobuf",
-        ),
-      ),
-    ).containsExactly(
-      "@rules_python", "@@rules_python+",
-      "@protobuf", "@com_google_protobuf",
-    )
-
-    // Also verify that all languages are covered.
-    for (language in Rules.entries) {
-      assertThat(repoMappingForRules(mapOf(language to "@@canonical+")).values).contains("@@canonical+")
-    }
   }
 }

@@ -233,6 +233,6 @@ private fun stringToLangue(s: String): Rules {
 
 fun parseLanguages(s: String) = s.split(",").map(::stringToLangue)
 
-private fun parseRepoMapping(s: String): Map<String, String> {
-  return s.split(",").map { it.split("=", limit = 2).let { (key, value) -> key to value } }.toMap()
+private fun parseRepoMapping(s: String): Map<Rules, String> {
+  return s.split(",").map { it.split("=", limit = 2).let { (key, value) -> stringToLangue(key) to value } }.toMap()
 }

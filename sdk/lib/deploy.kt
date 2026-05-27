@@ -39,7 +39,7 @@ data class AspectConfig(
   /**
    * A mapping from default repo names to a specific replacement e.g., conical repo name.
    */
-  val repoMapping: Map<String, String>,
+  val repoMapping: Map<Rules, String>,
   /**
    * Languages for which to use the builtin rule, i.e., for which to strip rule set loads.
    */

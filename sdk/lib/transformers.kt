@@ -40,14 +40,16 @@ class TransformRelativePaths(private val prefix: Path) : Transformer {
 /**
  *  Remaps external repository names according to the provided mapping.
  */
-class TransformExternalRepositories(private val mapping: Map<String, String>) : Transformer {
+class TransformExternalRepositories(private val mapping: Map<Rules, String>) : Transformer {
+
+  val nameMapping = mapping.mapKeys { (language, _) -> language.rulesetName }
 
   override fun apply(loads: MutableList<LoadStatement>, lines: MutableList<String>) {
     loads.replaceAll { stmt ->
-      if (stmt.repository !is Repository.External || stmt.repository.name !in mapping) {
+      if (stmt.repository !is Repository.External || stmt.repository.name !in nameMapping) {
         stmt
       } else {
-        stmt.copy(repository = Repository.External(mapping[stmt.repository.name]!!))
+        stmt.copy(repository = Repository.External(nameMapping[stmt.repository.name]!!))
       }
     }
   }
