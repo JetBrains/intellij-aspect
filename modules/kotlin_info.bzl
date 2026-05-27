@@ -167,9 +167,15 @@ def _get_generated_jars(target, ctx):
         ]
     return []
 
-def _get_outputs(target, ctx):
+def _get_outputs(target, ctx, plugins):
     resolve_files = []
     resolve_transitives = []
+    sync_transitives = []
+    if TOOLCHAIN_TYPE in ctx.toolchains and hasattr(ctx.toolchains[TOOLCHAIN_TYPE], "jvm_stdlibs"):
+        sync_transitives = [ctx.toolchains[TOOLCHAIN_TYPE].jvm_stdlibs.compile_jars]
+    for plugin in plugins:
+        if KtCompilerPluginInfo in plugin:
+            sync_transitives += [plugin[KtCompilerPluginInfo].classpath]
     for out in getattr(getattr(target[KtJvmInfo], "outputs", struct()), "jars", []):
         if getattr(out, "compile_jar", None):
             resolve_files += [out.compile_jar]
@@ -185,9 +191,12 @@ def _get_outputs(target, ctx):
     if intellij_common.label_is_external(target.label) or (ctx.rule.kind in IMPORT_RULE_KIND):
         return {"intellij-sync-java": depset(resolve_files, transitive = resolve_transitives + [
             getattr(target[KtJvmInfo], "transitive_source_jars", depset()),
-        ])}
+        ] + sync_transitives)}
     else:
-        return {"intellij-build-java": depset(resolve_files, transitive = resolve_transitives)}
+        return {
+            "intellij-sync-java": depset(transitive = sync_transitives),
+            "intellij-build-java": depset(resolve_files, transitive = resolve_transitives),
+        }
 
 def _aspect_impl(target, ctx):
     if not KtJvmInfo in target:
@@ -209,7 +218,7 @@ def _aspect_impl(target, ctx):
     return [
         intellij_provider.create(
             provider = intellij_provider.KotlinInfo,
-            outputs = _get_outputs(target, ctx),
+            outputs = _get_outputs(target, ctx, plugins),
             value = intellij_common.struct(
                 language_version = getattr(target[KtJvmInfo], "language_version", None),
                 api_version = getattr(target[KtJvmInfo], "language_version", None),  # API version currently not exposed

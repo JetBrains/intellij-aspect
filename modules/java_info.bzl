@@ -129,8 +129,6 @@ def _get_outputs(target, ctx, jdeps):
                 resolve_files += out.source_jars
     if intellij_common.label_is_external(target.label) or (ctx.rule.kind in IMPORT_RULE_KIND):
         return {"intellij-sync-java": depset(resolve_files, transitive = resolve_transitives + [
-            _runtime_jars(target),
-            _compile_jars(target),
             target[JavaInfo].transitive_source_jars,
         ])}
     else:
