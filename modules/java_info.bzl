@@ -114,7 +114,7 @@ def _compile_jars(target):
 
 def _get_outputs(target, ctx, jdeps):
     resolve_files = []
-    resolve_transitives = []
+    resolve_transitives = [_runtime_jars(target), _compile_jars(target)]
     for out in target[JavaInfo].java_outputs:
         if getattr(out, "compile_jar", None):
             resolve_files += [out.compile_jar]
