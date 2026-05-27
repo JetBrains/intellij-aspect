@@ -66,4 +66,13 @@ class SimpleTest {
       }.map { it.importPath },
     ).isEqualTo(listOf("my_prefix/libA/lib_a.proto"))
   }
+
+  @Test
+  fun testOutputGroups() {
+    val buildFiles = aspect.findOutputGroup("intellij-build-java")
+    assertThat(buildFiles.filter { it.contains("consumerJava/main.jar") }).isNotEmpty()
+    assertThat(buildFiles.filter { it.contains("consumerJava/main-src.jar") }).isNotEmpty()
+    assertThat(buildFiles.filter { it.contains("libB/liblib_b") }).isNotEmpty()
+    assertThat(buildFiles.filter { it.contains("libA/liblib_a") }).isNotEmpty()
+  }
 }
