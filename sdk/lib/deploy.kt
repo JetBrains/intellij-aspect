@@ -43,7 +43,7 @@ data class AspectConfig(
   /**
    * Languages for which to use the builtin rule, i.e., for which to strip rule set loads.
    */
-  val useBuiltin: Set<Languages>,
+  val useBuiltin: Set<Rules>,
 )
 
 /**
@@ -73,7 +73,7 @@ fun deployAspectZip(
     TransformExternalRepositories(config.repoMapping),
   )
 
-  if (Languages.CC in config.useBuiltin) {
+  if (Rules.CC in config.useBuiltin) {
     transformers.add(TransformCcToolchainType)
   }
   transformers.add(TransformBuiltinRules(config.useBuiltin))

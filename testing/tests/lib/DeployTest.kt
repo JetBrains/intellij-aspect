@@ -18,13 +18,12 @@ package com.intellij.aspect.testing.tests.lib
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.build.runfiles.Runfiles
 import com.intellij.aspect.lib.AspectConfig
-import com.intellij.aspect.lib.Languages
 import com.intellij.aspect.lib.LoadStatement
-import com.intellij.aspect.lib.RULE_NAMES
 import com.intellij.aspect.lib.Repository
+import com.intellij.aspect.lib.Rules
 import com.intellij.aspect.lib.deployAspectZip
 import com.intellij.aspect.lib.parseLoads
-import com.intellij.aspect.lib.repoMappingForLanguages
+import com.intellij.aspect.lib.repoMappingForRules
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -79,7 +78,7 @@ class DeployTest {
       AspectConfig(
         bazelVersion = "8.5.0",
         repoMapping = emptyMap(),
-        useBuiltin = Languages.entries.toSet(),
+        useBuiltin = Rules.entries.toSet(),
       ),
     )
 
@@ -96,7 +95,7 @@ class DeployTest {
       AspectConfig(
         bazelVersion = "8.5.0",
         repoMapping = emptyMap(),
-        useBuiltin = setOf(Languages.PYTHON),
+        useBuiltin = setOf(Rules.PYTHON),
       ),
     )
 
@@ -126,10 +125,10 @@ class DeployTest {
   @Test
   fun testLanguageRepoMapping() {
     assertThat(
-      repoMappingForLanguages(
+      repoMappingForRules(
         mapOf(
-          Languages.PYTHON to "@@rules_python+",
-          Languages.PROTO to "@com_google_protobuf",
+          Rules.PYTHON to "@@rules_python+",
+          Rules.PROTO to "@com_google_protobuf",
         ),
       ),
     ).containsExactly(
@@ -138,8 +137,8 @@ class DeployTest {
     )
 
     // Also verify that all languages are covered.
-    for (language in Languages.entries) {
-      assertThat(repoMappingForLanguages(mapOf(language to "@@canonical+")).values).contains("@@canonical+")
+    for (language in Rules.entries) {
+      assertThat(repoMappingForRules(mapOf(language to "@@canonical+")).values).contains("@@canonical+")
     }
   }
 }

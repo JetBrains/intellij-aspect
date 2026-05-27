@@ -57,7 +57,7 @@ class TransformExternalRepositories(private val mapping: Map<String, String>) : 
  * Removes load statements from external repositories not in the allowed list. Used for removing
  * loads when the user's project uses the builtin rules.
  */
-class TransformBuiltinRules(useBuiltin: Set<Languages>) : Transformer {
+class TransformBuiltinRules(useBuiltin: Set<Rules>) : Transformer {
   val repoNamesToRemove = useBuiltin.map { it.rulesetName }
 
   override fun apply(loads: MutableList<LoadStatement>, lines: MutableList<String>) {

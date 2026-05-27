@@ -16,45 +16,35 @@
 
 package com.intellij.aspect.lib
 
-enum class Languages {
-  CC,
-  PYTHON,
-  JAVA,
-  KOTLIN,
-  SCALA,
-  GO,
-  PROTO,
+enum class Rules(val rulesetName: String) {
+  CC("@rules_cc"),
+  PYTHON("@rules_python"),
+  JAVA("@rules_java"),
+  KOTLIN("@rules_kotlin"),
+  SCALA("@rules_scala"),
+  GO("@rules_go"),
+  PROTO("@protobuf"),
 }
-
-val RULE_NAMES = mapOf(
-  Languages.CC to "@rules_cc",
-  Languages.PYTHON to "@rules_python",
-  Languages.JAVA to "@rules_java",
-  Languages.KOTLIN to "@rules_kotlin",
-  Languages.SCALA to "@rules_scala",
-  Languages.GO to "@rules_go",
-  Languages.PROTO to "@protobuf",
-)
 
 // Aspects in correct (topological) order together with the languages for which they should be present.
 private val aspectsWithLanguages =
   listOf(
-    "modules:protobuf_info.bzl%intellij_protobuf_info_aspect" to setOf(Languages.PROTO),
-    "modules:cc_info.bzl%intellij_cc_info_aspect" to setOf(Languages.CC),
-    "modules:py_info.bzl%intellij_py_info_aspect" to setOf(Languages.PYTHON),
-    "modules:python_info.bzl%intellij_python_info_aspect" to setOf(Languages.PYTHON),
-    "modules:java_info.bzl%intellij_java_info_aspect" to setOf(Languages.JAVA),
-    "modules:kotlin_info.bzl%intellij_kotlin_info_aspect" to setOf(Languages.KOTLIN),
-    "modules:scala_info.bzl%intellij_scala_info_aspect" to setOf(Languages.SCALA),
-    "modules:jvm_info.bzl%intellij_jvm_info_aspect" to setOf(Languages.JAVA, Languages.KOTLIN, Languages.SCALA),
+    "modules:protobuf_info.bzl%intellij_protobuf_info_aspect" to setOf(Rules.PROTO),
+    "modules:cc_info.bzl%intellij_cc_info_aspect" to setOf(Rules.CC),
+    "modules:py_info.bzl%intellij_py_info_aspect" to setOf(Rules.PYTHON),
+    "modules:python_info.bzl%intellij_python_info_aspect" to setOf(Rules.PYTHON),
+    "modules:java_info.bzl%intellij_java_info_aspect" to setOf(Rules.JAVA),
+    "modules:kotlin_info.bzl%intellij_kotlin_info_aspect" to setOf(Rules.KOTLIN),
+    "modules:scala_info.bzl%intellij_scala_info_aspect" to setOf(Rules.SCALA),
+    "modules:jvm_info.bzl%intellij_jvm_info_aspect" to setOf(Rules.JAVA, Rules.KOTLIN, Rules.SCALA),
     "modules:java_common_info.bzl%intellij_java_common_info_aspect" to
-      setOf(Languages.JAVA, Languages.KOTLIN, Languages.SCALA),
-    "modules:go_info.bzl%intellij_go_info_aspect" to setOf(Languages.GO),
-    "intellij:aspect.bzl%intellij_info_aspect" to Languages.values().toSet(),
+      setOf(Rules.JAVA, Rules.KOTLIN, Rules.SCALA),
+    "modules:go_info.bzl%intellij_go_info_aspect" to setOf(Rules.GO),
+    "intellij:aspect.bzl%intellij_info_aspect" to Rules.values().toSet(),
   )
 
 // For the specified languages, return the list of aspects to be run in correct order.
-fun aspectsForLanguages(languages: Set<Languages>): List<String> {
+fun aspectsForLanguages(languages: Set<Rules>): List<String> {
   return aspectsWithLanguages.filter { (aspect, runsOnLanguage) ->
     languages.any { it in runsOnLanguage }
   }.map { it.first }
@@ -62,5 +52,5 @@ fun aspectsForLanguages(languages: Set<Languages>): List<String> {
 
 // If the repository names of the rules for certain languages are known, provide the appropriate
 // repo-mapping to be used in the aspect configuration.
-fun repoMappingForLanguages(mapping: Map<Languages, String>): Map<String, String> =
-  mapping.mapKeys { (language, _) -> RULE_NAMES[language]!! }
+fun repoMappingForRules(mapping: Map<Rules, String>): Map<String, String> =
+  mapping.mapKeys { (language, _) -> language.rulesetName }
