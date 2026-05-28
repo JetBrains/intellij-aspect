@@ -100,7 +100,7 @@ test_module_deps(
 
 _TOOLCHAINS_LLVM_CONFIG = """
 llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm")
-llvm.toolchain(llvm_version = "16.0.0")
+llvm.toolchain(llvm_version = "20.1.0")
 use_repo(llvm, "llvm_toolchain")
 
 register_toolchains("@llvm_toolchain//:all")
@@ -109,5 +109,5 @@ register_toolchains("@llvm_toolchain//:all")
 test_module_deps(
     config = _TOOLCHAINS_LLVM_CONFIG,
     module_name = "toolchains_llvm",
-    versions = ["1.6.0"],
+    versions = ["1.7.0"],
 )
