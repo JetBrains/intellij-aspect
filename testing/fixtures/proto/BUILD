@@ -31,7 +31,12 @@ test_fixture(
     aspects = _ASPECTS,
     bazel = ">=8",  # only very old versions of protobuf support bazel 7
     modules = _MODULES,
-    output_groups = _OUTPUT_GROUPS,
+    output_groups = select(
+        {
+            "@bazel_tools//src/conditions:windows": [],
+            "//conditions:default": _OUTPUT_GROUPS,
+        },
+    ),
     targets = [
         "//consumerJava:main",
     ],

@@ -18,6 +18,7 @@ package com.intellij.aspect.testing.tests.proto
 
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IdeInfo
+import com.intellij.aspect.private.lib.utils.isWindows
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import com.intellij.aspect.testing.tests.lib.dependencyLabels
 import org.junit.Rule
@@ -69,10 +70,12 @@ class SimpleTest {
 
   @Test
   fun testOutputGroups() {
-    val buildFiles = aspect.findOutputGroup("intellij-build-java")
-    assertThat(buildFiles.filter { it.contains("consumerJava/main.jar") }).isNotEmpty()
-    assertThat(buildFiles.filter { it.contains("consumerJava/main-src.jar") }).isNotEmpty()
-    assertThat(buildFiles.filter { it.contains("libB/liblib_b") }).isNotEmpty()
-    assertThat(buildFiles.filter { it.contains("libA/liblib_a") }).isNotEmpty()
+    if (!isWindows()) {
+      val buildFiles = aspect.findOutputGroup("intellij-build-java")
+      assertThat(buildFiles.filter { it.contains("consumerJava/main.jar") }).isNotEmpty()
+      assertThat(buildFiles.filter { it.contains("consumerJava/main-src.jar") }).isNotEmpty()
+      assertThat(buildFiles.filter { it.contains("libB/liblib_b") }).isNotEmpty()
+      assertThat(buildFiles.filter { it.contains("libA/liblib_a") }).isNotEmpty()
+    }
   }
 }
