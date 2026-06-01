@@ -50,6 +50,7 @@ test_fixture(
     srcs = glob(["plugin/**"]),
     aspects = _ASPECTS,
     modules = _MODULES,
+    output_groups = _OUTPUT_GROUPS,
     targets = ["//:java_lib"],
 )
 
