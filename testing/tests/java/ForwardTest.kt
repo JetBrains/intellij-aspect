@@ -66,6 +66,20 @@ class ForwardTest {
     assertThat(target.javaCommon.jdepsList[0].relativePath).contains("materialized")
     assertThat(target.javaCommon.jdepsList[0].relativePath).endsWith("util.jdeps")
 
+    val targetTwo = aspect.findTarget("//forwarded:fwd2")
+    assertThat(targetTwo.hasJavaProvider()).isTrue()
+    assertThat(targetTwo.kind).isEqualTo("forward")
+    assertThat(targetTwo.javaCommon.jdepsCount).isEqualTo(1)
+    assertThat(targetTwo.javaCommon.jdepsList[0].relativePath).isEqualTo(target.javaCommon.jdepsList[0].relativePath)
+
+    val targetTag = aspect.findTarget("//forwarded:fwdtag")
+    assertThat(targetTag.hasJavaProvider()).isTrue()
+    assertThat(targetTag.kind).isEqualTo("forward")
+    assertThat(targetTag.javaCommon.jdepsCount).isEqualTo(1)
+    assertThat(targetTag.javaCommon.jdepsList[0].relativePath).startsWith("forwarded")
+    assertThat(targetTag.javaCommon.jdepsList[0].relativePath).contains("materialized")
+    assertThat(targetTag.javaCommon.jdepsList[0].relativePath).endsWith("util.jdeps")
+
     val nestedTarget = aspect.findTarget("//forwarded:nested/fwd")
     assertThat(nestedTarget.hasJavaProvider()).isTrue()
     assertThat(nestedTarget.kind).isEqualTo("forward")

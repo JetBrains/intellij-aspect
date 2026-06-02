@@ -144,9 +144,16 @@ def _get_jdeps(target, ctx):
     # --experimental_inmemory_jdeps_files is true by default, which means jdeps won't be stored on disk with remote execution.
     # So we just "materialize" the in-memory file by copying it onto disk.
     materialized_jdeps = []
+
+    # The tags implicitly enter the action as "execution info" which is also part of the action equality. Therefore, we have to include
+    # them in the hash included in the output path to avoid non-sharable actions with the same output.
+    extra_action_key = ""
+    for tag in ctx.rule.attr.tags:
+        extra_action_key += str(abs(hash(tag))) + "_"
+    extra_action_key += "_"
     for raw_jdeps_file in jdeps:
         materialized_jdeps_file = ctx.actions.declare_file(
-            "materialized_" + str(abs(hash(raw_jdeps_file.path))) + "_" + raw_jdeps_file.basename,
+            "materialized_" + str(abs(hash(extra_action_key + raw_jdeps_file.path))) + "_" + raw_jdeps_file.basename,
         )
         copy(
             ctx,

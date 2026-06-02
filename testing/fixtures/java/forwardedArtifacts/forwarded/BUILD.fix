@@ -7,6 +7,19 @@ forward(
 )
 
 forward(
+    name = "fwd2",
+    dep = "//lib:util",
+    testonly = 1,
+)
+
+forward(
+    name = "fwdtag",
+    dep = "//lib:util",
+    testonly = 1,
+    tags = ["no-tool"],
+)
+
+forward(
     name = "nested/fwd",
     dep = "//lib:nested/util",
     testonly = 1,
