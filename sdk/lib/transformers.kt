@@ -19,7 +19,9 @@ import com.intellij.aspect.private.lib.utils.asBazelPath
 import java.nio.file.Path
 
 private const val CC_TOOLCHAIN_FIELD = "CC_TOOLCHAIN_TYPE"
+private const val PYTHON_TOOLCHAIN_FIELD = "PYTHON_TOOLCHAIN_TYPE"
 private const val CC_TOOLCHAIN_LABEL = "@bazel_tools//tools/cpp:toolchain_type"
+private const val PYTHON_TOOLCHAIN_LABEL = "@bazel_tools//tools/python:toolchain_type"
 
 /**
  * Rewrites repo-absolute load paths by prepending the deploy directory prefix.
@@ -85,6 +87,26 @@ object TransformCcToolchainType : Transformer {
 
     if (needsToolchainType) {
       lines.add(0, "$CC_TOOLCHAIN_FIELD = Label(\"$CC_TOOLCHAIN_LABEL\")")
+    }
+  }
+}
+
+/**
+ * Replaces PYTHON_TOOLCHAIN_TYPE load from rules_python with a direct Label assignment. Used for replacing
+ * the load from rules_python with a direct Label assignment when the user's project uses the builtin
+ * rules.
+ */
+object TransformPythonToolchainType : Transformer {
+
+  override fun apply(loads: MutableList<LoadStatement>, lines: MutableList<String>) {
+    val needsToolchainType = loads.removeAll { stmt ->
+      stmt.repository is Repository.External && stmt.repository.name == "@rules_python" && stmt.arguments.contains(
+        PYTHON_TOOLCHAIN_FIELD,
+      )
+    }
+
+    if (needsToolchainType) {
+      lines.add(0, "$PYTHON_TOOLCHAIN_FIELD = Label(\"$PYTHON_TOOLCHAIN_LABEL\")")
     }
   }
 }

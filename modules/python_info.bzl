@@ -13,11 +13,12 @@
 # limitations under the License.
 
 load("@rules_python//python:defs.bzl", "PyInfo")
+load("@rules_python//python/private:toolchain_types.bzl", PYTHON_TOOLCHAIN_TYPE = "TARGET_TOOLCHAIN_TYPE")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load(":provider.bzl", "intellij_provider")
 
-TOOLCHAIN_TYPE = "@rules_python//python:toolchain_type"  # alias target pointing to the actual toolchain
+TOOLCHAIN_TYPE = str(PYTHON_TOOLCHAIN_TYPE)
 
 def _get_runtime(ctx):
     if TOOLCHAIN_TYPE in ctx.toolchains:
