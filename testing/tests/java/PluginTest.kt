@@ -69,4 +69,11 @@ class PluginTest {
     assertThat(binaryJars[0].relativePath).isEqualTo("helper/liblib.jar")
     assertThat(target.javaCommon.generatedJarsList).isEmpty()
   }
+
+  @Test
+  fun testOutputGroups() {
+    val buildFiles = aspect.findOutputGroup("intellij-build-java")
+    assertThat(buildFiles.filter { it.endsWith("libjava_lib-gen.jar") }).isNotEmpty()
+    assertThat(buildFiles.filter { it.endsWith("libjava_lib-gensrc.jar") }).isNotEmpty()
+  }
 }

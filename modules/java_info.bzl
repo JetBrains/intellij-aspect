@@ -113,7 +113,15 @@ def _compile_jars(target):
     return compilation_info.compilation_classpath if compilation_info else depset()
 
 def _get_outputs(target, ctx, jdeps):
-    resolve_files = []
+    generated_outputs = [
+        output
+        for output in target[JavaInfo].java_outputs
+        if (output != None) and (output.generated_class_jar != None)
+    ]
+    resolve_files = (
+        [output.generated_class_jar for output in generated_outputs] +
+        [output.generated_source_jar for output in generated_outputs]
+    )
     resolve_transitives = [_runtime_jars(target), _compile_jars(target)]
     for out in target[JavaInfo].java_outputs:
         if getattr(out, "compile_jar", None):
