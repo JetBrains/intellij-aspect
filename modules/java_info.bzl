@@ -42,7 +42,7 @@ RUNTIME_DEPS = [
 
 IMPORT_RULE_KIND = ["java_import", "jvm_import", "kt_jvm_import"]
 
-PROVIDERLESS_JAVA_RULES = ["java_binary", "java_test"]
+PROVIDERLESS_JAVA_RULES = ["java_binary", "java_test", "java_plugin"]
 
 def _get_javacopts_from_context(ctx):
     javacopts_raw = getattr(ctx.rule.attr, "javacopts", [])
@@ -181,7 +181,9 @@ def _aspect_impl(target, ctx):
             return [
                 intellij_provider.create(
                     provider = intellij_provider.JavaInfo,
-                    value = intellij_common.struct(),
+                    value = intellij_common.struct(
+                        has_api_generating_plugins = _has_api_generating_plugins(target),
+                    ),
                     dependencies = {
                         intellij_deps.COMPILE_TIME: intellij_deps.collect(
                             ctx,
