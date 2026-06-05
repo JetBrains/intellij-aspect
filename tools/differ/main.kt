@@ -15,10 +15,10 @@
  */
 package com.intellij.aspect.tools.differ
 
-import com.google.devtools.intellij.ideinfo.IdeInfo.TargetIdeInfo
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
 import com.google.protobuf.TextFormat
 import com.intellij.aspect.lib.Rules
-import com.intellij.aspect.lib.aspectsForLanguages
+import com.intellij.aspect.lib.Aspects
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.default
@@ -117,7 +117,8 @@ fun main(args: Array<String>) {
   parser.parse(args)
 
   try {
-    val currentAspectsToRun = deployLanguages?.let { parseLanguages(it) }?.let { aspectsForLanguages(it.toSet()) }
+    val currentAspectsToRun = deployLanguages?.let { parseLanguages(it) }
+      ?.let { Aspects.forRules(it.toSet()).map(Aspects::toString) }
     System.err.println("Running differ on project: $projectPath")
 
     // set up the temporary workspace

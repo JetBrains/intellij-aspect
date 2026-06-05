@@ -20,6 +20,7 @@ syntax = "proto3";
 import "sdk/proto/common.proto";
 
 option java_package = "com.google.devtools.intellij.ideinfo";
+option java_outer_classname = "IntellijIdeInfo";
 
 message XcodeIdeInfo {
   string xcode_version = 1;

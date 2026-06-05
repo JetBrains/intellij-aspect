@@ -17,8 +17,8 @@
 package com.intellij.aspect.testing.tests.python
 
 import com.google.common.truth.Truth.assertThat
-import com.google.devtools.intellij.ideinfo.IdeInfo.PyIdeInfo.PythonSrcsVersion
-import com.google.devtools.intellij.ideinfo.IdeInfo.PyIdeInfo.PythonVersion
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.PyIdeInfo.PythonSrcsVersion
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.PyIdeInfo.PythonVersion
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import com.intellij.aspect.testing.tests.lib.relativeArtifactPath
 import org.junit.Rule

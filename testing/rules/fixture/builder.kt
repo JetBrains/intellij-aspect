@@ -16,7 +16,7 @@
 
 package com.intellij.aspect.testing.rules.fixture
 
-import com.google.devtools.intellij.ideinfo.IdeInfo.TargetIdeInfo
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
 import com.google.protobuf.TextFormat
 import com.intellij.aspect.private.lib.utils.parseTextProtoResponseFile
 import com.intellij.aspect.testing.rules.fixture.BuilderProto.BuilderArguments

@@ -15,7 +15,7 @@
  */
 package com.intellij.aspect.lib
 
-import com.google.devtools.intellij.ideinfo.IdeInfo.TargetIdeInfo
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
 import com.google.protobuf.TextFormat
 import java.io.IOException
 import java.nio.file.Path

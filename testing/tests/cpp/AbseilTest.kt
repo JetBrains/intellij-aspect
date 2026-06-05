@@ -17,7 +17,7 @@
 package com.intellij.aspect.testing.tests.cpp
 
 import com.google.common.truth.Truth.assertThat
-import com.google.devtools.intellij.ideinfo.IdeInfo.Dependency.DependencyType
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.DependencyType
 import com.intellij.aspect.private.lib.utils.isWindows
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import com.intellij.aspect.testing.tests.lib.dependencyLabels

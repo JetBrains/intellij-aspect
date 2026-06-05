@@ -16,8 +16,8 @@
 package com.intellij.aspect.tools.differ
 
 import com.google.devtools.intellij.aspect.Common.ArtifactLocation
-import com.google.devtools.intellij.ideinfo.IdeInfo.TargetIdeInfo
-import com.google.devtools.intellij.ideinfo.IdeInfo.TargetKey
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetKey
 import com.google.protobuf.Descriptors
 import com.google.protobuf.MapEntry
 import com.google.protobuf.Message

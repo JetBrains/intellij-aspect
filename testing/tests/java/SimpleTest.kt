@@ -17,7 +17,7 @@
 package com.intellij.aspect.testing.tests.java
 
 import com.google.common.truth.Truth.assertThat
-import com.google.devtools.intellij.ideinfo.IdeInfo.Dependency.DependencyType
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.DependencyType
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import com.intellij.aspect.testing.tests.lib.dependencyLabels
 import org.junit.Rule

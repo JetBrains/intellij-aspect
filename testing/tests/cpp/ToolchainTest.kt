@@ -17,7 +17,7 @@
 package com.intellij.aspect.testing.tests.cpp
 
 import com.google.common.truth.Truth.assertThat
-import com.google.devtools.intellij.ideinfo.IdeInfo.*
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.*
 import com.google.protobuf.Message
 import com.intellij.aspect.private.lib.utils.isMacOS
 import com.intellij.aspect.testing.rules.fixture.AspectFixture

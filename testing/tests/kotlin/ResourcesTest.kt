@@ -17,9 +17,8 @@
 package com.intellij.aspect.testing.tests.kotlin
 
 import com.google.common.truth.Truth.assertThat
-import com.google.devtools.intellij.ideinfo.IdeInfo
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.DependencyType
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
-import com.intellij.aspect.testing.tests.lib.dependencyLabels
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,9 +38,7 @@ class ResourcesTest {
     assertThat(target.kind).isEqualTo("kt_jvm_library")
 
     assertThat(
-      target.depsList.filter {
-        it.dependencyType == IdeInfo.Dependency.DependencyType.RUNTIME
-      }.map { it.target.label },
+      target.depsList.filter { it.dependencyType == DependencyType.RUNTIME }.map { it.target.label }
     ).containsExactly("//module:foo-res", "//module:bar-res")
   }
 

@@ -18,8 +18,8 @@ package com.intellij.aspect.testing.tests.lib
 import com.google.common.truth.Correspondence
 import com.google.common.truth.IterableSubject
 import com.google.devtools.intellij.aspect.Common.ArtifactLocation
-import com.google.devtools.intellij.ideinfo.IdeInfo.Dependency
-import com.google.devtools.intellij.ideinfo.IdeInfo.Dependency.DependencyType
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.DependencyType
 
 inline fun <reified T : Any> assertNotNull(value: T?): T {
   return value ?: throw AssertionError("value of type ${T::class} is null")

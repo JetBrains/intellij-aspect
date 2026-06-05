@@ -16,9 +16,10 @@
 package com.intellij.aspect.testing.tests.python
 
 import com.google.common.truth.Truth.assertThat
-import com.google.devtools.intellij.ideinfo.IdeInfo
-import com.google.devtools.intellij.ideinfo.IdeInfo.PyIdeInfo.PythonSrcsVersion
-import com.google.devtools.intellij.ideinfo.IdeInfo.PyIdeInfo.PythonVersion
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.PyIdeInfo.PythonSrcsVersion
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.PyIdeInfo.PythonVersion
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.DependencyType
 import com.intellij.aspect.private.lib.utils.isWindows
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import com.intellij.aspect.testing.tests.lib.dependencyLabels
@@ -40,8 +41,7 @@ class WithImportsTest {
   fun testMain() {
     val target = aspect.findTarget("//:main")
     assertThat(target.kind).isEqualTo("py_binary")
-    assertThat(target.depsList).dependencyLabels(IdeInfo.Dependency.DependencyType.COMPILE_TIME)
-      .containsExactly("//:lib")
+    assertThat(target.depsList).dependencyLabels(DependencyType.COMPILE_TIME).containsExactly("//:lib")
 
     assertThat(target.pythonTargetInfo.version).isEqualTo("PY3")
     assertThat(target.pythonTargetInfo.interpreter.rootPath).containsMatch("rules_python")
@@ -52,8 +52,7 @@ class WithImportsTest {
   fun testLib() {
     val target = aspect.findTarget("//:lib")
     assertThat(target.kind).isEqualTo("py_library")
-    assertThat(target.depsList).dependencyLabels(IdeInfo.Dependency.DependencyType.COMPILE_TIME)
-      .containsExactly("//:pure_lib")
+    assertThat(target.depsList).dependencyLabels(DependencyType.COMPILE_TIME).containsExactly("//:pure_lib")
     assertThat(target.pythonTargetInfo.version).isEqualTo("PY3")
     assertThat(target.pythonTargetInfo.importsList).containsExactly("src")
     assertThat(target.pythonTargetInfo.generatedSourcesList).relativeArtifactPath()

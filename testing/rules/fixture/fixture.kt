@@ -18,7 +18,7 @@ package com.intellij.aspect.testing.rules.fixture
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import com.google.devtools.build.runfiles.Runfiles
-import com.google.devtools.intellij.ideinfo.IdeInfo.*
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.*
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.TestFixture
 import org.junit.AssumptionViolatedException
 import org.junit.rules.ExternalResource

@@ -15,7 +15,7 @@
  */
 package com.intellij.aspect.testing.rules.worker
 
-import com.google.devtools.intellij.ideinfo.IdeInfo.TargetIdeInfo
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
 import com.google.protobuf.TextFormat
 import com.intellij.aspect.lib.AspectConfig
 import com.intellij.aspect.lib.Rules
