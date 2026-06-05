@@ -17,8 +17,8 @@ package com.intellij.aspect.tools.differ
 
 import com.google.devtools.intellij.ideinfo.IdeInfo.TargetIdeInfo
 import com.google.protobuf.TextFormat
+import com.intellij.aspect.lib.Aspects
 import com.intellij.aspect.lib.Rules
-import com.intellij.aspect.lib.aspectsForLanguages
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.default
@@ -117,7 +117,7 @@ fun main(args: Array<String>) {
   parser.parse(args)
 
   try {
-    val currentAspectsToRun = deployLanguages?.let { parseLanguages(it) }?.let { aspectsForLanguages(it.toSet()) }
+    val currentAspectsToRun = deployLanguages?.let { Aspects.forRules(parseLanguages(it)).map(Aspects::toString) }
     System.err.println("Running differ on project: $projectPath")
 
     // set up the temporary workspace
@@ -231,7 +231,9 @@ private fun stringToLangue(s: String): Rules {
   }
 }
 
-fun parseLanguages(s: String) = s.split(",").map(::stringToLangue)
+fun parseLanguages(s: String): Set<Rules> {
+  return s.split(",").map(::stringToLangue).toSet()
+}
 
 private fun parseRepoMapping(s: String): Map<Rules, String> {
   return s.split(",").map { it.split("=", limit = 2).let { (key, value) -> stringToLangue(key) to value } }.toMap()
