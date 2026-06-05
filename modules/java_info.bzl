@@ -254,4 +254,5 @@ intellij_java_info_aspect = intellij_common.aspect(
     provides = [intellij_provider.JavaInfo],
     requires = [intellij_java_toolchain_info_aspect],
     toolchains_aspects = [str(JAVA_TOOLCHAIN_TYPE)],
+    required_aspect_providers = [[JavaInfo]],
 )
