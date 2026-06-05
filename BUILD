@@ -70,7 +70,6 @@ java_binary(
     name = "sdk_plain",
     create_executable = False,
     deploy_env = ["//third_party/kotlin:deploy_env"],
-    visibility = ["//visibility:private"],
     runtime_deps = ["//sdk"],
 )
 
