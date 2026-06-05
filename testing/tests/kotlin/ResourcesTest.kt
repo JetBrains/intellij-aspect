@@ -38,7 +38,7 @@ class ResourcesTest {
     assertThat(target.kind).isEqualTo("kt_jvm_library")
 
     assertThat(
-      target.depsList.filter { it.dependencyType == DependencyType.RUNTIME }.map { it.target.label }
+      target.depsList.filter { it.dependencyType == DependencyType.RUNTIME }.map { it.target.label },
     ).containsExactly("//module:foo-res", "//module:bar-res")
   }
 
