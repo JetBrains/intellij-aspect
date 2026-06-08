@@ -13,13 +13,13 @@
 # limitations under the License.
 
 load("@rules_java//java:defs.bzl", "java_common")
-load("@rules_java//java/common:java_semantics.bzl", "semantics")
+load("@rules_java//java/common:java_semantics.bzl", JAVA_SEMANTICS = "semantics")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//common:ide_info.bzl", "ide_info")
 load(":provider.bzl", "intellij_provider")
 
-JAVA_TOOLCHAIN_TYPE = semantics.JAVA_RUNTIME_TOOLCHAIN_TYPE
+JAVA_TOOLCHAIN_TYPE = JAVA_SEMANTICS.JAVA_RUNTIME_TOOLCHAIN_TYPE
 
 def _aspect_impl(target, ctx):
     if not java_common.JavaToolchainInfo in target:

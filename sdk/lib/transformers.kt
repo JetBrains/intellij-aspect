@@ -20,8 +20,11 @@ import java.nio.file.Path
 
 private const val CC_TOOLCHAIN_FIELD = "CC_TOOLCHAIN_TYPE"
 private const val PYTHON_TOOLCHAIN_FIELD = "PYTHON_TOOLCHAIN_TYPE"
+private const val JAVA_SEMANTICS_FIELD = "JAVA_SEMANTICS"
 private const val CC_TOOLCHAIN_LABEL = "@bazel_tools//tools/cpp:toolchain_type"
 private const val PYTHON_TOOLCHAIN_LABEL = "@bazel_tools//tools/python:toolchain_type"
+private const val JAVA_TOOLCHAIN_LABEL = "@bazel_tools//tools/java:toolchain_type"
+private const val JAVA_TOOLCHAIN_KEY = "JAVA_RUNTIME_TOOLCHAIN_TYPE"
 
 /**
  * Rewrites repo-absolute load paths by prepending the deploy directory prefix.
@@ -107,6 +110,24 @@ object TransformPythonToolchainType : Transformer {
 
     if (needsToolchainType) {
       lines.add(0, "$PYTHON_TOOLCHAIN_FIELD = Label(\"$PYTHON_TOOLCHAIN_LABEL\")")
+    }
+  }
+}
+
+/**
+ * Replace JAVA_SEMANTICS load by an explicit struct assigning the toolchain key to a direct Label when the user's
+ * project uses the builtin rules.
+ */
+object TransformJavaSemantics : Transformer {
+
+  override fun apply(loads: MutableList<LoadStatement>, lines: MutableList<String>) {
+    val needsSemantics = loads.removeAll { stmt ->
+      stmt.repository is Repository.External && stmt.repository.name == "@rules_java" &&
+        stmt.arguments.contains(JAVA_SEMANTICS_FIELD)
+    }
+
+    if (needsSemantics) {
+      lines.add(0, "$JAVA_SEMANTICS_FIELD = struct($JAVA_TOOLCHAIN_KEY = Label(\"$JAVA_TOOLCHAIN_LABEL\"))")
     }
   }
 }

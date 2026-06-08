@@ -79,6 +79,9 @@ fun deployAspectZip(
   if (Rules.PYTHON in config.useBuiltin) {
     transformers.add(TransformPythonToolchainType)
   }
+  if (Rules.JAVA in config.useBuiltin) {
+    transformers.add(TransformJavaSemantics)
+  }
   transformers.add(TransformBuiltinRules(config.useBuiltin))
 
   val archiveStream = if (archiveZip == null) {
