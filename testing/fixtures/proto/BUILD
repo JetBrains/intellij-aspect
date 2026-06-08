@@ -38,6 +38,6 @@ test_fixture(
         },
     ),
     targets = [
-        "//consumerJava:main",
+        "//...",
     ],
 )
