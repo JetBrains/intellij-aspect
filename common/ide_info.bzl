@@ -16,17 +16,23 @@ load(":artifact_location.bzl", "artifact_location")
 load(":common.bzl", "intellij_common")
 load(":make_variables.bzl", "expand_make_variables")
 
-def _target_hash(target):
+def _target_hash(key):
     """Creates a unique hash for the target based on its key."""
-    key = target[intellij_common.TargetInfo].key
     parts = [key.label, getattr(key, "configuration", "")] + key.aspect_ids
     return hash(".".join(parts))
 
-def _write_info(target, ctx, fields):
+def _write_info(target, ctx, fields, extra_key_aspects):
     """
     Collects some common information in addtion to the procided fields and
     writes everything to an intellij-info.txt file.
     """
+
+    plain_key = target[intellij_common.TargetInfo].key
+    key = intellij_common.struct(
+        label = plain_key.label,
+        aspect_ids = depset(plain_key.aspect_ids + extra_key_aspects).to_list(),
+        configuration = getattr(plain_key, "configuration", None),
+    )
 
     build_file_location = artifact_location.create(
         root_path = ctx.label.workspace_root,
@@ -49,7 +55,7 @@ def _write_info(target, ctx, fields):
         "features": ctx.features,
         "kind": ctx.rule.kind,
         "tags": ctx.rule.attr.tags,
-        "key": target[intellij_common.TargetInfo].key,
+        "key": key,
         "workspace_name": ctx.workspace_name,
         "generator_name": getattr(ctx.rule.attr, "generator_name", ""),
         "testonly": getattr(ctx.rule.attr, "testonly", False),
@@ -63,7 +69,7 @@ def _write_info(target, ctx, fields):
     }
 
     # bazel allows target names differing only by case, so append a hash to support case-insensitive file systems
-    file_name = "%s-%s.intellij-info.txt" % (target.label.name, _target_hash(target))
+    file_name = "%s-%s.intellij-info.txt" % (target.label.name, _target_hash(key))
 
     file = ctx.actions.declare_file(file_name)
     ctx.actions.write(file, proto.encode_text(struct(**info)))
@@ -72,7 +78,7 @@ def _write_info(target, ctx, fields):
 
 def _write_toolchain_info(target, ctx, name, info):
     """Convenience wrapper around write ide info for toolchains."""
-    return _write_info(target, ctx, {name: info})
+    return _write_info(target, ctx, {name: info}, [])
 
 ide_info = struct(
     write = _write_info,
