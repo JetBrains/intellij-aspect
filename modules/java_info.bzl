@@ -247,6 +247,15 @@ def _aspect_impl(target, ctx):
                     jvm_target = True,
                 ),
                 exports = intellij_common.attr_as_label_list(ctx, "exports"),
+                # As we request JavaInfo also if provided from aspects (e.g., the proto aspect), indicate
+                # the extra aspects we have seen.
+                aspect_ids = [
+                    it
+                    for it in ctx.aspect_ids
+                    if (not "intellij_java_info_aspect" in it) and
+                       (not "intellij_java_toolchain_info_aspect" in it) and
+                       (not "_intellij_target_info_aspect" in it)
+                ],
             ),
         ),
     ]
