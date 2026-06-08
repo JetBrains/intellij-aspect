@@ -72,7 +72,7 @@ class AspectFixture : ExternalResource() {
     val targets = findTargets(label, externalRepo, fractionalAspectIds)
     assertWithMessage("target not found: $label").that(targets).isNotEmpty()
 
-    return targets.first()
+    return targets.maxByOrNull { it.key.aspectIdsList.size }!!
   }
 
   fun findOutputGroup(
