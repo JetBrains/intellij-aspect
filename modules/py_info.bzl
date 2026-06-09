@@ -60,6 +60,7 @@ def _aspect_impl(target, ctx):
     # TODO: port python get_code_generator_rule_names
 
     return [intellij_provider.create(
+        ctx = ctx,
         provider = intellij_provider.PyInfo,
         outputs = {
             "intellij-compile-py": to_build,
