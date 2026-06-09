@@ -20,6 +20,7 @@ def _aspect_impl(target, ctx):
         return [intellij_provider.TestInfo(present = False)]
 
     return [intellij_provider.create(
+        ctx = ctx,
         provider = intellij_provider.TestInfo,
         value = intellij_common.struct(
             size = ctx.rule.attr.size,

@@ -153,6 +153,7 @@ def _aspect_impl(target, ctx):
             java_outputs = provider.outputs.jars
 
     return [intellij_provider.create(
+        ctx = ctx,
         provider = intellij_provider.ScalaInfo,
         outputs = _get_outputs(target, ctx, java_outputs, extra_sync),
         dependencies = {

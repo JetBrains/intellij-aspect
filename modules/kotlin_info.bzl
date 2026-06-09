@@ -217,6 +217,7 @@ def _aspect_impl(target, ctx):
 
     return [
         intellij_provider.create(
+            ctx = ctx,
             provider = intellij_provider.KotlinInfo,
             outputs = _get_outputs(target, ctx, plugins),
             value = intellij_common.struct(

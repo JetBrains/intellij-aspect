@@ -88,6 +88,7 @@ def _aspect_impl(target, ctx):
 
     sources = _sources(target, ctx)
     return [intellij_provider.create(
+        ctx = ctx,
         provider = intellij_provider.GoInfo,
         value = intellij_common.struct(
             import_path = _import_path(ctx),

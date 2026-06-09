@@ -18,7 +18,6 @@ _IntelliJTargetInfo = provider(
     doc = "Internal target identity used by IntelliJ aspects.",
     fields = {
         "owner": "Target - Underlying Bazel target that owns this info.",
-        "key": "struct - Stable identity (label, configuration, aspect ids).",
     },
 )
 
@@ -88,15 +87,23 @@ def _attr_as_label_list(ctx, name):
     """Returns the attr as a list of targets. Filters out everything except targets."""
     return [it for it in _attr_as_list(ctx, name) if type(it) == "Target"]
 
-def _intellij_info_aspect_impl(target, ctx):
-    """Implementation for the target info aspect. Creates the key for the target."""
-    key = _struct(
-        aspect_ids = [it for it in ctx.aspect_ids if not "_intellij_target_info_aspect" in it],
+def _is_intellij_aspect_id(id):
+    """Checks whether an aspect id refers to an aspect provided by us."""
+    (_, name) = id.split("%")
+    return name.removeprefix("_").startswith("intellij_")
+
+def _target_key(target, ctx, aspect_ids):
+    """Creates a target key. Aspect ids cannot be taken from the ctx since the current context might not see all aspects."""
+
+    return _struct(
+        aspect_ids = [id for id in aspect_ids if not _is_intellij_aspect_id(id)],
         label = intellij_common.label_to_string(target.label),
         configuration = getattr(ctx.configuration, "short_id", None),
     )
 
-    return [intellij_common.TargetInfo(key = key, owner = target)]
+def _intellij_info_aspect_impl(target, ctx):
+    """Implementation for the target info aspect. Creates the key for the target."""
+    return [intellij_common.TargetInfo(owner = target)]
 
 # This is the first aspect run and any other aspect depends on it. Provides a key
 # to uniquely reference targets between aspects.
@@ -136,4 +143,5 @@ intellij_common = struct(
     attr_as_list = _attr_as_list,
     attr_as_label_list = _attr_as_label_list,
     is_exec_configuration = _is_exec_configuration,
+    target_key = _target_key,
 )

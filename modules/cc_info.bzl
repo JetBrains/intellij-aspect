@@ -103,6 +103,7 @@ def _aspect_impl(target, ctx):
     resolve_files = target[CcInfo].compilation_context.headers
 
     return [intellij_provider.create(
+        ctx = ctx,
         provider = intellij_provider.CcInfo,
         outputs = {
             "intellij-compile-cpp": compile_files,
@@ -126,6 +127,6 @@ intellij_cc_info_aspect = intellij_common.aspect(
     implementation = _aspect_impl,
     provides = [intellij_provider.CcInfo],
     requires = [intellij_cc_toolchain_info_aspect],
-    required_aspect_providers = [[intellij_provider.XcodeToolchainInfo]],
+    required_aspect_providers = [[CcInfo], [intellij_provider.XcodeToolchainInfo]],
     toolchains_aspects = [str(CC_TOOLCHAIN_TYPE)],
 )

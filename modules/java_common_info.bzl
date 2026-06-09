@@ -43,6 +43,7 @@ def _aspect_impl(target, ctx):
             value[k] = value.get(k, False) or getattr(contribution, k, False)
 
     return [intellij_provider.create(
+        ctx = ctx,
         provider = intellij_provider.JavaCommonInfo,
         value = intellij_common.struct(**value),
     )]

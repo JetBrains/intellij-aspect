@@ -99,6 +99,7 @@ def _aspect_impl(target, ctx):
             generated_sources.extend([f for f in runfiles.files.to_list()])
 
     return [intellij_provider.create(
+        ctx = ctx,
         provider = intellij_provider.PythonInfo,
         value = intellij_common.struct(
             version = getattr(runtime, "python_version", None),

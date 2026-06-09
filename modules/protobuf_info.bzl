@@ -33,6 +33,7 @@ def _aspect_impl(target, ctx):
         return [intellij_provider.ProtoInfo(present = False)]
     return [
         intellij_provider.create(
+            ctx = ctx,
             provider = intellij_provider.ProtoInfo,
             value = intellij_common.struct(
                 source_mappings = _source_mappings(target),

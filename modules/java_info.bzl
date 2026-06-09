@@ -180,6 +180,7 @@ def _aspect_impl(target, ctx):
             # mark this target as a java target and take dependencies into account.
             return [
                 intellij_provider.create(
+                    ctx = ctx,
                     provider = intellij_provider.JavaInfo,
                     value = intellij_common.struct(
                         has_api_generating_plugins = _has_api_generating_plugins(target),
@@ -212,6 +213,7 @@ def _aspect_impl(target, ctx):
     jdeps = _get_jdeps(target, ctx)
     return [
         intellij_provider.create(
+            ctx = ctx,
             provider = intellij_provider.JavaInfo,
             outputs = _get_outputs(target, ctx, jdeps),
             value = intellij_common.struct(
@@ -247,15 +249,6 @@ def _aspect_impl(target, ctx):
                     jvm_target = True,
                 ),
                 exports = intellij_common.attr_as_label_list(ctx, "exports"),
-                # As we request JavaInfo also if provided from aspects (e.g., the proto aspect), indicate
-                # the extra aspects we have seen.
-                aspect_ids = [
-                    it
-                    for it in ctx.aspect_ids
-                    if (not "intellij_java_info_aspect" in it) and
-                       (not "intellij_java_toolchain_info_aspect" in it) and
-                       (not "_intellij_target_info_aspect" in it)
-                ],
             ),
         ),
     ]

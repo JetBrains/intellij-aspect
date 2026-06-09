@@ -21,18 +21,11 @@ def _target_hash(key):
     parts = [key.label, getattr(key, "configuration", "")] + key.aspect_ids
     return hash(".".join(parts))
 
-def _write_info(target, ctx, fields, extra_key_aspects):
+def _write_info(target, ctx, key, fields):
     """
-    Collects some common information in addtion to the procided fields and
+    Collects some common information in addition to the provided fields and
     writes everything to an intellij-info.txt file.
     """
-
-    plain_key = target[intellij_common.TargetInfo].key
-    key = intellij_common.struct(
-        label = plain_key.label,
-        aspect_ids = depset(plain_key.aspect_ids + extra_key_aspects).to_list(),
-        configuration = getattr(plain_key, "configuration", None),
-    )
 
     build_file_location = artifact_location.create(
         root_path = ctx.label.workspace_root,
@@ -78,7 +71,11 @@ def _write_info(target, ctx, fields, extra_key_aspects):
 
 def _write_toolchain_info(target, ctx, name, info):
     """Convenience wrapper around write ide info for toolchains."""
-    return _write_info(target, ctx, {name: info}, [])
+
+    # for toolchains it should be fine to simply use the aspects from the current context
+    key = intellij_common.target_key(target, ctx, ctx.aspect_ids)
+
+    return _write_info(target, ctx, key, {name: info})
 
 ide_info = struct(
     write = _write_info,

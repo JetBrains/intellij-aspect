@@ -78,4 +78,12 @@ class SimpleTest {
       assertThat(buildFiles.filter { it.contains("libA/liblib_a") }).isNotEmpty()
     }
   }
+
+  @Test
+  fun testAspectIds() {
+    val aspectIds = aspect.findTarget("//libA:lib_a").key.aspectIdsList
+
+    assertThat(aspectIds).hasSize(1)
+    assertThat(aspectIds[0]).endsWith("java_proto_aspect")
+  }
 }
