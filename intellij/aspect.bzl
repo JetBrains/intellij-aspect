@@ -37,11 +37,11 @@ def _merge_dependencies(builder, ctx):
 def _serialize_dependencies(builder):
     """Serializes all dependencies currently tracked by the builder."""
     return [
-        struct(target = dep[IntelliJInfo].key, dependency_type = key)
+        struct(target = dep[intellij_common.TargetInfo].partial_key, dependency_type = key)
         for key, list_of_sets in builder.dependencies.items()
         for set in list_of_sets
         for dep in set.to_list()
-        if IntelliJInfo in dep
+        if intellij_common.TargetInfo in dep
     ]
 
 def _collect_toolchain_info(target):

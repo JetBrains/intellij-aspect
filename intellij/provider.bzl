@@ -73,7 +73,7 @@ def _build(builder, target, ctx):
     return IntelliJInfo(
         key = _build_target_key(builder, target, ctx),
         outputs = _build_depset(builder.outputs),
-        dependencies = _build_depset(builder.outputs),
+        dependencies = _build_depset(builder.dependencies),
     )
 
 intellij_info_builder = struct(

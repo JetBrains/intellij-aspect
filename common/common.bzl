@@ -18,6 +18,7 @@ _IntelliJTargetInfo = provider(
     doc = "Internal target identity used by IntelliJ aspects.",
     fields = {
         "owner": "Target - Underlying Bazel target that owns this info.",
+        "partial_key": "struct - Label/configuration identity without the full set of aspect ids. Used to reference dependencies; not the complete target key (see the main aspect for that).",
     },
 )
 
@@ -102,8 +103,11 @@ def _target_key(target, ctx, aspect_ids):
     )
 
 def _intellij_info_aspect_impl(target, ctx):
-    """Implementation for the target info aspect. Creates the key for the target."""
-    return [intellij_common.TargetInfo(owner = target)]
+    """Implementation for the target info aspect. Creates the partial key for the target."""
+    return [intellij_common.TargetInfo(
+        owner = target,
+        partial_key = _target_key(target, ctx, ctx.aspect_ids),
+    )]
 
 # This is the first aspect run and any other aspect depends on it. Provides a key
 # to uniquely reference targets between aspects.
