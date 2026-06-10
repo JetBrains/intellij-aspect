@@ -87,7 +87,7 @@ enum class Aspects(val pkg: String, val file: String, val aspect: String, privat
      */
     @JvmStatic
     fun forRules(languages: Set<Rules>): List<Aspects> {
-      return entries.filter { aspect -> languages.any { it in aspect.rules } }
+      return entries.filter { aspect -> languages.any { it in aspect.rules } || aspect == INTELLIJ }
     }
   }
 }
