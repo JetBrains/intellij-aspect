@@ -25,6 +25,9 @@ load(":provider.bzl", "IntelliJInfo", "intellij_info_builder")
 # compile time dependencies collected for every target
 COMPILE_TIME_DEPS = ["deps"]
 
+# Rule kinds to include in outputs, even though no special information is available
+EXTRA_RULES = ["sh_binary", "sh_library", "genrule"]
+
 def _merge_dependencies(builder, ctx):
     """Adds information from all dependencies' intellij info providers."""
     for name in dir(ctx.rule.attr):
@@ -58,7 +61,7 @@ def _merge_target_info(builder, target, ctx):
     intellij_info_builder.append_ide_infos(builder, [it.info_file for it in _collect_toolchain_info(target)])
 
     # do not generate a intellij-info.txt if there is no language module attached
-    if not intellij_provider.has_module(target):
+    if (not intellij_provider.has_module(target)) and (not ctx.rule.kind in EXTRA_RULES):
         return {}
 
     info = {}
