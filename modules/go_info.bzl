@@ -49,13 +49,19 @@ def _sources(target, ctx):
         "go_appengine_library",
         "go_appengine_test",
     ]:
-        return [f for src in getattr(ctx.rule.attr, "srcs", []) for f in src.files.to_list()]
+        sources = [f for src in getattr(ctx.rule.attr, "srcs", []) for f in src.files.to_list()]
     elif ctx.rule.kind == "go_wrap_cc":
-        return [f for f in target.files.to_list() if f.basename.endswith(".go")]
+        sources = [f for f in target.files.to_list() if f.basename.endswith(".go")]
     elif hasattr(target[OutputGroupInfo], "go_generated_srcs"):
-        return [f for f in target[OutputGroupInfo].go_generated_srcs.to_list() if f.basename.endswith(".go")]
+        sources = [f for f in target[OutputGroupInfo].go_generated_srcs.to_list() if f.basename.endswith(".go")]
     else:
-        return []
+        sources = []
+    if ctx.rule.kind in ["go_test", "go_library", "go_appengine_test"]:
+        if getattr(ctx.rule.attr, "embed", None) != None:
+            for library in ctx.rule.attr.embed:
+                if intellij_provider.GoInfo in library:
+                    sources += library[intellij_provider.GoInfo].outputs["bazel-sources-go"].to_list()
+    return sources
 
 def _import_path(ctx):
     import_path = getattr(ctx.rule.attr, "importpath", None)
