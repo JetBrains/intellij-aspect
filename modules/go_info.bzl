@@ -89,7 +89,13 @@ def _library_labels(ctx):
         return [str(ctx.rule.attr.library.label)]
     if not getattr(ctx.rule.attr, "embed", None):
         return []
-    return [str(library.label) for library in ctx.rule.attr.embed]
+    return [
+        str(library.label)
+        for library in ctx.rule.attr.embed
+        if not ((intellij_provider.GoInfo in library) and
+                (library[intellij_provider.GoInfo].internal_value.kind in
+                 ["go_source", "go_proto_library"]))
+    ]
 
 def _aspect_impl(target, ctx):
     if (GoInfo not in target) and (ctx.rule.kind not in _GO_RULE_KINDS):
@@ -104,6 +110,9 @@ def _aspect_impl(target, ctx):
             sdk_home_path = _go_sdk(ctx),
             generated_sources = [artifact_location.from_file(f) for f in sources],
             library_labels = _library_labels(ctx),
+        ),
+        internal_value = intellij_common.struct(
+            kind = ctx.rule.kind,
         ),
         dependencies = {
             intellij_deps.COMPILE_TIME: intellij_deps.collect(
