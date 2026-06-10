@@ -16,6 +16,7 @@ load("@rules_go//go:def.bzl", "GoInfo", "go_context")
 load("@rules_go//go/private:common.bzl", "GO_TOOLCHAIN_LABEL")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
+load("//common:dependencies.bzl", "intellij_deps")
 load(":provider.bzl", "intellij_provider")
 
 # As go targets do not reliably have a provider, we need to detect go targets by rule_kind as well
@@ -32,6 +33,8 @@ _GO_RULE_KINDS = [
     "go_wrap_cc",
     "go_web_test",
 ]
+
+COMPILE_TIME_DEPS = ["embed"]
 
 def _go_sdk(ctx):
     go = go_context(ctx)
@@ -102,6 +105,12 @@ def _aspect_impl(target, ctx):
             generated_sources = [artifact_location.from_file(f) for f in sources],
             library_labels = _library_labels(ctx),
         ),
+        dependencies = {
+            intellij_deps.COMPILE_TIME: intellij_deps.collect(
+                ctx,
+                attributes = COMPILE_TIME_DEPS,
+            ),
+        },
         outputs = {
             "bazel-sources-go": depset(sources),
         },
