@@ -15,7 +15,7 @@ bazel_dep(name = "rules_java", version = "9.6.1")
 bazel_dep(name = "rules_kotlin", version = "2.3.20")
 
 # dependencies to test projects for the aspect
-bazel_dep(name = "abseil-cpp", version = "20260107.1")
+bazel_dep(name = "abseil-cpp", version = "20260526.0")
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(
