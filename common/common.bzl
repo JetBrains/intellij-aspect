@@ -14,6 +14,9 @@
 
 load(":version.bzl", "bazel_version")
 
+_FALLBACK_CONFIG = "00000f1"
+_FALLBACK_EXEC_CONFIG = "00000f2"
+
 _IntelliJTargetInfo = provider(
     doc = "Internal target identity used by IntelliJ aspects.",
     fields = {
@@ -93,13 +96,27 @@ def _is_intellij_aspect_id(id):
     (_, name) = id.split("%")
     return name.removeprefix("_").startswith("intellij_")
 
-def _target_key(target, ctx, aspect_ids):
-    """Creates a target key. Aspect ids cannot be taken from the ctx since the current context might not see all aspects."""
+def _target_config(ctx):
+    """
+    Returns the current configuration of the target. If the configuration id is
+    not available it only differentiates between tool and default configuration.
+    """
+    configuration = getattr(ctx.configuration, "short_id", None)
 
+    if not configuration and _is_exec_configuration(ctx):
+        return _FALLBACK_EXEC_CONFIG
+
+    return configuration or _FALLBACK_CONFIG
+
+def _target_key(target, ctx, aspect_ids):
+    """
+    Creates a target key. Aspect ids cannot be taken from the ctx since the
+    current context might not see all aspects.
+    """
     return _struct(
         aspect_ids = [id for id in aspect_ids if not _is_intellij_aspect_id(id)],
         label = intellij_common.label_to_string(target.label),
-        configuration = getattr(ctx.configuration, "short_id", None),
+        configuration = _target_config(ctx),
     )
 
 def _intellij_info_aspect_impl(target, ctx):
@@ -149,3 +166,4 @@ intellij_common = struct(
     is_exec_configuration = _is_exec_configuration,
     target_key = _target_key,
 )
+
