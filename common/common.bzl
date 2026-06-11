@@ -166,4 +166,3 @@ intellij_common = struct(
     is_exec_configuration = _is_exec_configuration,
     target_key = _target_key,
 )
-
