@@ -49,10 +49,6 @@ fun worker(
 
   log("worker started in: $cwd")
 
-  // the working directory is reused across runs; drop any per-build sandboxes
-  // left behind by a previous (possibly killed) worker before starting
-  removeStaleSandboxes(cwd)
-
   val shared = createResources(cwd, options)
 
   require(options.maxServers > 0)
@@ -125,9 +121,6 @@ fun worker(
       // best effort shutdown
     }
   }
-
-  // the working directory is intentionally left in place so its caches and
-  // output bases can be reused by the next worker process
 }
 
 /**
@@ -199,6 +192,7 @@ data class BazelServer(
   val identifier: String,
   val version: String,
   val sharedResources: SharedResources,
+  val root: Path,
   val outputRootDirectory: Path,
   val outputBaseDirectory: Path,
 )
@@ -211,6 +205,7 @@ private fun createServer(cwd: Path, version: String, slot: Int, shared: SharedRe
     identifier = "$version#$slot",
     version = version,
     sharedResources = shared,
+    root = root,
     outputRootDirectory = Files.createDirectories(root.resolve("output_root")),
     outputBaseDirectory = Files.createDirectories(root.resolve("output_base")),
   ).also { log(it, "created") }
@@ -267,6 +262,9 @@ private fun BazelServer.shutdown() {
   if (process.waitFor() != 0) {
     process.inputStream.transferTo(System.err)
   }
+
+  // remove the server directory
+  deleteRecursive(root)
 }
 
 private class LogOutputStream(private val server: BazelServer) : OutputStream() {
