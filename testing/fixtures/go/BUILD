@@ -20,6 +20,9 @@ test_fixture(
     srcs = glob(["simple/**"]),
     aspects = _ASPECTS,
     modules = _MODULES,
-    targets = ["//:all"],
+    targets = [
+        "//:all",
+        "//testa",
+    ],
     use_msys2 = True,
 )
