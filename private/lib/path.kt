@@ -57,6 +57,11 @@ fun deleteRecursive(directory: Path) {
         Files.deleteIfExists(file)
         return FileVisitResult.CONTINUE
       }
+
+      override fun postVisitDirectory(dir: Path, exc: IOException?): FileVisitResult {
+        Files.deleteIfExists(dir)
+        return FileVisitResult.CONTINUE
+      }
     },
   )
 }

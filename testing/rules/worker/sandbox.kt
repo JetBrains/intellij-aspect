@@ -63,6 +63,7 @@ class Sandbox(
     outputGroups: List<String> = emptyList(),
     flags: List<String> = emptyList(),
     profile: Path? = null,
+    execLog: Path? = null,
   ): Map<String, Set<Path>> {
     val cmd = mutableListOf<String>()
     cmd.add(server.sharedResources.bazeliskBinary.toAbsolutePath().toString())
@@ -84,6 +85,11 @@ class Sandbox(
     if (profile != null) {
       Files.createDirectories(profile.toAbsolutePath().parent)
       cmd.add("--profile=" + profile.toAbsolutePath())
+    }
+
+    if (execLog != null) {
+      Files.createDirectories(execLog.toAbsolutePath().parent)
+      cmd.add("--execution_log_compact_file=" + execLog.toAbsolutePath())
     }
 
     val bepFile = tempFile("build.bep.json")

@@ -77,6 +77,7 @@ fun main(args: Array<String>) {
       aspects = aspects,
       outputGroups = listOf(INTELLIJ_INFO) + input.outputGroupsList,
       profile = Path.of(input.outputProfile),
+      execLog = Path.of(input.outputExecLog),
       flags = input.extraFlagsList,
     )
     require(files.isNotEmpty()) { "no files were generated" }

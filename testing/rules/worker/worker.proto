@@ -33,6 +33,9 @@ message WorkerOptions {
 
   // The location of the shared repo cache. May be located in user defined location.
   string repo_cache = 4;
+
+  // The location of the workers working directory. May be located in user defined location.
+  string worker_dir = 5;
 }
 
 // An input file.
@@ -123,6 +126,11 @@ message WorkArguments {
 
   // Optional additional performance information of the Bazel build.
   string output_profile = 2;
+
+  // Optional compact execution log (zstd-compressed proto) recording every
+  // spawn and whether it was a cache hit. Used to diagnose suspicious cache
+  // misses.
+  string output_exec_log = 5;
 
   string project_archive = 3;
   string aspect_bcr_archive = 4;

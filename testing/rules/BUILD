@@ -11,3 +11,9 @@ string_flag(
     build_setting_default = "",
     visibility = ["//visibility:public"],
 )
+
+string_flag(
+    name = "worker_dir",
+    build_setting_default = "",
+    visibility = ["//visibility:public"],
+)

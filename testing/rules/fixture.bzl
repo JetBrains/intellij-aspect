@@ -19,6 +19,7 @@ load(":config.bzl", "TestMatrix", "config_hash", "config_name", "merge_matrixes"
 def _test_fixture_impl(ctx):
     output_protos = []
     profile_files = []
+    exec_log_files = []
 
     matrix = merge_matrixes([it[TestMatrix] for it in ctx.attr.configs])
 
@@ -27,17 +28,20 @@ def _test_fixture_impl(ctx):
 
         output_proto = ctx.actions.declare_file("%s-%s.intellij-aspect-fixture" % (ctx.label.name, unique_hash))
         profile_file = ctx.actions.declare_file("%s-%s_profile.gz" % (ctx.label.name, unique_hash))
+        exec_log_file = ctx.actions.declare_file("%s-%s_exec.log.zst" % (ctx.label.name, unique_hash))
 
         worker_options = proto.encode_text(struct(
             bazelisk = ctx.file._bazelisk.path,
             registry_file = ctx.file._registry_file.path,
             max_servers = ctx.attr._max_servers[BuildSettingInfo].value,
             repo_cache = ctx.attr._repo_cache[BuildSettingInfo].value,
+            worker_dir = ctx.attr._worker_dir[BuildSettingInfo].value,
         ))
 
         work_arguments = proto.encode_text(struct(
             output_proto = output_proto.path,
             output_profile = profile_file.path,
+            output_exec_log = exec_log_file.path,
             project_archive = ctx.file.project.path,
             aspect_bcr_archive = ctx.file._aspect_bcr.path,
             config = serialize_test_config(config),
@@ -68,7 +72,7 @@ def _test_fixture_impl(ctx):
             ],
             executable = ctx.executable._builder,
             arguments = [worker_options, "@" + flagfile.path],
-            outputs = [output_proto, profile_file],
+            outputs = [output_proto, profile_file, exec_log_file],
             mnemonic = "FixtureBuilder",
             progress_message = "Building test fixture for %{label} " + config_name(config),
             execution_requirements = {
@@ -81,10 +85,11 @@ def _test_fixture_impl(ctx):
 
         output_protos.append(output_proto)
         profile_files.append(profile_file)
+        exec_log_files.append(exec_log_file)
 
     return [
         DefaultInfo(files = depset(output_protos)),
-        OutputGroupInfo(debug = depset(profile_files)),
+        OutputGroupInfo(debug = depset(profile_files + exec_log_files)),
     ]
 
 test_fixture = rule(
@@ -134,6 +139,9 @@ test_fixture = rule(
         ),
         "_repo_cache": attr.label(
             default = Label("//testing/rules:repo_cache"),
+        ),
+        "_worker_dir": attr.label(
+            default = Label("//testing/rules:worker_dir"),
         ),
     },
     implementation = _test_fixture_impl,
