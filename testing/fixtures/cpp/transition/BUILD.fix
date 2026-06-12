@@ -10,3 +10,17 @@ foo_bar_binary(
     name = "foo_bar",
     dep = ":main",
 )
+
+genrule(
+    name = "exec_tool",
+    outs = ["exec_tool.sh"],
+    cmd = "echo '#!/bin/sh' > $@ && chmod +x $@",
+    executable = True,
+)
+
+genrule(
+    name = "exec_main",
+    outs = ["exec_main.out"],
+    cmd = "$(execpath :exec_tool) > $@",
+    tools = [":exec_tool"],
+)
