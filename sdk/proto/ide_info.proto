@@ -105,6 +105,7 @@ message JavaToolchainInfo {
   string target_version = 2;
   ArtifactLocation java_home = 3;
   ArtifactLocation boot_classpath_java_home = 4;
+  bool is_exec_config = 5;
 }
 
 message JvmOutputs {

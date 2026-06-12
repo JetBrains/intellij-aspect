@@ -33,6 +33,7 @@ def _aspect_impl(target, ctx):
         target_version = toolchain.target_version,
         java_home = artifact_location.from_execpath(runtime.java_home),
         boot_classpath_java_home = artifact_location.from_execpath(boot_classpath_java_home) if boot_classpath_java_home else None,
+        is_exec_config = intellij_common.is_exec_configuration(ctx),
     )
     return [intellij_provider.create_toolchain(
         provider = intellij_provider.JavaToolchainInfo,
