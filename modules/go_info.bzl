@@ -128,5 +128,7 @@ def _aspect_impl(target, ctx):
 intellij_go_info_aspect = intellij_common.aspect(
     implementation = _aspect_impl,
     provides = [intellij_provider.GoInfo],
-    toolchains = [str(GO_TOOLCHAIN_LABEL)],
+    toolchains = [
+        config_common.toolchain_type(str(GO_TOOLCHAIN_LABEL), mandatory = False),
+    ],
 )

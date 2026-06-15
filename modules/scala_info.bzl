@@ -178,5 +178,7 @@ def _aspect_impl(target, ctx):
 intellij_scala_info_aspect = intellij_common.aspect(
     implementation = _aspect_impl,
     provides = [intellij_provider.ScalaInfo],
-    toolchains = [TOOLCHAIN_TYPE],
+    toolchains = [
+        config_common.toolchain_type(TOOLCHAIN_TYPE, mandatory = False),
+    ],
 )

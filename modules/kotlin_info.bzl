@@ -263,6 +263,8 @@ def _aspect_impl(target, ctx):
 intellij_kotlin_info_aspect = intellij_common.aspect(
     implementation = _aspect_impl,
     provides = [intellij_provider.KotlinInfo],
-    toolchains = [TOOLCHAIN_TYPE],
+    toolchains = [
+        config_common.toolchain_type(TOOLCHAIN_TYPE, mandatory = False),
+    ],
     required_aspect_providers = [[it] for it in intellij_provider.JVM_MODULES if it != intellij_provider.KotlinInfo],
 )
