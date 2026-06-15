@@ -120,5 +120,7 @@ intellij_python_info_aspect = intellij_common.aspect(
     implementation = _aspect_impl,
     fragments = ["py"],
     provides = [intellij_provider.PythonInfo],
-    toolchains = [TOOLCHAIN_TYPE],
+    toolchains = [
+        config_common.toolchain_type(TOOLCHAIN_TYPE, mandatory = False),
+    ],
 )
