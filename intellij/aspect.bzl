@@ -57,12 +57,17 @@ def _collect_toolchain_info(target):
 def _merge_target_info(builder, target, ctx):
     """Adds information collected from the current target's module providers."""
 
+    if AnalysisTestResultInfo in target:
+        # We are not allowed to create an action (including a file-write action) for a target
+        # defined by an analysis-test rule.
+        return
+
     # for backwards compatibility with Bazel 8 and below, toolchains are dependencies
     intellij_info_builder.append_ide_infos(builder, [it.info_file for it in _collect_toolchain_info(target)])
 
     # do not generate a intellij-info.txt if there is no language module attached
     if (not intellij_provider.has_module(target)) and (not ctx.rule.kind in EXTRA_RULES):
-        return {}
+        return
 
     info = {}
 
