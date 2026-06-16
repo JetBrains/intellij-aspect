@@ -98,16 +98,22 @@ test_module_deps(
     ],
 )
 
-_TOOLCHAINS_LLVM_CONFIG = """
-llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm")
-llvm.toolchain(llvm_version = "20.1.0")
-use_repo(llvm, "llvm_toolchain")
+_HERMETIC_CC_TOOLCHAIN_CONFIG = """
+hermetic_cc = use_extension("@hermetic_cc_toolchain//toolchain:ext.bzl", "toolchains")
+use_repo(hermetic_cc, "zig_sdk")
 
-register_toolchains("@llvm_toolchain//:all")
+register_toolchains(
+    "@zig_sdk//toolchain:linux_amd64_gnu.2.28",
+    "@zig_sdk//toolchain:linux_arm64_gnu.2.28",
+    "@zig_sdk//toolchain:darwin_amd64",
+    "@zig_sdk//toolchain:darwin_arm64",
+    "@zig_sdk//toolchain:windows_amd64",
+    "@zig_sdk//toolchain:windows_arm64",
+)
 """
 
 test_module_deps(
-    config = _TOOLCHAINS_LLVM_CONFIG,
-    module_name = "toolchains_llvm",
-    versions = ["1.7.0"],
+    config = _HERMETIC_CC_TOOLCHAIN_CONFIG,
+    module_name = "hermetic_cc_toolchain",
+    versions = ["4.1.0"],
 )

@@ -9,7 +9,7 @@ _MODULES = [
     "//testing/fixtures:rules_cc_0_1_1",
     "//testing/fixtures:rules_cc_0_2_9",
     "//testing/fixtures:rules_cc_0_2_14",
-    "//testing/fixtures:toolchains_llvm_latest",
+    "//testing/fixtures:hermetic_cc_toolchain_latest",
 ]
 
 _ASPECTS = [

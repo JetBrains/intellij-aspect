@@ -7,7 +7,7 @@ package(
 
 _MODULES = [
     "//testing/fixtures:rules_go_0_60_0",
-    "//testing/fixtures:toolchains_llvm_latest",
+    "//testing/fixtures:hermetic_cc_toolchain_latest",
 ]
 
 _ASPECTS = [

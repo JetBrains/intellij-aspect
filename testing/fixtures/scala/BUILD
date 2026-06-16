@@ -7,7 +7,7 @@ package(
 
 _MODULES = [
     "//testing/fixtures:rules_scala_7_1_6",
-    "//testing/fixtures:toolchains_llvm_latest",
+    "//testing/fixtures:hermetic_cc_toolchain_latest",
 ]
 
 _ASPECTS = [
