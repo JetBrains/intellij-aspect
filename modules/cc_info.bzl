@@ -99,14 +99,13 @@ def _aspect_impl(target, ctx):
         return [intellij_provider.CcInfo(present = False)]
 
     # TODO(brendandouglas): target to cpp files only
-    compile_files = target[OutputGroupInfo].compilation_outputs if hasattr(target[OutputGroupInfo], "compilation_outputs") else depset([])
     resolve_files = target[CcInfo].compilation_context.headers
 
     return [intellij_provider.create(
         ctx = ctx,
         provider = intellij_provider.CcInfo,
         outputs = {
-            intellij_provider.BUILD_OUTPUT: compile_files,
+            intellij_provider.BUILD_OUTPUT: resolve_files,
             intellij_provider.SYNC_OUTPUT: resolve_files,
         },
         value = intellij_common.struct(
