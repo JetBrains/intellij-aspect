@@ -63,7 +63,7 @@ def _sources(target, ctx):
         if getattr(ctx.rule.attr, "embed", None) != None:
             for library in ctx.rule.attr.embed:
                 if intellij_provider.GoInfo in library:
-                    sources += library[intellij_provider.GoInfo].outputs["bazel-sources-go"].to_list()
+                    sources += library[intellij_provider.GoInfo].outputs[intellij_provider.SYNC_OUTPUT].to_list()
     return sources
 
 def _import_path(ctx):
@@ -121,7 +121,7 @@ def _aspect_impl(target, ctx):
             ),
         },
         outputs = {
-            "bazel-sources-go": depset(sources),
+            intellij_provider.SYNC_OUTPUT: depset(sources),
         },
     )]
 

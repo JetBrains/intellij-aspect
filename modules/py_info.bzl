@@ -63,8 +63,8 @@ def _aspect_impl(target, ctx):
         ctx = ctx,
         provider = intellij_provider.PyInfo,
         outputs = {
-            "intellij-compile-py": to_build,
-            "intellij-resolve-py": to_build,
+            intellij_provider.BUILD_OUTPUT: to_build,
+            intellij_provider.SYNC_OUTPUT: to_build,
         },
         value = intellij_common.struct(
             launcher = _get_py_launcher(ctx),

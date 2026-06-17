@@ -18,6 +18,7 @@ package com.intellij.aspect.testing.rules.worker
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
 import com.google.protobuf.TextFormat
 import com.intellij.aspect.lib.AspectConfig
+import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.lib.Rules
 import com.intellij.aspect.lib.deployAspectZip
 import com.intellij.aspect.private.lib.utils.asBazelPath
@@ -32,8 +33,6 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
-
-private const val INTELLIJ_INFO = "intellij-info"
 
 private val ASPECT_PREFIX = mapOf(
   AspectDeployment.BCR to "@intellij_aspect//",
@@ -75,7 +74,7 @@ fun main(args: Array<String>) {
       version,
       targets = input.targetsList,
       aspects = aspects,
-      outputGroups = listOf(INTELLIJ_INFO) + input.outputGroupsList,
+      outputGroups = listOf(OutputGroups.INFO.groupName) + input.outputGroupsList,
       profile = Path.of(input.outputProfile),
       execLog = Path.of(input.outputExecLog),
       flags = input.extraFlagsList,
@@ -85,7 +84,7 @@ fun main(args: Array<String>) {
     val builder = TestFixture.newBuilder().apply {
       config = input.config
 
-      files[INTELLIJ_INFO]?.map(::readInfoFile)?.forEach(::addTargets)
+      files[OutputGroups.INFO.groupName]?.map(::readInfoFile)?.forEach(::addTargets)
       files.entries.map(::createOutputGroup).forEach(::addOutputs)
 
       addAllExtraFlags(input.extraFlagsList)

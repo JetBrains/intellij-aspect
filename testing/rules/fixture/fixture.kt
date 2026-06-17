@@ -19,6 +19,7 @@ import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import com.google.devtools.build.runfiles.Runfiles
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.*
+import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.TestFixture
 import org.junit.AssumptionViolatedException
 import org.junit.rules.ExternalResource
@@ -76,9 +77,9 @@ class AspectFixture : ExternalResource() {
   }
 
   fun findOutputGroup(
-    group: String,
+    group: OutputGroups,
   ): List<String> {
-    val groups = output.outputsList.filter { it.name == group }
+    val groups = output.outputsList.filter { it.name == group.groupName }
     assertWithMessage("output group not found: $group").that(groups).isNotEmpty()
 
     return groups.first().filesList

@@ -18,6 +18,7 @@ package com.intellij.aspect.testing.rules.fixture
 
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
 import com.google.protobuf.TextFormat
+import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.private.lib.utils.parseTextProtoResponseFile
 import com.intellij.aspect.testing.rules.fixture.BuilderProto.BuilderArguments
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.AspectDeployment
@@ -28,8 +29,6 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.collections.map
-
-private const val INTELLIJ_INFO = "intellij-info"
 
 fun main(args: Array<String>) {
   val arguments = parseTextProtoResponseFile<BuilderArguments>(args[0])
@@ -42,7 +41,7 @@ fun main(args: Array<String>) {
       setAspectDeployment(AspectDeployment.BCR)
     }
 
-    arguments.outputGroupsList.first { it.name == INTELLIJ_INFO }.filesList
+    arguments.outputGroupsList.first { it.name == OutputGroups.INFO.groupName }.filesList
       .map(Path::of)
       .map(::readInfoFile)
       .forEach(::addTargets)
