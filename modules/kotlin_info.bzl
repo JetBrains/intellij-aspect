@@ -189,13 +189,13 @@ def _get_outputs(target, ctx, plugins):
             else:
                 resolve_files += out.source_jars
     if intellij_common.label_is_external(target.label) or (ctx.rule.kind in IMPORT_RULE_KIND):
-        return {"intellij-sync-java": depset(resolve_files, transitive = resolve_transitives + [
+        return {intellij_provider.SYNC_OUTPUT: depset(resolve_files, transitive = resolve_transitives + [
             getattr(target[KtJvmInfo], "transitive_source_jars", depset()),
         ] + sync_transitives)}
     else:
         return {
-            "intellij-sync-java": depset(transitive = sync_transitives),
-            "intellij-build-java": depset(resolve_files, transitive = resolve_transitives),
+            intellij_provider.SYNC_OUTPUT: depset(transitive = sync_transitives),
+            intellij_provider.BUILD_OUTPUT: depset(resolve_files, transitive = resolve_transitives),
         }
 
 def _aspect_impl(target, ctx):

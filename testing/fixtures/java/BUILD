@@ -20,8 +20,8 @@ _ASPECTS = [
 ]
 
 _OUTPUT_GROUPS = [
-    "intellij-sync-java",
-    "intellij-build-java",
+    "intellij-sync",
+    "intellij-build",
 ]
 
 test_fixture(

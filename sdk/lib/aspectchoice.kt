@@ -26,6 +26,12 @@ enum class Rules(val rulesetName: String) {
   PROTO("@protobuf"),
 }
 
+enum class OutputGroups(val groupName: String) {
+  INFO("intellij-info"),
+  SYNC("intellij-sync"),
+  BUILD("intellij-build"),
+}
+
 /**
  * Aspects in correct (topological) order together with the languages for which they should be present.
  */

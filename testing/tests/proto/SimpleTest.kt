@@ -18,6 +18,7 @@ package com.intellij.aspect.testing.tests.proto
 
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.DependencyType
+import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.private.lib.utils.isWindows
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import com.intellij.aspect.testing.tests.lib.dependencyLabels
@@ -70,7 +71,7 @@ class SimpleTest {
   @Test
   fun testOutputGroups() {
     if (!isWindows()) {
-      val buildFiles = aspect.findOutputGroup("intellij-build-java")
+      val buildFiles = aspect.findOutputGroup(OutputGroups.BUILD)
       assertThat(buildFiles.filter { it.contains("consumerJava/main.jar") }).isNotEmpty()
       assertThat(buildFiles.filter { it.contains("consumerJava/main-src.jar") }).isNotEmpty()
       assertThat(buildFiles.filter { it.contains("libB/liblib_b") }).isNotEmpty()

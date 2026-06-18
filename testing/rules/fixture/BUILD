@@ -35,6 +35,7 @@ kt_jvm_library(
     visibility = ["//testing/tests:__subpackages__"],
     deps = [
         ":fixture_java_proto",
+        "//sdk/lib:deploy",
         "@maven//:com_google_truth_truth",
         "@maven//:junit_junit",
         "@protobuf//:protobuf_java",
@@ -50,6 +51,7 @@ kt_jvm_library(
         ":builder_java_proto",
         "//private/lib:bep",
         "//private/lib:proto",
+        "//sdk/lib:deploy",
         "@protobuf//:protobuf_java",
     ],
 )
