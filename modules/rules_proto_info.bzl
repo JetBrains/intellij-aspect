@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@protobuf//bazel/common:proto_common.bzl", "proto_common")
-load("@protobuf//bazel/common:proto_info.bzl", "ProtoInfo")
+load("@rules_proto//proto:defs.bzl", "ProtoInfo", "proto_common")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load(":provider.bzl", "intellij_provider")
@@ -30,18 +29,18 @@ def _source_mappings(target):
 
 def _aspect_impl(target, ctx):
     if not ProtoInfo in target:
-        return [intellij_provider.ProtobufInfo(present = False)]
+        return [intellij_provider.LegacyRulesProtoInfo(present = False)]
     return [
         intellij_provider.create(
             ctx = ctx,
-            provider = intellij_provider.ProtobufInfo,
+            provider = intellij_provider.LegacyRulesProtoInfo,
             value = intellij_common.struct(
                 source_mappings = _source_mappings(target),
             ),
         ),
     ]
 
-intellij_protobuf_info_aspect = intellij_common.aspect(
+intellij_rules_proto_info_aspect = intellij_common.aspect(
     implementation = _aspect_impl,
-    provides = [intellij_provider.ProtobufInfo],
+    provides = [intellij_provider.LegacyRulesProtoInfo],
 )

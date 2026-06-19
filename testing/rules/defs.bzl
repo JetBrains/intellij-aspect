@@ -62,6 +62,7 @@ def test_fixture(
         output_groups = [],
         bazel = None,
         builtin = False,
+        bcr = True,
         strip_prefix = "",
         use_msys2 = False,
         extra_flags = []):
@@ -80,6 +81,7 @@ def test_fixture(
         aspects: List of aspect strings to apply.
         targets: List of targets to build in the test project.
         builtin: If True, also tests the builtin aspect deployment mode.
+        bcr: If True (the default) also test the BCR deployment mode.
         strip_prefix: Optional. Prefix to strip from source file paths when creating
             the project archive. Defaults to the fixture name if not specified.
         use_msys2: If True, the BAZEL_SH environment variable is forwarded from the host
@@ -101,16 +103,6 @@ def test_fixture(
     matrix_name = name + "_matrix"
 
     _test_matrix(
-        name = matrix_name + "_bcr",
-        aspects = aspects,
-        bazel = bazel_versions,
-        modules = modules,
-        aspect_deployment = "bcr",
-        visibility = ["//visibility:private"],
-        testonly = 1,
-    )
-
-    _test_matrix(
         name = matrix_name + "_materialized",
         aspects = aspects,
         bazel = bazel_versions,
@@ -120,7 +112,19 @@ def test_fixture(
         testonly = 1,
     )
 
-    configs = [matrix_name + "_bcr", matrix_name + "_materialized"]
+    configs = [matrix_name + "_materialized"]
+
+    if bcr:
+        _test_matrix(
+            name = matrix_name + "_bcr",
+            aspects = aspects,
+            bazel = bazel_versions,
+            modules = modules,
+            aspect_deployment = "bcr",
+            visibility = ["//visibility:private"],
+            testonly = 1,
+        )
+        configs.append(matrix_name + "_bcr")
 
     if builtin:
         _test_matrix(
@@ -171,7 +175,7 @@ def _derive_test_class(test):
 
     return "com.intellij.aspect.%s.%s" % (relative_path, class_name)
 
-def test_runner(test, fixture, deps = None, env = None):
+def test_runner(test, fixture, deps = None, env = None, test_name = None):
     """
     Creates a test runner. Runs the test for iterations of the fixture. The
     fixture can be loaded and iterated in the test using the AspectFixture rule:
@@ -180,7 +184,7 @@ def test_runner(test, fixture, deps = None, env = None):
     @JvmField
     val aspect = AspectFixture()
     """
-    name = test.removesuffix(".kt")
+    name = test_name or test.removesuffix(".kt")
 
     kt_jvm_library(
         name = name + "_lib",

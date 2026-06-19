@@ -36,7 +36,9 @@ _IntelliJKotlinInfo = _intellij_module_provider()
 _IntelliJScalaInfo = _intellij_module_provider()
 _IntelliJGoInfo = _intellij_module_provider()
 _IntelliJTestInfo = _intellij_module_provider()
-_IntelliJProtoInfo = _intellij_module_provider()
+_IntelliJLegacyRulesProtoInfo = _intellij_module_provider()  # protobuf  information from legacy rules_proto
+_IntelliJProtobufInfo = _intellij_module_provider()  # protobuf information from current protobuf rules
+_IntelliJProtoInfo = _intellij_module_provider()  # consolidated protobuf information
 
 _MODULE_PROVIDERS = {
     "c_ide_info": _IntelliJCcInfo,
@@ -59,6 +61,14 @@ _JVM_MODULES = [
     _IntelliJJavaInfo,
     _IntelliJKotlinInfo,
     _IntelliJScalaInfo,
+]
+
+# As the rules for handling protobuf have evolved over time, from `rules_proto` to `protbuf` and during
+# that transition also changed layout, etc. So, while conceptually the same rules, we have to handle them
+# as if they were separate rules. The collecting aspect then takes newest matching module (first in this list).
+_PROTO_MODULES = [
+    _IntelliJProtobufInfo,
+    _IntelliJLegacyRulesProtoInfo,
 ]
 
 def _intellij_toolchain_provider():
@@ -138,7 +148,10 @@ intellij_provider = struct(
     PyInfo = _IntelliJPyInfo,
     PythonInfo = _IntellijPythonInfo,
     TestInfo = _IntelliJTestInfo,
+    LegacyRulesProtoInfo = _IntelliJLegacyRulesProtoInfo,
+    ProtobufInfo = _IntelliJProtobufInfo,
     ProtoInfo = _IntelliJProtoInfo,
+    PROTO_MODULES = _PROTO_MODULES,
     JVM_MODULES = _JVM_MODULES,
     MODULE_MAP = _MODULE_PROVIDERS,
     TOOLCHAINS = _TOOLCHAIN_PROVIDERS,
