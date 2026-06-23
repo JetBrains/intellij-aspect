@@ -18,10 +18,17 @@ package com.intellij.aspect.lib
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
+import kotlin.io.path.isDirectory
 import kotlin.io.path.readText
 
+@OptIn(ExperimentalPathApi::class)
 fun writeFileIfContentDiffers(path: Path, payload: String) {
+  if (path.isDirectory()) {
+    path.deleteRecursively()
+  }
   if (!path.exists() || path.readText() != payload) {
     Files.writeString(
       path,
