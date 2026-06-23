@@ -475,7 +475,7 @@
     "@@aspect_tools_telemetry+//:extension.bzl%telemetry": {
       "general": {
         "bzlTransitiveDigest": "cl5A2O84vDL6Tt+Qga8FCj1DUDGqn+e7ly5rZ+4xvcc=",
-        "usagesDigest": "SJMV1XzGO/tewqMZheL8EJLCe6vXQwkGMIfqPlE0Puc=",
+        "usagesDigest": "tiZsmifkpLM+xnn6EXkTF48bYLsbvhr5rcGkv4SuImc=",
         "recordedInputs": [
           "REPO_MAPPING:aspect_tools_telemetry+,bazel_lib bazel_lib+",
           "REPO_MAPPING:aspect_tools_telemetry+,bazel_skylib bazel_skylib+"
@@ -485,7 +485,7 @@
             "repoRuleId": "@@aspect_tools_telemetry+//:extension.bzl%tel_repository",
             "attributes": {
               "deps": {
-                "aspect_rules_lint": "2.6.0",
+                "aspect_rules_lint": "2.7.1",
                 "aspect_tools_telemetry": "0.3.3"
               }
             }
@@ -594,8 +594,8 @@
     },
     "@@rules_multitool+//multitool:extension.bzl%multitool": {
       "general": {
-        "bzlTransitiveDigest": "rfheA1Wqu8L9a+TMHpfT7W+UXfZddcZF1A5JwuMwozo=",
-        "usagesDigest": "IKadbat0xKX6v0/s/4YLtI+NDwxwaR57hPVe6iX+kyM=",
+        "bzlTransitiveDigest": "7ZXZR0D5VHmH6+5t1aQv0TyDRMn1LhUROhZrD0PsCA0=",
+        "usagesDigest": "U46+zy+mfcGiaKarFQFmHcEwsvW7WDa0ePzBvHY9Vfg=",
         "recordedInputs": [
           "REPO_MAPPING:bazel_features+,bazel_features_globals bazel_features++version_extension+bazel_features_globals",
           "REPO_MAPPING:bazel_features+,bazel_features_version bazel_features++version_extension+bazel_features_version",
