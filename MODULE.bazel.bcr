@@ -8,5 +8,11 @@ bazel_dep(name = "rules_scala", version = "7.1.6", max_compatibility_level = 7)
 bazel_dep(name = "rules_go", version = "0.60.0", max_compatibility_level = 0)
 bazel_dep(name = "protobuf", version = "34.1", max_compatibility_level = 1)
 
+# As "rules_proto" is unsupported and superseded by "protobuf", the module `rules_proto_info.bzl`
+# is only for materialized deployment to support repositories that are late with transitioning to
+# "protobuf".
+# Therefore, we do *not* add the dependency of "rules_proto" which would be
+# bazel_dep(name = "rules_proto", version = "7.1.0", max_compatibility_level = 1)
+
 config = use_extension("//config:extension.bzl", "config")
 use_repo(config, "intellij_config")

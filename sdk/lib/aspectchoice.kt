@@ -24,6 +24,7 @@ enum class Rules(val rulesetName: String) {
   SCALA("@rules_scala"),
   GO("@rules_go"),
   PROTO("@protobuf"),
+  LEGACY_RULES_PROTO("@rules_proto"),
 }
 
 enum class OutputGroups(val groupName: String) {
@@ -36,9 +37,17 @@ enum class OutputGroups(val groupName: String) {
  * Aspects in correct (topological) order together with the languages for which they should be present.
  */
 enum class Aspects(val pkg: String, val file: String, val aspect: String, private val rules: Set<Rules>) {
+  RULES_PROTO(
+    "modules", "rules_proto_info.bzl", "intellij_rules_proto_info_aspect",
+    setOf(Rules.LEGACY_RULES_PROTO),
+  ),
   PROTOBUF(
     "modules", "protobuf_info.bzl", "intellij_protobuf_info_aspect",
     setOf(Rules.PROTO),
+  ),
+  PROTO(
+    "modules", "proto_info.bzl", "intellij_proto_info_aspect",
+    setOf(Rules.PROTO, Rules.LEGACY_RULES_PROTO),
   ),
   CC(
     "modules", "cc_info.bzl", "intellij_cc_info_aspect",
