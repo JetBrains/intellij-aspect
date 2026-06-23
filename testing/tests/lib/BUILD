@@ -23,3 +23,10 @@ junit_test(
         "@rules_java//java/runfiles",
     ],
 )
+
+junit_test(
+    test = "DeployFileTest.kt",
+    deps = [
+        "//sdk/lib:deploy",
+    ],
+)

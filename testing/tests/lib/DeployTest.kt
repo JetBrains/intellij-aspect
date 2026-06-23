@@ -23,7 +23,6 @@ import com.intellij.aspect.lib.Repository
 import com.intellij.aspect.lib.Rules
 import com.intellij.aspect.lib.deployAspectZip
 import com.intellij.aspect.lib.parseLoads
-import com.intellij.aspect.lib.repoMappingForRules
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
