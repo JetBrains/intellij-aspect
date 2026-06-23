@@ -18,10 +18,7 @@ package com.intellij.aspect.lib
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.StandardOpenOption
 import java.util.Locale
-import kotlin.io.path.exists
-import kotlin.io.path.readText
 
 /**
  * Creates the config directory and writes the config file as well as the
@@ -47,15 +44,3 @@ config = struct(
   os = "${System.getProperty("os.name").lowercase(Locale.ROOT)}",
 )
 """
-
-private fun writeFileIfContentDiffers(path: Path, payload: String) {
-  if (!path.exists() || path.readText() != payload) {
-    Files.writeString(
-      path,
-      payload,
-      Charsets.UTF_8,
-      StandardOpenOption.CREATE,
-      StandardOpenOption.TRUNCATE_EXISTING,
-    )
-  }
-}

@@ -20,11 +20,8 @@ import java.io.IOException
 import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.StandardOpenOption
 import java.util.zip.ZipInputStream
-import kotlin.io.path.exists
 import kotlin.io.path.extension
-import kotlin.io.path.readText
 
 /**
  * Location of the bundled aspect archive inside the jar.
@@ -111,15 +108,7 @@ private fun extractZipArchive(
         Files.createDirectories(target)
       } else {
         val payload = transformFile(stream.nonClosing(), transformers)
-        if (!target.exists() || target.readText() != payload) {
-          Files.writeString(
-            target,
-            payload,
-            Charsets.UTF_8,
-            StandardOpenOption.CREATE,
-            StandardOpenOption.TRUNCATE_EXISTING,
-          )
-        }
+        writeFileIfContentDiffers(target, payload)
       }
     }
   }

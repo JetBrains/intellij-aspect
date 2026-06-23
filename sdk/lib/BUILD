@@ -20,6 +20,7 @@ kt_jvm_library(
         "deploy.kt",
         "loads.kt",
         "transformers.kt",
+        "utils.kt",
     ],
     resource_jars = [":sdk_resource_jar"],
     visibility = ["//visibility:public"],
