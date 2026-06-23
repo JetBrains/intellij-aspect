@@ -8,7 +8,7 @@ package(
 _MODULES = [
     "//testing/fixtures:rules_java_8_16_1",
     "//testing/fixtures:rules_java_9_3_0",
-    "//testing/fixtures:toolchains_llvm_latest",
+    "//testing/fixtures:hermetic_cc_toolchain_latest",
 ]
 
 _ASPECTS = [

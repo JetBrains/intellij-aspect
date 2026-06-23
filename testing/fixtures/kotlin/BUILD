@@ -7,7 +7,7 @@ package(
 
 _MODULES = [
     "//testing/fixtures:rules_kotlin_2_3_20",
-    "//testing/fixtures:toolchains_llvm_latest",
+    "//testing/fixtures:hermetic_cc_toolchain_latest",
 ] + select({
     # rules_kotlin 2.2.x can fail on Windows with: LAUNCHER ERROR: Rlocation failed on ... annotations-13.0.jar
     # https://github.com/bazel-contrib/rules_kotlin/issues/1300
