@@ -151,10 +151,16 @@ def _get_associates(target, ctx):
                     additional_associates = additional_associates + [str(target.label) for target in getattr(provider_value.internal_value, "exports", [])]
     return associates_labels + additional_associates
 
+def _normalize_jars(jars):
+    if type(jars) == "list":
+        return jars
+    else:
+        return [jars]
+
 def _get_generated_jars(target, ctx):
     if getattr(target[KtJvmInfo], "annotation_processing", None) and target[KtJvmInfo].annotation_processing.enabled:
-        class_jars = [jar for jar in target[KtJvmInfo].annotation_processing.class_jar if jar != None]
-        source_jars = [jar for jar in target[KtJvmInfo].annotation_processing.source_jar if jar != None]
+        class_jars = [jar for jar in _normalize_jars(target[KtJvmInfo].annotation_processing.class_jar) if jar != None]
+        source_jars = [jar for jar in _normalize_jars(target[KtJvmInfo].annotation_processing.source_jar) if jar != None]
         if hasattr(target[KtJvmInfo], "additional_generated_source_jars"):
             source_jars = source_jars + [jar for jar in target[KtJvmInfo].additional_generated_source_jars]
         if hasattr(target[KtJvmInfo], "all_output_jars"):

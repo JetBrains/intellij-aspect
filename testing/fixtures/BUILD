@@ -37,6 +37,7 @@ test_module_deps(
     versions = [
         "2.2.0",
         "2.3.20",
+        "2.4.0",
     ],
 )
 

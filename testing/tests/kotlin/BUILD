@@ -14,3 +14,8 @@ test_runner(
     fixture = "//testing/fixtures/kotlin:resources",
     test = "ResourcesTest.kt",
 )
+
+test_runner(
+    fixture = "//testing/fixtures/kotlin:ksp",
+    test = "KspTest.kt",
+)

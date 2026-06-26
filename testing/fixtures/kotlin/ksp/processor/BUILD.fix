@@ -1,0 +1,25 @@
+load("@rules_kotlin//kotlin:core.bzl", "kt_ksp_plugin")
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+
+kt_jvm_library(
+    name = "annotation",
+    srcs = ["GenerateHello.kt"],
+    visibility = ["//visibility:public"],
+)
+
+kt_jvm_library(
+    name = "processor_lib",
+    srcs = ["HelloProcessor.kt"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":annotation",
+        "@rules_kotlin//kotlin/compiler:symbol-processing-api",
+    ],
+)
+
+kt_ksp_plugin(
+    name = "hello-processor",
+    processor_class = "com.example.processor.HelloProcessorProvider",
+    visibility = ["//visibility:public"],
+    deps = [":processor_lib"],
+)
