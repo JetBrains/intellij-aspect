@@ -6,7 +6,7 @@ package(
 )
 
 _MODULES = [
-    "//testing/fixtures:rules_go_0_60_0",
+    "//testing/fixtures:rules_go_0_61_1",
     "//testing/fixtures:toolchains_llvm_latest",
 ]
 
