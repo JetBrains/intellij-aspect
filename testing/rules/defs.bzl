@@ -192,7 +192,7 @@ def test_runner(test, fixture, deps = None, env = None, test_name = None):
         deps = (deps or []) + [
             "//private/lib:platform",
             "//testing/rules/fixture:fixture_lib",
-            "//testing/tests/lib:utils",
+            "//testing/rules/utils:utils_lib",
             "//sdk",
             "@maven//:junit_junit",
             "@maven//:com_google_truth_truth",

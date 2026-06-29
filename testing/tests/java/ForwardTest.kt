@@ -17,10 +17,7 @@
 package com.intellij.aspect.testing.tests.java
 
 import com.google.common.truth.Truth.assertThat
-import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.DependencyType
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
-import com.intellij.aspect.testing.tests.lib.dependencyLabels
-import com.intellij.aspect.testing.tests.lib.relativeArtifactPath
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

@@ -21,7 +21,7 @@ import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.Dependenc
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.private.lib.utils.isWindows
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
-import com.intellij.aspect.testing.tests.lib.dependencyLabels
+import com.intellij.aspect.testing.rules.utils.dependencyLabels
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

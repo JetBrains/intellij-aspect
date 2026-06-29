@@ -16,16 +16,13 @@
 package com.intellij.aspect.testing.tests.python
 
 import com.google.common.truth.Truth.assertThat
-import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.PyIdeInfo.PythonSrcsVersion
-import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.PyIdeInfo.PythonVersion
 import com.intellij.aspect.private.lib.utils.isWindows
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
-import com.intellij.aspect.testing.tests.lib.relativeArtifactPath
+import com.intellij.aspect.testing.rules.utils.relativeArtifactPath
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import java.util.Locale
 import java.util.Locale.getDefault
 
 @RunWith(JUnit4::class)
