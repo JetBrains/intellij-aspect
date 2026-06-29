@@ -41,8 +41,8 @@ use_repo(maven, "maven")
 bazel_registry = use_extension("//private:extension.bzl", "bazel_registry")
 bazel_registry.bazelisk(version = "1.25.0")
 bazel_registry.bcr(
-    commit = "25f0437e6a09e68e4d10fafe2151e3a9ae6eb815",
-    sha256 = "5e68f1f72e94e1f986cebaf390e3d02f186ec3931d143a287d8c0e0aba070389",
+    commit = "f5f475876c85e465d118d72e2b70eea1bc47bc5c",
+    sha256 = "bc3fedac197524e8dbaaf1a2dbae8bf3cd46dcb1eaccc05536a2c37b5054e966",
 )
 use_repo(bazel_registry, "bazel_env", "bazelisk", "bcr_archive")
 

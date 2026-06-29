@@ -19,6 +19,11 @@ _MOUDLES_WITH_JAVA = _MODULES + [
     "//testing/fixtures:rules_java_9_3_0",
 ]
 
+_MODULES_KSP = [
+    "//testing/fixtures:rules_kotlin_2_4_0",
+    "//testing/fixtures:toolchains_llvm_latest",
+]
+
 _ASPECTS = [
     "modules:kotlin_info.bzl%intellij_kotlin_info_aspect",
     # order is important, run jvm_info and java_common after all JVM-languages
@@ -69,5 +74,15 @@ test_fixture(
     modules = _MOUDLES_WITH_JAVA,
     targets = [
         "//module:a-lib",
+    ],
+)
+
+test_fixture(
+    name = "ksp",
+    srcs = glob(["ksp/**"]),
+    aspects = _ASPECTS,
+    modules = _MODULES_KSP,
+    targets = [
+        "//:A",
     ],
 )
