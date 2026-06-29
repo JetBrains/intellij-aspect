@@ -10,6 +10,12 @@ _MODULES = [
     "//testing/fixtures:toolchains_llvm_latest",
 ]
 
+# Old version of rules_go, not compatible with newer versions of bazel, but still in use
+_MODULES_OLD = [
+    "//testing/fixtures:rules_go_0_49_0",
+    "//testing/fixtures:toolchains_llvm_latest",
+]
+
 _ASPECTS = [
     "modules:go_info.bzl%intellij_go_info_aspect",
     "intellij:aspect.bzl%intellij_info_aspect",
@@ -20,6 +26,20 @@ test_fixture(
     srcs = glob(["simple/**"]),
     aspects = _ASPECTS,
     modules = _MODULES,
+    targets = [
+        "//:all",
+        "//testa",
+    ],
+    use_msys2 = True,
+)
+
+test_fixture(
+    name = "simple_old",
+    srcs = glob(["simple/**"]),
+    aspects = _ASPECTS,
+    bazel = "7",
+    modules = _MODULES_OLD,
+    strip_prefix = "simple",
     targets = [
         "//:all",
         "//testa",

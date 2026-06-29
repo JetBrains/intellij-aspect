@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_go//go:def.bzl", "GoInfo", "go_context")
+load("@rules_go//go:def.bzl", "go_context")
 load("@rules_go//go/private:common.bzl", "GO_TOOLCHAIN_LABEL")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
@@ -98,7 +98,10 @@ def _library_labels(ctx):
     ]
 
 def _aspect_impl(target, ctx):
-    if (GoInfo not in target) and (ctx.rule.kind not in _GO_RULE_KINDS):
+    # Ideally, we would like to check for the presence of a provider to be sure, the target is defined by
+    # the expected rule set; however, the currently-used provider was only introduced in 2024 and older versions
+    # of rules_go are still in use. Therefore, check against a list of rule kinds.
+    if ctx.rule.kind not in _GO_RULE_KINDS:
         return [intellij_provider.GoInfo(present = False)]
 
     sources = _sources(target, ctx)
