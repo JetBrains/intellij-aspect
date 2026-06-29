@@ -144,6 +144,8 @@ message CToolchainIdeInfo {
   repeated string built_in_include_directory = 6;
   string compiler_name = 7;
   string sysroot = 8;
+  map<string, string> c_environment = 9;
+  map<string, string> cpp_environment = 10;
 }
 
 message KotlincPluginOption {

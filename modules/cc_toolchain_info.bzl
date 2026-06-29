@@ -89,6 +89,16 @@ def _aspect_impl(target, ctx):
         feature_configuration = feature_configuration,
         action_name = ACTION_NAMES.cpp_compile,
     )
+    c_environment = cc_common.get_environment_variables(
+        feature_configuration = feature_configuration,
+        action_name = ACTION_NAMES.c_compile,
+        variables = c_variables,
+    )
+    cpp_environment = cc_common.get_environment_variables(
+        feature_configuration = feature_configuration,
+        action_name = ACTION_NAMES.cpp_compile,
+        variables = cpp_variables,
+    )
 
     info = intellij_common.struct(
         built_in_include_directory = [str(it) for it in cc_toolchain.built_in_include_directories],
@@ -96,6 +106,8 @@ def _aspect_impl(target, ctx):
         cpp_option = cpp_options,
         c_compiler = c_compiler,
         cpp_compiler = cpp_compiler,
+        c_environment = c_environment,
+        cpp_environment = cpp_environment,
         target_name = cc_toolchain.target_gnu_system_name,
         compiler_name = cc_toolchain.compiler,
         sysroot = cc_toolchain.sysroot,
