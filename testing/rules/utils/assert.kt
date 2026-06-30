@@ -42,4 +42,3 @@ fun IterableSubject.dependencyLabels(
   }
   return comparingElementsUsing(Correspondence.from(predicate, "dependency label"))
 }
-
