@@ -33,16 +33,50 @@ class CustomToolchainTest {
   @JvmField
   val aspect = AspectFixture()
 
+  private val info: CToolchainIdeInfo
+    get() = aspect.findToolchainInfo("//:main", TargetIdeInfo.C_TOOLCHAIN_IDE_INFO_FIELD_NUMBER)
+
   @Test
   fun testCapturesToolchainEnvironment() {
-    val info = aspect.findToolchainInfo<CToolchainIdeInfo>("//:main", TargetIdeInfo.C_TOOLCHAIN_IDE_INFO_FIELD_NUMBER)
-
-    assertThat(info.compilerName).isEqualTo("sdp-qcc")
-
     assertThat(info.cEnvironmentMap).containsEntry("QNX_HOST", "/proc/self/cwd/external/qnx_sdp/host/linux/x86_64")
     assertThat(info.cEnvironmentMap).containsEntry("QNX_TARGET", "/proc/self/cwd/external/qnx_sdp/target/qnx")
 
     assertThat(info.cppEnvironmentMap).containsEntry("QNX_HOST", "/proc/self/cwd/external/qnx_sdp/host/linux/x86_64")
     assertThat(info.cppEnvironmentMap).containsEntry("QNX_TARGET", "/proc/self/cwd/external/qnx_sdp/target/qnx")
+  }
+
+  @Test
+  fun testCompilerName() {
+    assertThat(info.compilerName).isEqualTo("sdp-qcc")
+  }
+
+  @Test
+  fun testTargetName() {
+    assertThat(info.targetName).isEqualTo("sdp-qnx")
+  }
+
+  @Test
+  fun testCompilerPaths() {
+    assertThat(info.cCompiler).isEqualTo("/usr/bin/false")
+    assertThat(info.cppCompiler).isEqualTo("/usr/bin/false")
+  }
+
+  @Test
+  fun testSysroot() {
+    assertThat(info.sysroot).isEqualTo("/proc/self/cwd/external/qnx_sdp/target/qnx")
+  }
+
+  @Test
+  fun testBuiltInIncludeDirectories() {
+    assertThat(info.builtInIncludeDirectoryList).contains("/proc/self/cwd/external/qnx_sdp/target/qnx/usr/include")
+  }
+
+  @Test
+  fun testCompileOptionsAreLanguageSpecific() {
+    assertThat(info.cOptionList).contains("-std=gnu11")
+    assertThat(info.cOptionList).doesNotContain("-std=c++17")
+
+    assertThat(info.cppOptionList).contains("-std=c++17")
+    assertThat(info.cppOptionList).doesNotContain("-std=gnu11")
   }
 }

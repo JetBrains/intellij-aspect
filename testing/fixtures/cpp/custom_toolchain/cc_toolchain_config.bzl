@@ -13,7 +13,7 @@
 # limitations under the License.
 
 load("@rules_cc//cc:action_names.bzl", "ACTION_NAMES")
-load("@rules_cc//cc:cc_toolchain_config_lib.bzl", "env_entry", "env_set", "feature", "tool_path")
+load("@rules_cc//cc:cc_toolchain_config_lib.bzl", "env_entry", "env_set", "feature", "flag_group", "flag_set", "tool_path")
 load("@rules_cc//cc:defs.bzl", "cc_common")
 load("@rules_cc//cc/toolchains:cc_toolchain_config_info.bzl", "CcToolchainConfigInfo")
 
@@ -48,6 +48,23 @@ def _impl(ctx):
         ],
     )
 
+    # Distinct C vs C++ compile flags so the aspect's separate command-line
+    # resolution for each language is observable (e.g. the -std= level differs).
+    sdp_flags_feature = feature(
+        name = "sdp_flags",
+        enabled = True,
+        flag_sets = [
+            flag_set(
+                actions = [ACTION_NAMES.c_compile],
+                flag_groups = [flag_group(flags = ["-D__QNX__", "-std=gnu11"])],
+            ),
+            flag_set(
+                actions = [ACTION_NAMES.cpp_compile],
+                flag_groups = [flag_group(flags = ["-D__QNX__", "-std=c++17"])],
+            ),
+        ],
+    )
+
     # dummy tool paths
     tool_paths = [
         tool_path(name = "gcc", path = "/usr/bin/false"),
@@ -70,7 +87,9 @@ def _impl(ctx):
         compiler = "sdp-qcc",
         abi_version = "unknown",
         abi_libc_version = "unknown",
-        features = [sdp_env_feature],
+        builtin_sysroot = "/proc/self/cwd/external/qnx_sdp/target/qnx",
+        cxx_builtin_include_directories = ["/proc/self/cwd/external/qnx_sdp/target/qnx/usr/include"],
+        features = [sdp_env_feature, sdp_flags_feature],
         tool_paths = tool_paths,
     )
 
