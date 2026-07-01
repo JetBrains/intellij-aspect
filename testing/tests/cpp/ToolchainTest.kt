@@ -34,11 +34,29 @@ class ToolchainTest {
   @JvmField
   val aspect = AspectFixture()
 
+  private val info: CToolchainIdeInfo
+    get() = aspect.findToolchainInfo<CToolchainIdeInfo>("//:main", TargetIdeInfo.C_TOOLCHAIN_IDE_INFO_FIELD_NUMBER)
+
   @Test
-  fun teatHasToolchain() {
-    val info = aspect.findToolchainInfo<CToolchainIdeInfo>("//:main", TargetIdeInfo.C_TOOLCHAIN_IDE_INFO_FIELD_NUMBER)
+  fun testHasToolchain() {
     assertThat(info.cCompiler).isNotEmpty()
     assertThat(info.cCompiler).isEqualTo(info.cppCompiler)
+  }
+
+  @Test
+  fun testHasCompilerName() {
+    assertThat(info.compilerName).isNotEmpty()
+  }
+
+  @Test
+  fun testHasBuiltInIncludeDirectories() {
+    assertThat(info.builtInIncludeDirectoryList).isNotEmpty()
+  }
+
+  @Test
+  fun testHasCompileOptions() {
+    assertThat(info.cOptionList).isNotEmpty()
+    assertThat(info.cppOptionList).isNotEmpty()
   }
 
   @Test

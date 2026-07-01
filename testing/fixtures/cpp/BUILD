@@ -55,6 +55,15 @@ test_fixture(
 )
 
 test_fixture(
+    name = "custom_toolchain",
+    srcs = glob(["custom_toolchain/**"]),
+    aspects = _ASPECTS,
+    extra_flags = ["--extra_toolchains=//:sdp_toolchain"],
+    modules = ["//testing/fixtures:rules_cc_latest"],
+    targets = ["//:main"],
+)
+
+test_fixture(
     name = "layout_default",
     srcs = glob(["layout/**"]),
     aspects = _ASPECTS,
