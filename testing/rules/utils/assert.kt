@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.intellij.aspect.testing.tests.lib
+package com.intellij.aspect.testing.rules.utils
 
 import com.google.common.truth.Correspondence
 import com.google.common.truth.IterableSubject

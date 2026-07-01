@@ -18,7 +18,8 @@ package com.intellij.aspect.testing.tests.cpp
 
 import com.google.common.truth.Truth.assertThat
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
-import com.intellij.aspect.testing.tests.lib.relativeArtifactPath
+import com.intellij.aspect.testing.rules.utils.findCIdeInfo
+import com.intellij.aspect.testing.rules.utils.relativeArtifactPath
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith

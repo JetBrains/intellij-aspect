@@ -85,28 +85,6 @@ class AspectFixture : ExternalResource() {
     return groups.first().filesList
   }
 
-  fun findCIdeInfo(
-    label: String,
-    externalRepo: String? = null,
-    fractionalAspectIds: List<String> = emptyList(),
-  ): CIdeInfo {
-    val target = findTarget(label, externalRepo, fractionalAspectIds)
-    assertThat(target.hasCIdeInfo()).isTrue()
-
-    return target.cIdeInfo
-  }
-
-  fun findPyIdeInfo(
-    label: String,
-    externalRepo: String? = null,
-    fractionalAspectIds: List<String> = emptyList(),
-  ): PyIdeInfo {
-    val target = findTarget(label, externalRepo, fractionalAspectIds)
-    assertThat(target.hasPyIdeInfo()).isTrue()
-
-    return target.pyIdeInfo
-  }
-
   fun bazelVersion(min: Int? = null, max: Int? = null): Boolean {
     val (major, _, _) = output.config.bazelVersion.split(".")
     if (min != null && min > major.toInt()) return false

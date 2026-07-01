@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.intellij.aspect.testing.tests.lib
+package com.intellij.aspect.testing.tests.deploy
 
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.build.runfiles.Runfiles

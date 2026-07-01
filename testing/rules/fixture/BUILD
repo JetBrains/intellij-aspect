@@ -32,7 +32,7 @@ java_proto_library(
 kt_jvm_library(
     name = "fixture_lib",
     srcs = ["fixture.kt"],
-    visibility = ["//testing/tests:__subpackages__"],
+    visibility = ["//testing:__subpackages__"],
     deps = [
         ":fixture_java_proto",
         "//sdk/lib:deploy",
