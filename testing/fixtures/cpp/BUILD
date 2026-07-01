@@ -15,6 +15,7 @@ _MODULES = [
 _ASPECTS = [
     "modules:xcode_info.bzl%intellij_xcode_info_aspect",
     "modules:cc_info.bzl%intellij_cc_info_aspect",
+    "modules:top_level_targets.bzl%intellij_top_level_targets_info_aspect",
     "intellij:aspect.bzl%intellij_info_aspect",
 ]
 

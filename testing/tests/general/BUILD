@@ -19,3 +19,8 @@ test_runner(
     fixture = "//testing/fixtures/cpp:transition",
     test = "ExecConfigTest.kt",
 )
+
+test_runner(
+    fixture = "//testing/fixtures/general:simple",
+    test = "GeneralTest.kt",
+)

@@ -18,6 +18,7 @@ _MODULES_OLD = [
 
 _ASPECTS = [
     "modules:go_info.bzl%intellij_go_info_aspect",
+    "modules:top_level_targets.bzl%intellij_top_level_targets_info_aspect",
     "intellij:aspect.bzl%intellij_info_aspect",
 ]
 

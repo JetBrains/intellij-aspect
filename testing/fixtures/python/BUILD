@@ -15,6 +15,7 @@ _MODULES = [
 _ASPECTS = [
     "modules:py_info.bzl%intellij_py_info_aspect",
     "modules:python_info.bzl%intellij_python_info_aspect",
+    "modules:top_level_targets.bzl%intellij_top_level_targets_info_aspect",
     "intellij:aspect.bzl%intellij_info_aspect",
 ]
 

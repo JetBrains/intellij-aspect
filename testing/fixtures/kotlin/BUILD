@@ -29,6 +29,7 @@ _ASPECTS = [
     # order is important, run jvm_info and java_common after all JVM-languages
     "modules:jvm_info.bzl%intellij_jvm_info_aspect",
     "modules:java_common_info.bzl%intellij_java_common_info_aspect",
+    "modules:top_level_targets.bzl%intellij_top_level_targets_info_aspect",
     "intellij:aspect.bzl%intellij_info_aspect",
 ]
 
@@ -38,6 +39,7 @@ _ASPECTS_WITH_JAVA = [
     # order is important, run jvm_info and java_common after all JVM-languages
     "modules:jvm_info.bzl%intellij_jvm_info_aspect",
     "modules:java_common_info.bzl%intellij_java_common_info_aspect",
+    "modules:top_level_targets.bzl%intellij_top_level_targets_info_aspect",
     "intellij:aspect.bzl%intellij_info_aspect",
 ]
 
