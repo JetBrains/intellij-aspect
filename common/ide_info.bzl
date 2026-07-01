@@ -21,7 +21,7 @@ def _target_hash(key):
     parts = [key.label, getattr(key, "configuration", "")] + key.aspect_ids
     return hash(".".join(parts))
 
-def _write_info(target, ctx, key, fields):
+def _write_info(target, ctx, key, fields, include_default_arguments):
     """
     Collects some common information in addition to the provided fields and
     writes everything to an intellij-info.txt file.
@@ -53,13 +53,19 @@ def _write_info(target, ctx, key, fields):
         "generator_name": getattr(ctx.rule.attr, "generator_name", ""),
         "testonly": getattr(ctx.rule.attr, "testonly", False),
         "executable_info": executable_info,
-        "env_inherit": getattr(ctx.rule.attr, "env_inherit", []),
-        "env": {
-            k: "".join(expand_make_variables(ctx, False, [v]))
-            for k, v in getattr(ctx.rule.attr, "env", {}).items()
-        },
-        "srcs": artifact_location.from_attr(ctx, "srcs"),
     }
+
+    # If we know the rule follows the standard convention on how attributes are named,
+    # we can obtain additional information.
+    if include_default_arguments:
+        info = info | {
+            "srcs": artifact_location.from_attr(ctx, "srcs"),
+            "env_inherit": getattr(ctx.rule.attr, "env_inherit", []),
+            "env": {
+                k: "".join(expand_make_variables(ctx, False, [v]))
+                for k, v in getattr(ctx.rule.attr, "env", {}).items()
+            },
+        }
 
     # bazel allows target names differing only by case, so append a hash to support case-insensitive file systems
     file_name = "%s-%s.intellij-info.txt" % (target.label.name, _target_hash(key))
@@ -75,7 +81,7 @@ def _write_toolchain_info(target, ctx, name, info):
     # for toolchains it should be fine to simply use the aspects from the current context
     key = intellij_common.target_key(target, ctx, ctx.aspect_ids)
 
-    return _write_info(target, ctx, key, {name: info})
+    return _write_info(target, ctx, key, {name: info}, True)
 
 ide_info = struct(
     write = _write_info,

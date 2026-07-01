@@ -85,6 +85,10 @@ enum class Aspects(val pkg: String, val file: String, val aspect: String, privat
     "modules", "go_info.bzl", "intellij_go_info_aspect",
     setOf(Rules.GO),
   ),
+  TOP_LEVEL(
+    "modules", "top_level_targets.bzl", "intellij_top_level_targets_info_aspect",
+    Rules.entries.toSet(),
+  ),
   INTELLIJ(
     "intellij", "aspect.bzl", "intellij_info_aspect",
     Rules.entries.toSet(),

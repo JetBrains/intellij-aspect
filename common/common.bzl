@@ -142,8 +142,12 @@ def _aspect(**kwargs):
     if bazel_version.le(8):
         kwargs.pop("toolchains_aspects", None)
 
+    attr_aspect = kwargs.pop("attr_aspects", None)
+    if attr_aspect == None:
+        attr_aspect = ["*"]
+
     return aspect(
-        attr_aspects = ["*"],
+        attr_aspects = attr_aspect,
         requires = requires,
         **kwargs
     )
