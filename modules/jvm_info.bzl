@@ -25,7 +25,7 @@ def _get_reosource_strip_prefix(ctx):
         # special case for rules_kotlin
         return prefix.label.name
 
-def _get_jvm_info(target, ctx):
+def _get_resources(ctx):
     resources_attr = getattr(ctx.rule.attr, "resources", None)
     if resources_attr == None and ctx.rule.kind.endswith("_resources"):
         # https://github.com/JetBrains/intellij-community/blob/b41a4084da5521effedd334e28896fd9d07410da/build/jvm-rules/rules/resource.bzl#L49
@@ -33,14 +33,18 @@ def _get_jvm_info(target, ctx):
 
     resources = []
     if type(resources_attr) == "list":
-        resources = artifact_location.from_list(resources_attr)
+        resources = [f for target in resources_attr for f in target.files.to_list()]
 
+    return resources
+
+def _get_jvm_info(ctx):
+    resource_files = [artifact_location.from_file(f) for f in _get_resources(ctx)]
     return intellij_common.struct(
         args = intellij_common.attr_as_list(ctx, "args"),
         main_class = getattr(ctx.rule.attr, "main_class", None),
         jvm_flags = expand_make_variables(ctx, True, intellij_common.attr_as_list(ctx, "jvm_flags")),
         resource_strip_prefix = _get_reosource_strip_prefix(ctx),
-        resources = resources,
+        resources = resource_files,
     )
 
 def _aspect_impl(target, ctx):
@@ -50,7 +54,10 @@ def _aspect_impl(target, ctx):
     return [intellij_provider.create(
         ctx = ctx,
         provider = intellij_provider.JvmInfo,
-        value = _get_jvm_info(target, ctx),
+        value = _get_jvm_info(ctx),
+        outputs = {
+            intellij_provider.BUILD_OUTPUT: depset(_get_resources(ctx)),
+        },
     )]
 
 intellij_jvm_info_aspect = intellij_common.aspect(

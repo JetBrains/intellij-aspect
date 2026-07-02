@@ -58,8 +58,9 @@ def _test_fixture_impl(ctx):
 
         env = {}
 
-        if ctx.attr.use_msys2:
-            env["BAZEL_SH"] = _bazel_env.get("BAZEL_SH", default = "")
+        bazel_sh = _bazel_env.get("BAZEL_SH", default = "")
+        if ctx.attr.use_msys2 and bazel_sh:
+            env["BAZEL_SH"] = bazel_sh
 
         ctx.actions.run(
             inputs = [

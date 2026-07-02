@@ -19,3 +19,8 @@ test_runner(
     fixture = "//testing/fixtures/java:forwardedArtifacts",
     test = "ForwardTest.kt",
 )
+
+test_runner(
+    fixture = "//testing/fixtures/java:resources",
+    test = "ResourcesTest.kt",
+)
