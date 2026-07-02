@@ -65,6 +65,16 @@ test_fixture(
     use_msys2 = True,
 )
 
+test_fixture(
+    name = "resources",
+    srcs = glob(["resources/**"]),
+    aspects = _ASPECTS,
+    modules = _MODULES,
+    output_groups = _OUTPUT_GROUPS,
+    targets = ["//:hello"],
+    use_msys2 = True,
+)
+
 local_test_fixture(
     name = "maven",
     deps = [

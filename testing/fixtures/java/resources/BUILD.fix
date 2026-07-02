@@ -1,0 +1,14 @@
+load("@rules_java//java:java_binary.bzl", "java_binary")
+
+java_binary(
+    name = "hello",
+    srcs = ["Hello.java"],
+    main_class = "Hello",
+    resources = [":greeting"],
+)
+
+genrule(
+    name = "greeting",
+    outs = ["greeting.txt"],
+    cmd = "echo Hello from genrule. > $@",
+)
