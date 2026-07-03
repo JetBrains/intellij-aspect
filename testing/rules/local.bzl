@@ -32,7 +32,7 @@ _ASPECTS = [
     intellij_cc_info_aspect,
     intellij_go_info_aspect,
     intellij_java_info_aspect,
-    intellij_scala_info_aspect,
+    # intellij_scala_info_aspect, the scala toolcahin is not configuried for this project
     intellij_kotlin_info_aspect,
     intellij_jvm_info_aspect,
     intellij_java_common_info_aspect,

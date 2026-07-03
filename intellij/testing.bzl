@@ -73,7 +73,7 @@ _LANGUAGE_ASPECTS = {
 
 def _intellij_aspect_build_impl(ctx):
     info_files = [
-        dep[OutputGroupInfo]["intellij-info"]
+        getattr(dep[OutputGroupInfo], "intellij-info", depset())
         for language in _LANGUAGE_ASPECTS
         for dep in getattr(ctx.attr, language)
     ]
