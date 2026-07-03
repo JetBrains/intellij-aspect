@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("//common:platform.bzl", "platform")
 load("//modules:cc_info.bzl", "intellij_cc_info_aspect")
 load("//modules:go_info.bzl", "intellij_go_info_aspect")
 load("//modules:java_common_info.bzl", "intellij_java_common_info_aspect")
@@ -24,7 +25,6 @@ load("//modules:py_info.bzl", "intellij_py_info_aspect")
 load("//modules:python_info.bzl", "intellij_python_info_aspect")
 load("//modules:scala_info.bzl", "intellij_scala_info_aspect")
 load("//modules:xcode_info.bzl", "intellij_xcode_info_aspect")
-load("//common:platform.bzl", "platform")
 load(":aspect.bzl", "intellij_info_aspect")
 
 # Aspects are grouped per language so that a target only runs the aspects for
