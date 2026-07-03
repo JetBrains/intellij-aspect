@@ -18,6 +18,7 @@ package com.intellij.aspect.testing.rules.worker
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
 import com.google.protobuf.TextFormat
 import com.intellij.aspect.lib.AspectConfig
+import com.intellij.aspect.lib.Aspects
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.lib.Rules
 import com.intellij.aspect.lib.deployAspectZip
@@ -26,6 +27,7 @@ import com.intellij.aspect.private.lib.utils.unzip
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.AspectDeployment
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.BazelModule
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.OutputGroup
+import com.intellij.aspect.testing.rules.fixture.FixtureProto.RuleSet
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.TestFixture
 import java.io.IOException
 import java.io.InputStreamReader
@@ -38,6 +40,17 @@ private val ASPECT_PREFIX = mapOf(
   AspectDeployment.BCR to "@intellij_aspect//",
   AspectDeployment.MATERIALIZED to "//aspect/default/",
   AspectDeployment.BUILTIN to "//aspect/builtin/",
+)
+
+private val RULES = mapOf(
+  RuleSet.CC to Rules.CC,
+  RuleSet.PYTHON to Rules.PYTHON,
+  RuleSet.JAVA to Rules.JAVA,
+  RuleSet.KOTLIN to Rules.KOTLIN,
+  RuleSet.SCALA to Rules.SCALA,
+  RuleSet.GO to Rules.GO,
+  RuleSet.PROTO to Rules.PROTO,
+  RuleSet.LEGACY_RULES_PROTO to Rules.LEGACY_RULES_PROTO,
 )
 
 fun main(args: Array<String>) {
@@ -67,13 +80,15 @@ fun main(args: Array<String>) {
       else -> throw IllegalArgumentException("unknown aspect deployment: $deployment")
     }
 
+    val ruleSets = input.config.ruleSetsList.map { RULES[it]!! }.toSet()
+    val aspects = Aspects.forRules(ruleSets)
     val prefix = ASPECT_PREFIX.getValue(deployment)
-    val aspects = input.config.aspectsList.map { prefix + it }
+    val aspectLabels = aspects.map { prefix + it.toString() }
 
     val files = bazelBuild(
       version,
       targets = input.targetsList,
-      aspects = aspects,
+      aspects = aspectLabels,
       outputGroups = listOf(OutputGroups.INFO.groupName) + input.outputGroupsList,
       profile = Path.of(input.outputProfile),
       execLog = Path.of(input.outputExecLog),

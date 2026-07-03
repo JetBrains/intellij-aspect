@@ -10,21 +10,12 @@ _MODULES = [
     "//testing/fixtures:toolchains_llvm_latest",
 ]
 
-_ASPECTS = [
-    "modules:scala_info.bzl%intellij_scala_info_aspect",
-    # order is important, run jvm_info and java_common after all JVM-languages
-    "modules:jvm_info.bzl%intellij_jvm_info_aspect",
-    "modules:java_common_info.bzl%intellij_java_common_info_aspect",
-    "modules:top_level_targets.bzl%intellij_top_level_targets_info_aspect",
-    "intellij:aspect.bzl%intellij_info_aspect",
-]
-
 test_fixture(
     name = "simple",
     srcs = glob(["simple/**"]),
-    aspects = _ASPECTS,
     bazel = ">=9",
     modules = _MODULES,
+    rule_sets = ["scala"],
     targets = [
         "//src/test/com/example/foo:test",
     ],

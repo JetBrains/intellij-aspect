@@ -16,17 +16,11 @@ _MODULES_OLD = [
     "//testing/fixtures:toolchains_llvm_latest",
 ]
 
-_ASPECTS = [
-    "modules:go_info.bzl%intellij_go_info_aspect",
-    "modules:top_level_targets.bzl%intellij_top_level_targets_info_aspect",
-    "intellij:aspect.bzl%intellij_info_aspect",
-]
-
 test_fixture(
     name = "simple",
     srcs = glob(["simple/**"]),
-    aspects = _ASPECTS,
     modules = _MODULES,
+    rule_sets = ["go"],
     targets = [
         "//:all",
         "//testa",
@@ -37,9 +31,9 @@ test_fixture(
 test_fixture(
     name = "simple_old",
     srcs = glob(["simple/**"]),
-    aspects = _ASPECTS,
     bazel = "7",
     modules = _MODULES_OLD,
+    rule_sets = ["go"],
     strip_prefix = "simple",
     targets = [
         "//:all",

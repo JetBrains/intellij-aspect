@@ -24,25 +24,6 @@ _MODULES_KSP = [
     "//testing/fixtures:toolchains_llvm_latest",
 ]
 
-_ASPECTS = [
-    "modules:kotlin_info.bzl%intellij_kotlin_info_aspect",
-    # order is important, run jvm_info and java_common after all JVM-languages
-    "modules:jvm_info.bzl%intellij_jvm_info_aspect",
-    "modules:java_common_info.bzl%intellij_java_common_info_aspect",
-    "modules:top_level_targets.bzl%intellij_top_level_targets_info_aspect",
-    "intellij:aspect.bzl%intellij_info_aspect",
-]
-
-_ASPECTS_WITH_JAVA = [
-    "modules:java_info.bzl%intellij_java_info_aspect",
-    "modules:kotlin_info.bzl%intellij_kotlin_info_aspect",
-    # order is important, run jvm_info and java_common after all JVM-languages
-    "modules:jvm_info.bzl%intellij_jvm_info_aspect",
-    "modules:java_common_info.bzl%intellij_java_common_info_aspect",
-    "modules:top_level_targets.bzl%intellij_top_level_targets_info_aspect",
-    "intellij:aspect.bzl%intellij_info_aspect",
-]
-
 _OUTPUT_GROUPS = [
     "intellij-sync",
     "intellij-build",
@@ -51,9 +32,9 @@ _OUTPUT_GROUPS = [
 test_fixture(
     name = "simple",
     srcs = glob(["simple/**"]),
-    aspects = _ASPECTS,
     modules = _MODULES,
     output_groups = _OUTPUT_GROUPS,
+    rule_sets = ["kotlin"],
     targets = [
         "//:main",
     ],
@@ -62,8 +43,8 @@ test_fixture(
 test_fixture(
     name = "associates",
     srcs = glob(["associates/**"]),
-    aspects = _ASPECTS,
     modules = _MODULES,
+    rule_sets = ["kotlin"],
     targets = [
         "//:A",
     ],
@@ -72,8 +53,11 @@ test_fixture(
 test_fixture(
     name = "resources",
     srcs = glob(["resources/**"]),
-    aspects = _ASPECTS_WITH_JAVA,
     modules = _MOUDLES_WITH_JAVA,
+    rule_sets = [
+        "kotlin",
+        "java",
+    ],
     targets = [
         "//module:a-lib",
     ],
@@ -82,8 +66,8 @@ test_fixture(
 test_fixture(
     name = "ksp",
     srcs = glob(["ksp/**"]),
-    aspects = _ASPECTS,
     modules = _MODULES_KSP,
+    rule_sets = ["kotlin"],
     targets = [
         "//:A",
     ],

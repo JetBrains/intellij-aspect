@@ -17,28 +17,6 @@ _RULES_PROTO_MODULES = [
     "//testing/fixtures:toolchains_llvm_latest",
 ]
 
-_ASPECTS = [
-    "modules:protobuf_info.bzl%intellij_protobuf_info_aspect",
-    "modules:proto_info.bzl%intellij_proto_info_aspect",
-    "modules:java_info.bzl%intellij_java_info_aspect",
-    # order is important, run jvm_info and java_common after all JVM-languages
-    "modules:jvm_info.bzl%intellij_jvm_info_aspect",
-    "modules:java_common_info.bzl%intellij_java_common_info_aspect",
-    "modules:top_level_targets.bzl%intellij_top_level_targets_info_aspect",
-    "intellij:aspect.bzl%intellij_info_aspect",
-]
-
-_RULES_PROTO_ASPECTCS = [
-    "modules:rules_proto_info.bzl%intellij_rules_proto_info_aspect",
-    "modules:proto_info.bzl%intellij_proto_info_aspect",
-    "modules:java_info.bzl%intellij_java_info_aspect",
-    # order is important, run jvm_info and java_common after all JVM-languages
-    "modules:jvm_info.bzl%intellij_jvm_info_aspect",
-    "modules:java_common_info.bzl%intellij_java_common_info_aspect",
-    "modules:top_level_targets.bzl%intellij_top_level_targets_info_aspect",
-    "intellij:aspect.bzl%intellij_info_aspect",
-]
-
 _OUTPUT_GROUPS = [
     "intellij-sync",
     "intellij-build",
@@ -47,7 +25,6 @@ _OUTPUT_GROUPS = [
 test_fixture(
     name = "simple",
     srcs = glob(["simple/**"]),
-    aspects = _ASPECTS,
     bazel = ">=8",  # only very old versions of protobuf support bazel 7
     modules = _MODULES,
     output_groups = select(
@@ -56,6 +33,10 @@ test_fixture(
             "//conditions:default": _OUTPUT_GROUPS,
         },
     ),
+    rule_sets = [
+        "proto",
+        "java",
+    ],
     targets = [
         "//...",
     ],
@@ -64,7 +45,6 @@ test_fixture(
 test_fixture(
     name = "rules_proto_simple",
     srcs = glob(["rules_proto_simple/**"]),
-    aspects = _RULES_PROTO_ASPECTCS,
     bazel = "8",  # rules_proto is not bazel-9 ready
     bcr = False,
     modules = _RULES_PROTO_MODULES,
@@ -74,6 +54,10 @@ test_fixture(
             "//conditions:default": _OUTPUT_GROUPS,
         },
     ),
+    rule_sets = [
+        "legacy_rules_proto",
+        "java",
+    ],
     targets = [
         "//...",
     ],

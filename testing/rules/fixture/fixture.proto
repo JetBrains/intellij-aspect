@@ -32,9 +32,20 @@ enum AspectDeployment {
   BUILTIN = 2;
 }
 
+enum RuleSet {
+    CC = 0;
+    PYTHON = 1;
+    JAVA = 2;
+    KOTLIN = 3;
+    SCALA = 4;
+    GO = 5;
+    PROTO = 6;
+    LEGACY_RULES_PROTO = 7;
+}
+
 message TestConfig {
   repeated BazelModule modules = 1;
-  repeated string aspects = 2;
+  repeated RuleSet rule_sets = 2;
   AspectDeployment aspect_deployment = 3;
   string bazel_version = 4;
 }

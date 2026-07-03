@@ -11,15 +11,6 @@ _MODULES = [
     "//testing/fixtures:toolchains_llvm_latest",
 ]
 
-_ASPECTS = [
-    "modules:java_info.bzl%intellij_java_info_aspect",
-    # order is important, run jvm_info and java_common after all JVM-languages
-    "modules:jvm_info.bzl%intellij_jvm_info_aspect",
-    "modules:java_common_info.bzl%intellij_java_common_info_aspect",
-    "modules:top_level_targets.bzl%intellij_top_level_targets_info_aspect",
-    "intellij:aspect.bzl%intellij_info_aspect",
-]
-
 _OUTPUT_GROUPS = [
     "intellij-sync",
     "intellij-build",
@@ -28,9 +19,9 @@ _OUTPUT_GROUPS = [
 test_fixture(
     name = "simple",
     srcs = glob(["simple/**"]),
-    aspects = _ASPECTS,
     modules = _MODULES,
     output_groups = _OUTPUT_GROUPS,
+    rule_sets = ["java"],
     targets = [
         "//:main",
         "//test/...",
@@ -41,26 +32,26 @@ test_fixture(
 test_fixture(
     name = "macro",
     srcs = glob(["macro/**"]),
-    aspects = _ASPECTS,
     modules = _MODULES,
+    rule_sets = ["java"],
     targets = ["//..."],
 )
 
 test_fixture(
     name = "plugin",
     srcs = glob(["plugin/**"]),
-    aspects = _ASPECTS,
     modules = _MODULES,
     output_groups = _OUTPUT_GROUPS,
+    rule_sets = ["java"],
     targets = ["//:java_lib"],
 )
 
 test_fixture(
     name = "forwardedArtifacts",
     srcs = glob(["forwardedArtifacts/**"]),
-    aspects = _ASPECTS,
     modules = _MODULES,
     output_groups = _OUTPUT_GROUPS,
+    rule_sets = ["java"],
     targets = ["//..."],
     use_msys2 = True,
 )
@@ -68,9 +59,9 @@ test_fixture(
 test_fixture(
     name = "resources",
     srcs = glob(["resources/**"]),
-    aspects = _ASPECTS,
     modules = _MODULES,
     output_groups = _OUTPUT_GROUPS,
+    rule_sets = ["java"],
     targets = ["//:hello"],
     use_msys2 = True,
 )

@@ -19,7 +19,7 @@ TestConfig = provider(
     fields = {
         "bazel": "str - Bazel version string (e.g., 8.6.0).",
         "modules": "list[TestModuleDep] - List of BCR modules the fixture depends upon.",
-        "aspects": "list[str] - Aspects enabled when building the fixture.",
+        "rule_sets": "list[str] - rule sets (cc, python, java, kotlin, scala, go, proto, legacy_rules_proto) for which the aspects should be used when building the fixture.",
         "aspect_deployment": "str - Aspect deployment option (bcr, materialized, builtin).",
     },
 )
@@ -39,7 +39,7 @@ def config_hash(config):
     parts = [config.bazel]
     parts.extend(["%s:%s" % (m.name, m.version) for m in config.modules])
     parts.append(config.aspect_deployment)
-    parts.extend(config.aspects)
+    parts.extend(config.rule_sets)
 
     return hash(".".join(parts))
 
@@ -62,6 +62,16 @@ def serialize_test_config(config):
         "materialized": 1,
         "builtin": 2,
     }
+    rule_set_map = {
+        "cc": 0,
+        "python": 1,
+        "java": 2,
+        "kotlin": 3,
+        "scala": 4,
+        "go": 5,
+        "proto": 6,
+        "legacy_rules_proto": 7,
+    }
 
     return struct(
         bazel_version = config.bazel,
@@ -69,7 +79,7 @@ def serialize_test_config(config):
             struct(name = it.name, version = it.version, config = it.config, flags = it.flags)
             for it in config.modules
         ],
-        aspects = config.aspects,
+        rule_sets = [rule_set_map[r] for r in config.rule_sets],
         aspect_deployment = aspect_deployment_map[config.aspect_deployment],
     )
 
@@ -106,7 +116,7 @@ def _test_matrix_impl(ctx):
         TestConfig(
             bazel = version,
             modules = modules,
-            aspects = ctx.attr.aspects,
+            rule_sets = ctx.attr.rule_sets,
             aspect_deployment = ctx.attr.aspect_deployment,
         )
         for version in ctx.attr.bazel
@@ -128,9 +138,9 @@ test_matrix = rule(
             providers = [TestModuleDep],
             doc = "list of TestModuleDep targets the fixture depends upon, generates matrix over all provided versions",
         ),
-        "aspects": attr.string_list(
+        "rule_sets": attr.string_list(
             mandatory = True,
-            doc = "list of enabled aspects when building the fixture",
+            doc = "list of rule_sets (cc, python, java, kotlin, scala, go, proto, legacy_rules_proto) for which the respective module aspects should be used",
         ),
         "aspect_deployment": attr.string(
             default = "bcr",

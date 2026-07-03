@@ -12,18 +12,11 @@ _MODULES = [
     "//testing/fixtures:toolchains_llvm_latest",
 ]
 
-_ASPECTS = [
-    "modules:py_info.bzl%intellij_py_info_aspect",
-    "modules:python_info.bzl%intellij_python_info_aspect",
-    "modules:top_level_targets.bzl%intellij_top_level_targets_info_aspect",
-    "intellij:aspect.bzl%intellij_info_aspect",
-]
-
 test_fixture(
     name = "simple",
     srcs = glob(["simple/**"]),
-    aspects = _ASPECTS,
     modules = _MODULES,
+    rule_sets = ["python"],
     targets = ["//:all"],
     use_msys2 = True,
 )
@@ -31,15 +24,15 @@ test_fixture(
 test_fixture(
     name = "args",
     srcs = glob(["args/**"]),
-    aspects = _ASPECTS,
     modules = _MODULES,
+    rule_sets = ["python"],
     targets = ["//:all"],
 )
 
 test_fixture(
     name = "withImports",
     srcs = glob(["withImports/**"]),
-    aspects = _ASPECTS,
     modules = _MODULES,
+    rule_sets = ["python"],
     targets = ["//:main"],
 )

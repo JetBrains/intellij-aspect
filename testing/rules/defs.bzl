@@ -57,7 +57,7 @@ def test_fixture(
         name,
         srcs,
         modules,
-        aspects,
+        rule_sets,
         targets,
         output_groups = [],
         bazel = None,
@@ -78,7 +78,7 @@ def test_fixture(
         bazel: Bazel version spec. Can be None (all versions), an int (e.g., 8),
             a string expression (e.g., ">=8", ">7", "<10"), or a list of version strings.
         modules: Label list of test_module_dep targets the fixture depends upon.
-        aspects: List of aspect strings to apply.
+        rule_sets: List of rule sets for which to use the respective aspects.
         targets: List of targets to build in the test project.
         builtin: If True, also tests the builtin aspect deployment mode.
         bcr: If True (the default) also test the BCR deployment mode.
@@ -95,7 +95,7 @@ def test_fixture(
             srcs = glob(["simple/**"]),
             bazel = ">=8",
             modules = [":rules_cc"],
-            aspects = ["intellij:aspect.bzl%intellij_info_aspect"],
+            rule_sets = [rule_sets.CC],
             targets = ["//:main"],
         )
     """
@@ -104,7 +104,7 @@ def test_fixture(
 
     _test_matrix(
         name = matrix_name + "_materialized",
-        aspects = aspects,
+        rule_sets = rule_sets,
         bazel = bazel_versions,
         modules = modules,
         aspect_deployment = "materialized",
@@ -117,7 +117,7 @@ def test_fixture(
     if bcr:
         _test_matrix(
             name = matrix_name + "_bcr",
-            aspects = aspects,
+            rule_sets = rule_sets,
             bazel = bazel_versions,
             modules = modules,
             aspect_deployment = "bcr",
@@ -129,7 +129,7 @@ def test_fixture(
     if builtin:
         _test_matrix(
             name = matrix_name + "_builtin",
-            aspects = aspects,
+            rule_sets = rule_sets,
             bazel = bazel_versions,
             modules = modules,
             aspect_deployment = "builtin",
