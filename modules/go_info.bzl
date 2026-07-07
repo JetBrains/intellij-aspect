@@ -59,11 +59,6 @@ def _sources(target, ctx):
         sources = [f for f in target[OutputGroupInfo].go_generated_srcs.to_list() if f.basename.endswith(".go")]
     else:
         sources = []
-    if ctx.rule.kind in ["go_test", "go_library", "go_appengine_test"]:
-        if getattr(ctx.rule.attr, "embed", None) != None:
-            for library in ctx.rule.attr.embed:
-                if intellij_provider.GoInfo in library:
-                    sources += library[intellij_provider.GoInfo].outputs[intellij_provider.SYNC_OUTPUT].to_list()
     return sources
 
 def _import_path(ctx):
@@ -82,19 +77,13 @@ def _import_path(ctx):
         import_path += "/" + ctx.label.name
     return import_path
 
-def _library_labels(ctx):
-    if ctx.rule.kind not in ["go_test", "go_library", "go_appengine_test"]:
-        return []
-    if getattr(ctx.rule.attr, "library", None):
-        return [str(ctx.rule.attr.library.label)]
+def _embed(ctx):
     if not getattr(ctx.rule.attr, "embed", None):
         return []
     return [
-        str(library.label)
-        for library in ctx.rule.attr.embed
-        if not ((intellij_provider.GoInfo in library) and
-                (library[intellij_provider.GoInfo].internal_value.kind in
-                 ["go_source", "go_proto_library"]))
+        embed[intellij_common.TargetInfo].partial_key
+        for embed in ctx.rule.attr.embed
+        if intellij_provider.GoInfo in embed
     ]
 
 def _aspect_impl(target, ctx):
@@ -112,8 +101,8 @@ def _aspect_impl(target, ctx):
         value = intellij_common.struct(
             import_path = _import_path(ctx),
             sdk_home_path = _go_sdk(ctx),
-            generated_sources = [artifact_location.from_file(f) for f in sources],
-            library_labels = _library_labels(ctx),
+            sources = [artifact_location.from_file(f) for f in sources],
+            embed = _embed(ctx),
         ),
         internal_value = intellij_common.struct(
             kind = ctx.rule.kind,

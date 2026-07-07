@@ -35,7 +35,7 @@ class CustomRule {
   fun testMain() {
     val target = aspect.findTarget("//:main")
     assertThat(target.kind).isEqualTo("go_library")
-    assertThat(target.srcsList).relativeArtifactPath().containsExactly("main.go")
+    assertThat(target.goTargetInfo.sourcesList).relativeArtifactPath().containsExactly("main.go")
     assertThat(target.depsList).dependencyLabels(DependencyType.COMPILE_TIME).containsExactly("//:generated_lib")
   }
 
@@ -43,7 +43,7 @@ class CustomRule {
   fun testGeneratedLib() {
     val target = aspect.findTarget("//:generated_lib")
     assertThat(target.kind).isEqualTo("simple_gen")
-    assertThat(target.goTargetInfo.generatedSourcesList).relativeArtifactPath()
+    assertThat(target.goTargetInfo.sourcesList).relativeArtifactPath()
       .containsExactly("generated_lib_/generated_lib.go")
   }
 }

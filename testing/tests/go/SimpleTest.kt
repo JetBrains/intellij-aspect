@@ -45,8 +45,7 @@ class SimpleTest {
   fun testLibrary() {
     val target = aspect.findTarget("//:library")
     assertThat(target.kind).isEqualTo("go_library")
-    assertThat(target.srcsList).relativeArtifactPath().containsExactly("lib.go")
-
+    assertThat(target.goTargetInfo.sourcesList).relativeArtifactPath().containsExactly("lib.go")
     assertThat(target.goTargetInfo.sdkHomePath.relativePath).containsMatch("bin/go(|.exe)$")
   }
 
@@ -54,8 +53,7 @@ class SimpleTest {
   fun testTest() {
     val target = aspect.findTarget("//:test")
     assertThat(target.kind).isEqualTo("go_test")
-    assertThat(target.srcsList).relativeArtifactPath().containsExactly("test.go")
-
+    assertThat(target.goTargetInfo.sourcesList).relativeArtifactPath().containsExactly("test.go")
     assertThat(target.goTargetInfo.sdkHomePath.relativePath).containsMatch("bin/go(|.exe)$")
   }
 
@@ -64,10 +62,15 @@ class SimpleTest {
     val target = aspect.findTarget("//testa:testa")
     assertThat(target.kind).isEqualTo("go_library")
     assertThat(target.depsList).dependencyLabels(DependencyType.COMPILE_TIME).contains("//testa:srcs")
-    assertThat(
-      target.goTargetInfo.generatedSourcesList.map {
-        it.relativePath
-      },
-    ).containsExactly("testa/testa.go", "testa/src.go", "testa/gen.go")
+    assertThat(target.goTargetInfo.embedList).contains(aspect.findTarget("//testa:srcs").key)
+    // Don't roll up sources, that's handled by the Bazel plugin
+    assertThat(target.goTargetInfo.sourcesList).relativeArtifactPath().containsExactly("testa/testa.go")
+  }
+
+  @Test
+  fun testSrcs() {
+    val target = aspect.findTarget("//testa:srcs")
+    assertThat(target.kind).isEqualTo("go_source")
+    assertThat(target.goTargetInfo.sourcesList).relativeArtifactPath().containsExactly("testa/src.go", "testa/gen.go")
   }
 }
