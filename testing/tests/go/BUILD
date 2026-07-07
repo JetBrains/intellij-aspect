@@ -10,3 +10,8 @@ test_runner(
     test = "SimpleTest.kt",
     test_name = "SimpleTestOld",
 )
+
+test_runner(
+    fixture = "//testing/fixtures/go:custom_rule",
+    test = "CustomRule.kt",
+)

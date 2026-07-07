@@ -41,3 +41,15 @@ test_fixture(
     ],
     use_msys2 = True,
 )
+
+test_fixture(
+    name = "custom_rule",
+    srcs = glob(["custom_rule/**"]),
+    modules = _MODULES,
+    rule_sets = ["go"],
+    targets = [
+        "//:main",
+        "//:generated_lib",
+    ],
+    use_msys2 = True,
+)
