@@ -55,7 +55,7 @@ def _sources(target, ctx):
         sources = [f for src in getattr(ctx.rule.attr, "srcs", []) for f in src.files.to_list()]
     elif ctx.rule.kind == "go_wrap_cc":
         sources = [f for f in target.files.to_list() if f.basename.endswith(".go")]
-    elif hasattr(target[OutputGroupInfo], "go_generated_srcs"):
+    elif OutputGroupInfo in target and hasattr(target[OutputGroupInfo], "go_generated_srcs"):
         sources = [f for f in target[OutputGroupInfo].go_generated_srcs.to_list() if f.basename.endswith(".go")]
     else:
         sources = []
@@ -101,7 +101,8 @@ def _aspect_impl(target, ctx):
     # Ideally, we would like to check for the presence of a provider to be sure, the target is defined by
     # the expected rule set; however, the currently-used provider was only introduced in 2024 and older versions
     # of rules_go are still in use. Therefore, check against a list of rule kinds.
-    if ctx.rule.kind not in _GO_RULE_KINDS:
+    if ctx.rule.kind not in _GO_RULE_KINDS and \
+       (OutputGroupInfo not in target or not hasattr(target[OutputGroupInfo], "go_generated_srcs")):  # support at least a subset of custom rules not hardcoded in _GO_RULE_KINDS
         return [intellij_provider.GoInfo(present = False)]
 
     sources = _sources(target, ctx)
