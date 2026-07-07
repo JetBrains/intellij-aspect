@@ -30,6 +30,21 @@ test_fixture(
 )
 
 test_fixture(
+    name = "top_level_toolchain",
+    srcs = glob(["simple/**"]),
+    modules = _MODULES,
+    output_groups = _OUTPUT_GROUPS,
+    rule_sets = ["java"],
+    strip_prefix = "simple",
+    targets = [
+        "//:main",
+        "//test/...",
+        "@rules_java//toolchains:current_java_toolchain",
+    ],
+    use_msys2 = True,
+)
+
+test_fixture(
     name = "macro",
     srcs = glob(["macro/**"]),
     modules = _MODULES,

@@ -24,3 +24,9 @@ test_runner(
     fixture = "//testing/fixtures/java:resources",
     test = "ResourcesTest.kt",
 )
+
+test_runner(
+    fixture = "//testing/fixtures/java:top_level_toolchain",
+    test = "SimpleTest.kt",
+    test_name = "TopLevelToolchain",
+)
