@@ -49,6 +49,10 @@ enum class Aspects(val pkg: String, val file: String, val aspect: String, privat
     "modules", "proto_info.bzl", "intellij_proto_info_aspect",
     setOf(Rules.PROTO, Rules.LEGACY_RULES_PROTO),
   ),
+  XCODE(
+    "modules", "xcode_info.bzl", "intellij_xcode_info_aspect",
+    setOf(Rules.CC),
+  ),
   CC(
     "modules", "cc_info.bzl", "intellij_cc_info_aspect",
     setOf(Rules.CC),
