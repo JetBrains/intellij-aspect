@@ -51,6 +51,12 @@ class InfoTest {
   }
 
   @Test
+  fun testFeaturesList() {
+    val info = aspect.findTarget("//lib:lib")
+    assertThat(info.featuresList).containsAtLeast("parse_headers", "layering_check")
+  }
+
+  @Test
   fun testIncludePrefix() {
     val info = aspect.findCIdeInfo("//lib:lib")
     assertThat(info.ruleContext.includePrefix).isEqualTo("prefixed")

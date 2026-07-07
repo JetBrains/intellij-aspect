@@ -18,17 +18,6 @@ java_proto_library(
     deps = [":fixture_proto"],
 )
 
-proto_library(
-    name = "builder_proto",
-    srcs = ["builder.proto"],
-    deps = [":fixture_proto"],
-)
-
-java_proto_library(
-    name = "builder_java_proto",
-    deps = [":builder_proto"],
-)
-
 kt_jvm_library(
     name = "fixture_lib",
     srcs = ["fixture.kt"],
@@ -41,24 +30,4 @@ kt_jvm_library(
         "@protobuf//:protobuf_java",
         "@rules_java//java/runfiles",
     ],
-)
-
-kt_jvm_library(
-    name = "builder_lib",
-    srcs = ["builder.kt"],
-    visibility = ["//testing/tests:__subpackages__"],
-    deps = [
-        ":builder_java_proto",
-        "//private/lib:bep",
-        "//private/lib:proto",
-        "//sdk/lib:deploy",
-        "@protobuf//:protobuf_java",
-    ],
-)
-
-java_binary(
-    name = "builder_bin",
-    main_class = "com.intellij.aspect.testing.rules.fixture.BuilderKt",
-    visibility = ["//testing/fixtures:__subpackages__"],
-    runtime_deps = [":builder_lib"],
 )

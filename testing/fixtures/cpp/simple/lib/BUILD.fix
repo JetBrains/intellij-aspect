@@ -6,8 +6,12 @@ cc_library(
     srcs = ["source.cc"],
     copts = ["-DLIB_COPT"],
     defines = ["PUBLIC_DEFINE"],
-    local_defines = ["LOCAL_DEFINE"],
-    includes = ["include/path"],
+    features = [
+        "parse_headers",
+        "layering_check",
+    ],
     include_prefix = "prefixed",
+    includes = ["include/path"],
+    local_defines = ["LOCAL_DEFINE"],
     visibility = ["//visibility:public"],
 )

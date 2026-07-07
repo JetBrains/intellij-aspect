@@ -1,4 +1,4 @@
-load("//testing/rules:defs.bzl", "local_test_fixture", "test_fixture")
+load("//testing/rules:defs.bzl", "test_fixture")
 
 package(
     default_testonly = 1,
@@ -91,17 +91,5 @@ filegroup(
     srcs = [
         ":layout_default",
         ":layout_sibling",
-    ],
-)
-
-local_test_fixture(
-    name = "abseil",
-    deps = [
-        "@abseil-cpp//absl/algorithm:algorithm",
-        "@abseil-cpp//absl/algorithm:container",
-        "@abseil-cpp//absl/container:flat_hash_map",
-        "@abseil-cpp//absl/meta:type_traits",
-        "@abseil-cpp//absl/status:status",
-        "@abseil-cpp//absl/strings:strings",
     ],
 )

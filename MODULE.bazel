@@ -14,7 +14,6 @@ bazel_dep(name = "rules_python", version = "2.2.0")
 bazel_dep(name = "rules_java", version = "9.6.1")
 bazel_dep(name = "rules_kotlin", version = "2.4.0")
 bazel_dep(name = "rules_go", version = "0.61.1")
-bazel_dep(name = "rules_scala", version = "7.2.6")
 
 # dependencies to test projects for the aspect
 bazel_dep(name = "abseil-cpp", version = "20260526.0")

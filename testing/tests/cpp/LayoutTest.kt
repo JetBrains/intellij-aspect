@@ -17,7 +17,9 @@
 package com.intellij.aspect.testing.tests.cpp
 
 import com.google.common.truth.Truth.assertThat
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.DependencyType
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
+import com.intellij.aspect.testing.rules.utils.dependencyLabels
 import com.intellij.aspect.testing.rules.utils.findCIdeInfo
 import com.intellij.aspect.testing.rules.utils.relativeArtifactPath
 import org.junit.Rule
@@ -58,11 +60,23 @@ class LayoutTest {
 
   @Test
   fun testBuildFileLocations() {
-    assertThat(aspect.findTarget("//main:main").buildFileArtifactLocation.relativePath)
-      .isEqualTo("main/BUILD")
-    assertThat(aspect.findTarget("//lib:lib").buildFileArtifactLocation.relativePath)
-      .isEqualTo("lib/BUILD")
-    assertThat(aspect.findTarget("//srcs:lib", externalRepo = "external_module").buildFileArtifactLocation.relativePath)
-      .isEqualTo("srcs/BUILD")
+    val main = aspect.findTarget("//main:main").buildFileArtifactLocation
+    assertThat(main.relativePath).isEqualTo("main/BUILD")
+    assertThat(main.isExternal).isFalse()
+
+    assertThat(aspect.findTarget("//lib:lib").buildFileArtifactLocation.relativePath).isEqualTo("lib/BUILD")
+
+    // An injected `--inject_repository` repo does not report isExternal=true on its build file
+    // the way a fetched external module does, so we only assert it resolves as a source artifact.
+    val external = aspect.findTarget("//srcs:lib", externalRepo = "external_module").buildFileArtifactLocation
+    assertThat(external.relativePath).isEqualTo("srcs/BUILD")
+    assertThat(external.isSource).isTrue()
+  }
+
+  @Test
+  fun testExternalDep() {
+    assertThat(aspect.findTarget("//main:main").depsList)
+      .dependencyLabels(DependencyType.COMPILE_TIME)
+      .contains("//srcs:lib")
   }
 }
