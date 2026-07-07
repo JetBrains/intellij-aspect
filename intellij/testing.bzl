@@ -30,7 +30,7 @@ load(":aspect.bzl", "intellij_info_aspect")
 # Aspects are grouped per language so that a target only runs the aspects for
 # its own language. This matters because some aspects (e.g. go, scala) force
 # resolution of their toolchain; keeping them off unrelated deps means a consumer
-# only needs the rule sets and toolchains for the languages they test.
+# only needs declare the toolchains for the languages they test.
 _LANGUAGE_ASPECTS = {
     "cc": [
         intellij_xcode_info_aspect,
