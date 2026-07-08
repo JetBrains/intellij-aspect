@@ -65,8 +65,8 @@ def _merge_target_info(builder, target, ctx):
     # for backwards compatibility with Bazel 8 and below, toolchains are dependencies
     intellij_info_builder.append_ide_infos(builder, [it.info_file for it in _collect_toolchain_info(target)])
 
-    # do not generate a intellij-info.txt if we cannot provide any useful information and it is not a top-level target
-    if not (intellij_provider.has_module(target) or (ctx.rule.kind in EXTRA_RULES) or (intellij_provider.TopLevelTargetInfo in target)):
+    # do not generate a intellij-info.txt if there is no language module attached
+    if (not intellij_provider.has_module(target)) and (not ctx.rule.kind in EXTRA_RULES):
         return
 
     info = {}
@@ -106,10 +106,8 @@ def _merge_target_info(builder, target, ctx):
     # generate the target key based on the information currently accumulated by the builder
     key = intellij_info_builder.build_target_key(builder, target, ctx)
 
-    is_standard_rule = intellij_provider.has_module(target) or target in EXTRA_RULES
-
     # write the ide info to file and add the generated file to the appropriate output group
-    intellij_info_builder.append_ide_infos(builder, [ide_info.write(target, ctx, key, info, is_standard_rule)])
+    intellij_info_builder.append_ide_infos(builder, [ide_info.write(target, ctx, key, info)])
 
 def _aspect_impl(target, ctx):
     builder = intellij_info_builder.create()
