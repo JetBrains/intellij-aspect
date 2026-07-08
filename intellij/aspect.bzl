@@ -26,7 +26,7 @@ load(":provider.bzl", "IntelliJInfo", "intellij_info_builder")
 COMPILE_TIME_DEPS = ["deps"]
 
 # Rule kinds to include in outputs, even though no special information is available
-EXTRA_RULES = ["sh_binary", "sh_library", "genrule"]
+EXTRA_RULES = ["sh_binary", "sh_library", "genrule", "intellij_plugin_debug_target", "_plugin_deploy_zip", "intellij_plugin_zip"]
 
 def _merge_dependencies(builder, ctx):
     """Adds information from all dependencies' intellij info providers."""
