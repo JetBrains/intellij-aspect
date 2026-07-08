@@ -104,9 +104,6 @@ def _aspect_impl(target, ctx):
             sources = [artifact_location.from_file(f) for f in sources],
             embed = _embed(ctx),
         ),
-        internal_value = intellij_common.struct(
-            kind = ctx.rule.kind,
-        ),
         dependencies = {
             intellij_deps.COMPILE_TIME: intellij_deps.collect(
                 ctx,

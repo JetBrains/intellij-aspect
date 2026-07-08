@@ -51,5 +51,4 @@ test_fixture(
         "//:main",
         "//:generated_lib",
     ],
-    use_msys2 = True,
 )
