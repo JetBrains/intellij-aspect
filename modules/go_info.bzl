@@ -55,15 +55,10 @@ def _sources(target, ctx):
         sources = [f for src in getattr(ctx.rule.attr, "srcs", []) for f in src.files.to_list()]
     elif ctx.rule.kind == "go_wrap_cc":
         sources = [f for f in target.files.to_list() if f.basename.endswith(".go")]
-    elif hasattr(target[OutputGroupInfo], "go_generated_srcs"):
+    elif OutputGroupInfo in target and hasattr(target[OutputGroupInfo], "go_generated_srcs"):
         sources = [f for f in target[OutputGroupInfo].go_generated_srcs.to_list() if f.basename.endswith(".go")]
     else:
         sources = []
-    if ctx.rule.kind in ["go_test", "go_library", "go_appengine_test"]:
-        if getattr(ctx.rule.attr, "embed", None) != None:
-            for library in ctx.rule.attr.embed:
-                if intellij_provider.GoInfo in library:
-                    sources += library[intellij_provider.GoInfo].outputs[intellij_provider.SYNC_OUTPUT].to_list()
     return sources
 
 def _import_path(ctx):
@@ -82,26 +77,21 @@ def _import_path(ctx):
         import_path += "/" + ctx.label.name
     return import_path
 
-def _library_labels(ctx):
-    if ctx.rule.kind not in ["go_test", "go_library", "go_appengine_test"]:
-        return []
-    if getattr(ctx.rule.attr, "library", None):
-        return [str(ctx.rule.attr.library.label)]
+def _embed(ctx):
     if not getattr(ctx.rule.attr, "embed", None):
         return []
     return [
-        str(library.label)
-        for library in ctx.rule.attr.embed
-        if not ((intellij_provider.GoInfo in library) and
-                (library[intellij_provider.GoInfo].internal_value.kind in
-                 ["go_source", "go_proto_library"]))
+        embed[intellij_common.TargetInfo].partial_key
+        for embed in ctx.rule.attr.embed
+        if intellij_provider.GoInfo in embed
     ]
 
 def _aspect_impl(target, ctx):
     # Ideally, we would like to check for the presence of a provider to be sure, the target is defined by
     # the expected rule set; however, the currently-used provider was only introduced in 2024 and older versions
     # of rules_go are still in use. Therefore, check against a list of rule kinds.
-    if ctx.rule.kind not in _GO_RULE_KINDS:
+    if ctx.rule.kind not in _GO_RULE_KINDS and \
+       (OutputGroupInfo not in target or not hasattr(target[OutputGroupInfo], "go_generated_srcs")):  # support at least a subset of custom rules not hardcoded in _GO_RULE_KINDS
         return [intellij_provider.GoInfo(present = False)]
 
     sources = _sources(target, ctx)
@@ -111,11 +101,8 @@ def _aspect_impl(target, ctx):
         value = intellij_common.struct(
             import_path = _import_path(ctx),
             sdk_home_path = _go_sdk(ctx),
-            generated_sources = [artifact_location.from_file(f) for f in sources],
-            library_labels = _library_labels(ctx),
-        ),
-        internal_value = intellij_common.struct(
-            kind = ctx.rule.kind,
+            sources = [artifact_location.from_file(f) for f in sources],
+            embed = _embed(ctx),
         ),
         dependencies = {
             intellij_deps.COMPILE_TIME: intellij_deps.collect(

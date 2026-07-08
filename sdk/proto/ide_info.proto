@@ -187,8 +187,9 @@ message ProtobufTargetInfo {
 message GoTargetInfo {
   string import_path = 1;
   ArtifactLocation sdk_home_path = 2;
-  repeated ArtifactLocation generated_sources = 3;
-  repeated string library_labels = 5;
+  repeated ArtifactLocation sources = 6;
+  repeated TargetKey embed = 7;
+  reserved 3, 4, 5;
 }
 
 message TestInfo {
