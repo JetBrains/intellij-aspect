@@ -1,4 +1,4 @@
-load("//testing/rules:defs.bzl", "local_test_fixture", "test_fixture")
+load("//testing/rules:defs.bzl", "test_fixture")
 
 package(
     default_testonly = 1,

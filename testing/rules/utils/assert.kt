@@ -38,7 +38,7 @@ fun IterableSubject.dependencyLabels(
   type: DependencyType,
 ): IterableSubject.UsingCorrespondence<Dependency, String> {
   val predicate = Correspondence.BinaryPredicate<Dependency, String> { dependency, label ->
-    dependency.dependencyType == type && dependency.target.label == label
+    dependency.dependencyType != type || dependency.target.label == label
   }
   return comparingElementsUsing(Correspondence.from(predicate, "dependency label"))
 }

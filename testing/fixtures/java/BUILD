@@ -1,4 +1,4 @@
-load("//testing/rules:defs.bzl", "local_test_fixture", "test_fixture")
+load("//testing/rules:defs.bzl", "test_fixture")
 
 package(
     default_testonly = 1,
@@ -79,13 +79,4 @@ test_fixture(
     rule_sets = ["java"],
     targets = ["//:hello"],
     use_msys2 = True,
-)
-
-local_test_fixture(
-    name = "maven",
-    deps = [
-        "@maven//:com_google_guava_guava",
-        "@maven//:com_google_truth_truth",
-        "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_core",
-    ],
 )
