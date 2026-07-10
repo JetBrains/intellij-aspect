@@ -1,0 +1,13 @@
+load("@rules_python//python:defs.bzl", "py_binary")
+load(":defs.bzl", "py_codegen")
+
+py_codegen(
+    name = "gen",
+    srcs = ["gen.py.tmpl"],
+)
+
+py_binary(
+    name = "main",
+    srcs = ["main.py"],
+    deps = [":gen"],
+)

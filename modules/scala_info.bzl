@@ -41,6 +41,26 @@ TOOLCHAIN_DEPS = [
     "_scalatest_reporter",
 ]
 
+SCALA_SOURCE_EXTENSIONS = ["scala", "sc"]
+
+def _source_files(ctx):
+    return [
+        f
+        for t in intellij_common.attr_as_label_list(ctx, "srcs")
+        for f in t[DefaultInfo].files.to_list()
+    ]
+
+def _is_scala_target(target, ctx):
+    # As custom Scala rules cannot be detected reliably by a provider (rules_scala only
+    # advertises ScalaInfo since version 7 and loading it would break older versions),
+    # detect them by the sources they compile.
+    for f in _source_files(ctx):
+        if f.extension in SCALA_SOURCE_EXTENSIONS:
+            return True
+
+    # Fall back to rule kinds for rules without Scala sources, e.g. srcjar-only targets.
+    return ctx.rule.kind.startswith("scala_") or ctx.rule.kind.startswith("thrift_")
+
 def contains_substring(strings, name):
     for s in strings:
         if s in name:
@@ -128,7 +148,7 @@ def _get_outputs(target, ctx, java_outputs, extra_sync):
         }
 
 def _aspect_impl(target, ctx):
-    if not ctx.rule.kind.startswith("scala_") and not ctx.rule.kind.startswith("thrift_"):
+    if not _is_scala_target(target, ctx):
         return [intellij_provider.ScalaInfo(present = False)]
 
     compiler_classpath_info = None
@@ -147,10 +167,10 @@ def _aspect_impl(target, ctx):
 
     java_outputs = []
     if hasattr(target, "scala"):
-        if hasattr(target.scala, "java_outputs") and provider.java_outputs:
+        if hasattr(target.scala, "java_outputs") and target.scala.java_outputs:
             java_outputs = target.scala.java_outputs
-        elif hasattr(target.scala, "outputs") and provider.outputs:
-            java_outputs = provider.outputs.jars
+        elif hasattr(target.scala, "outputs") and target.scala.outputs:
+            java_outputs = target.scala.outputs.jars
 
     return [intellij_provider.create(
         ctx = ctx,

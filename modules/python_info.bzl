@@ -20,6 +20,8 @@ load(":provider.bzl", "intellij_provider")
 
 TOOLCHAIN_TYPE = str(PYTHON_TOOLCHAIN_TYPE)
 
+PYTHON_SOURCE_EXTENSIONS = ["py", "pyi", "pyw"]
+
 def _get_runtime(ctx):
     if TOOLCHAIN_TYPE in ctx.toolchains:
         toolchain = ctx.toolchains[TOOLCHAIN_TYPE]
@@ -50,7 +52,12 @@ def _aspect_impl(target, ctx):
 
     imports = list(getattr(ctx.rule.attr, "imports", []))
     generated_sources = []
-    if 0 == len(_source_files(ctx)):
+
+    # If the rule does not carry Python sources in its srcs attribute, the target's Python
+    # code has to come from the PyInfo provider instead. This covers custom rules that
+    # generate Python code, whose srcs (if any) are inputs to the generator rather than
+    # Python sources, e.g. templates or proto files.
+    if not [f for f in _source_files(ctx) if f.extension in PYTHON_SOURCE_EXTENSIONS]:
         def provider_import_to_attr_import(provider_import):
             """\
             Remaps the imports from PyInfo
@@ -94,9 +101,17 @@ def _aspect_impl(target, ctx):
 
         if target[PyInfo].imports:
             imports.extend(provider_imports_to_attr_imports())
+
+        # The target's own outputs cover rules that do not populate their runfiles.
+        generated_sources.extend([
+            f
+            for f in target[DefaultInfo].files.to_list()
+            if f.extension in PYTHON_SOURCE_EXTENSIONS
+        ])
         runfiles = target[DefaultInfo].default_runfiles
         if runfiles and runfiles.files:
             generated_sources.extend([f for f in runfiles.files.to_list()])
+        generated_sources = depset(generated_sources).to_list()
 
     return [intellij_provider.create(
         ctx = ctx,

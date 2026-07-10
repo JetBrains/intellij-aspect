@@ -37,6 +37,19 @@ def _get_resources(ctx):
 
     return resources
 
+def _get_generated_sources(ctx):
+    """
+    Files in srcs produced by other rules, e.g. by a code generator. They are added
+    to the sync output group because they have to be materialized on disk for the
+    IDE to be able to index them.
+    """
+    return [
+        f
+        for t in intellij_common.attr_as_label_list(ctx, "srcs")
+        for f in t[DefaultInfo].files.to_list()
+        if not f.is_source
+    ]
+
 def _get_jvm_info(ctx):
     resource_files = [artifact_location.from_file(f) for f in _get_resources(ctx)]
     return intellij_common.struct(
@@ -57,6 +70,7 @@ def _aspect_impl(target, ctx):
         value = _get_jvm_info(ctx),
         outputs = {
             intellij_provider.BUILD_OUTPUT: depset(_get_resources(ctx)),
+            intellij_provider.SYNC_OUTPUT: depset(_get_generated_sources(ctx)),
         },
     )]
 
