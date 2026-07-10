@@ -97,10 +97,10 @@ filegroup(
 test_fixture(
     name = "protobuf",
     srcs = glob(["protobuf/**"]),
+    bazel = ">=8",
     modules = _MODULES + [
         "//testing/fixtures:protobuf_34_1",
     ],
-    bazel = ">=8",
     rule_sets = ["cc"],
     targets = ["//main:main"],
 )
