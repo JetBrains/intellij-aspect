@@ -19,7 +19,7 @@ load(":make_variables.bzl", "expand_make_variables")
 def _target_hash(key):
     """Creates a unique hash for the target based on its key."""
     parts = [key.label, getattr(key, "configuration", "")] + key.aspect_ids
-    return hash(".".join(parts))
+    return abs(hash(".".join(parts)))
 
 def _write_info(target, ctx, key, fields):
     """
