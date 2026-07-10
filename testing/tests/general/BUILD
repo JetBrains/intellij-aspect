@@ -24,3 +24,8 @@ test_runner(
     fixture = "//testing/fixtures/general:simple",
     test = "GeneralTest.kt",
 )
+
+test_runner(
+    fixture = "//testing/fixtures/general:custom_rules",
+    test = "CustomRuleTest.kt",
+)

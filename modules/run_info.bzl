@@ -12,14 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
-load(":artifact_location.bzl", "artifact_location")
 load(":provider.bzl", "intellij_provider")
 
 def _aspect_impl(target, ctx):
     files_to_run = target[DefaultInfo].files_to_run
 
-    if not files_to_run or not hasattr(files_to_run, "executable"):
+    # files_to_run.executable is None for non-executable targets
+    if not files_to_run or getattr(files_to_run, "executable", None) == None:
         return [intellij_provider.RunInfo(present = False)]
 
     return [intellij_provider.create(

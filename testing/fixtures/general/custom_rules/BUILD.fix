@@ -1,0 +1,7 @@
+load(":rules.bzl", "custom_binary", "custom_library", "custom_test")
+
+custom_binary(name = "custom_bin")
+
+custom_test(name = "custom_test")
+
+custom_library(name = "custom_lib")
