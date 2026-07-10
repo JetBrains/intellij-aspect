@@ -20,6 +20,7 @@ jobs:
         bazelisk-cache: true
         disk-cache: ${{ github.workflow }}-linux
         repository-cache: true
+        cache-save: ${{ github.ref == 'refs/heads/main' }}
 
     - name: Build all targets
       run: bazel build //... --//testing/rules:max_servers=2 --//testing/rules:repo_cache=~/.cache/bazel-repo --execution_log_binary_file="${{ runner.temp }}/build_exec.log"
@@ -61,6 +62,7 @@ jobs:
         bazelisk-cache: true
         disk-cache: ${{ github.workflow }}-macos
         repository-cache: true
+        cache-save: ${{ github.ref == 'refs/heads/main' }}
 
     - name: Build all targets
       run: bazel build //... --//testing/rules:max_servers=2 --//testing/rules:repo_cache=~/.cache/bazel-repo --execution_log_binary_file="${{ runner.temp }}/build_exec.log"
@@ -97,6 +99,7 @@ jobs:
         bazelisk-cache: true
         disk-cache: ${{ github.workflow }}-windows
         repository-cache: true
+        cache-save: ${{ github.ref == 'refs/heads/main' }}
 
     - name: Build all targets
       env:
