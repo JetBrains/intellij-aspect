@@ -17,6 +17,10 @@ load("//common:common.bzl", "intellij_common")
 load(":provider.bzl", "intellij_provider")
 
 def _aspect_impl(target, ctx):
+    # targets built under exec configuration are most likely used as local tool
+    if intellij_common.is_exec_configuration(ctx):
+        return [intellij_provider.RunInfo(present = False)]
+
     files_to_run = target[DefaultInfo].files_to_run
 
     # files_to_run.executable is None for non-executable targets
