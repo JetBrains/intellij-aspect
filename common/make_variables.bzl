@@ -15,6 +15,8 @@
 #
 # Derived from: https://github.com/bazelbuild/bazel/blob/6f7faa659e5eb3e56c8a6274ebcb86884703d603/src/main/starlark/builtins_bzl/common/cc/cc_helper.bzl
 
+load(":common.bzl", "intellij_common")
+
 def expand_make_variables(ctx, tokenization, unexpanded_tokens, additional_make_variable_substitutions = {}):
     tokens = []
     targets = []
@@ -51,9 +53,7 @@ def _expand_nested_variable(ctx, additional_vars, exp, execpath = True, targets 
         if not execpath:
             if exp.startswith("location"):
                 exp = exp.replace("location", "rootpath", 1)
-        data_targets = []
-        if ctx.rule.attr.data:
-            data_targets = ctx.rule.attr.data
+        data_targets = intellij_common.attr_as_label_list(ctx, "data")
 
         # Make sure we do not duplicate targets.
         unified_targets_set = {}

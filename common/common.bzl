@@ -57,12 +57,12 @@ def _label_to_string(label):
     # okay with the fixture setups.
     return s.lstrip("@") if s.startswith("@@//") or s.startswith("@//") else s
 
-def _attr_as_str(ctx, name):
+def _attr_as_str(ctx, name, strict = False):
     """Returns the attr as a string. Or the empty string if the attr is invalid."""
     value = getattr(ctx.rule.attr, name, None)
 
     if not value or type(value) != "string":
-        return ""
+        return None if strict else ""
 
     return value
 
@@ -75,7 +75,7 @@ def _attr_as_target(ctx, name):
 
     return value
 
-def _attr_as_list(ctx, name):
+def _attr_as_list(ctx, name, strict = False):
     """Returns the attr as a list. Or the empty list if the attr is invalid."""
     value = getattr(ctx.rule.attr, name, None)
 
@@ -83,13 +83,30 @@ def _attr_as_list(ctx, name):
         return []
 
     if type(value) != "list":
-        return [value]
+        return [] if strict else [value]
 
     return value
 
-def _attr_as_label_list(ctx, name):
+def _attr_as_label_list(ctx, name, strict = False):
     """Returns the attr as a list of targets. Filters out everything except targets."""
-    return [it for it in _attr_as_list(ctx, name) if type(it) == "Target"]
+    return [it for it in _attr_as_list(ctx, name, strict) if type(it) == "Target"]
+
+def _attr_as_string_list(ctx, name, strict = False):
+    """Returns the attr as a list of strings. Filters out everything except strings."""
+    return [it for it in _attr_as_list(ctx, name, strict) if type(it) == "string"]
+
+def _attr_as_dict(ctx, name):
+    """Returns the attr as a dict. Or the empty dict if the attr is invalid."""
+    value = getattr(ctx.rule.attr, name, None)
+
+    if not value or type(value) != "dict":
+        return {}
+
+    return value
+
+def _attr_as_string_dict(ctx, name):
+    """Returns the attr as a dict of strings. Filters out everything except strings."""
+    return {key: value for key, value in _attr_as_dict(ctx, name).items() if type(value) == "string"}
 
 def _is_intellij_aspect_id(id):
     """Checks whether an aspect id refers to an aspect provided by us."""
@@ -163,6 +180,9 @@ intellij_common = struct(
     attr_as_target = _attr_as_target,
     attr_as_list = _attr_as_list,
     attr_as_label_list = _attr_as_label_list,
+    attr_as_string_list = _attr_as_string_list,
+    attr_as_dict = _attr_as_dict,
+    attr_as_string_dict = _attr_as_string_dict,
     is_exec_configuration = _is_exec_configuration,
     target_key = _target_key,
 )

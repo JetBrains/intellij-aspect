@@ -61,7 +61,7 @@ def _from_depset(filedepset):
 
 def _from_attr(ctx, name):
     """Converts a rule attribute to a list of artifact locations. Rule attribute should be of type label list."""
-    return _from_list(getattr(ctx.rule.attr, name, []))
+    return _from_list(intellij_common.attr_as_label_list(ctx, name))
 
 def _from_execpath(exec_path):
     if exec_path == None:

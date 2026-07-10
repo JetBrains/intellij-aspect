@@ -34,6 +34,11 @@ def _write_info(target, ctx, key, fields):
         is_external = intellij_common.label_is_external(ctx.label),
     )
 
+    env = {
+        key: "".join(expand_make_variables(ctx, False, [value]))
+        for key, value in intellij_common.attr_as_string_dict(ctx, "env").items()
+    }
+
     info = fields | {
         "build_file_artifact_location": build_file_location,
         "features": ctx.features,
@@ -43,11 +48,8 @@ def _write_info(target, ctx, key, fields):
         "workspace_name": ctx.workspace_name,
         "generator_name": getattr(ctx.rule.attr, "generator_name", ""),
         "testonly": getattr(ctx.rule.attr, "testonly", False),
-        "env_inherit": getattr(ctx.rule.attr, "env_inherit", []),
-        "env": {
-            k: "".join(expand_make_variables(ctx, False, [v]))
-            for k, v in getattr(ctx.rule.attr, "env", {}).items()
-        },
+        "env_inherit": intellij_common.attr_as_string_list(ctx, "env_inherit", strict = True),
+        "env": env,
         "srcs": artifact_location.from_attr(ctx, "srcs"),
     }
 
