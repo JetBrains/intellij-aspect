@@ -36,6 +36,11 @@ test_runner(
     test = "LayoutTest.kt",
 )
 
+test_runner(
+    fixture = "//testing/fixtures/cpp:protobuf",
+    test = "ProtobufTest.kt",
+)
+
 intellij_aspect_test(
     name = "aspect_test",
     cc = [

@@ -75,13 +75,16 @@ def _collect_compilation_context(ctx, target):
         system_includes = compilation_context.system_includes.to_list() + external_includes,
     )
 
+def _contains_toolchain(deps):
+    for it in deps.to_list():
+        if intellij_provider.get(it, intellij_provider.CcToolchainInfo):
+            return True
+
+    return False
+
 def _aspect_guard(target, ctx):
     """Returns true if the aspect should be applied to the current target."""
     if CcInfo not in target:
-        return False
-
-    # ignore cc_proto_library, attach to proto_library with aspect attached instead
-    if ctx.rule.kind == "cc_proto_library":
         return False
 
     # go targets always provide CcInfo, usually it's empty and even if it isn't we don't handle it
@@ -98,8 +101,16 @@ def _aspect_impl(target, ctx):
     if not _aspect_guard(target, ctx):
         return [intellij_provider.CcInfo(present = False)]
 
-    # TODO(brendandouglas): target to cpp files only
     resolve_files = target[CcInfo].compilation_context.headers
+
+    dependencies = intellij_deps.collect(
+        ctx,
+        attributes = COMPILE_TIME_DEPS,
+        toolchain_types = [CC_TOOLCHAIN_TYPE],
+    )
+
+    toolchains = intellij_deps.find_toolchains(ctx, CC_TOOLCHAIN_TYPE)
+    add_fallback_toolchain = not toolchains and not _contains_toolchain(dependencies)
 
     return [intellij_provider.create(
         ctx = ctx,
@@ -113,13 +124,10 @@ def _aspect_impl(target, ctx):
             compilation_context = _collect_compilation_context(ctx, target),
         ),
         dependencies = {
-            intellij_deps.COMPILE_TIME: intellij_deps.collect(
-                ctx,
-                attributes = COMPILE_TIME_DEPS,
-                toolchain_types = [CC_TOOLCHAIN_TYPE],
-            ),
+            intellij_deps.COMPILE_TIME: dependencies,
+            intellij_deps.TOOLCHAIN: depset([ctx.attr._cc_toolchain]) if add_fallback_toolchain else depset(),
         },
-        toolchains = intellij_deps.find_toolchains(ctx, CC_TOOLCHAIN_TYPE),
+        toolchains = toolchains,
     )]
 
 intellij_cc_info_aspect = intellij_common.aspect(
@@ -128,4 +136,9 @@ intellij_cc_info_aspect = intellij_common.aspect(
     requires = [intellij_cc_toolchain_info_aspect],
     required_aspect_providers = [[CcInfo], [intellij_provider.XcodeToolchainInfo]],
     toolchains_aspects = [str(CC_TOOLCHAIN_TYPE)],
+    attrs = {
+        # Used to resolve the cc toolchain for targets whose rule does not declare it (e.g.
+        # proto_library / cc_proto_library, which get their CcInfo from protobuf's cc_proto_aspect).
+        "_cc_toolchain": attr.label(default = Label("@rules_cc//cc:optional_current_cc_toolchain")),
+    },
 )
