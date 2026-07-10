@@ -71,8 +71,8 @@ _LANGUAGE_ASPECTS = {
     ],
 }
 
-# To ensure that targets visited under different aspect configurations created by 
-# this rule do not cause write conflicts this transition enforces a unique 
+# To ensure that targets visited under different aspect configurations created by
+# this rule do not cause write conflicts this transition enforces a unique
 # bazel configuration for each aspect configuration.
 def _create_language_transition(language):
     def _impl(_settings, _attr):
