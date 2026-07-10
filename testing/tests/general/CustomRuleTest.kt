@@ -22,11 +22,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
-/**
- * Verifies that expanding a pattern (//...) discovers all executable targets, even custom
- * rules the aspect has no specific knowledge of. Executability is detected generically from
- * DefaultInfo.files_to_run.executable (see //modules:run_info.bzl).
- */
 @RunWith(JUnit4::class)
 class CustomRuleTest {
 
@@ -52,8 +47,41 @@ class CustomRuleTest {
 
   @Test
   fun testCustomLibraryHasNoExecutableInfo() {
-    // A non-executable custom rule has no module provider, so the aspect writes no info file
-    // for it. This proves discovery is driven by executability, not by the rule name.
+    // a non-executable custom rule has no module provider, so the aspect writes no info file
     assertThat(aspect.findTargets("//:custom_lib")).isEmpty()
+  }
+
+  @Test
+  fun testWeirdBinarySurvivesHostileAttributes() {
+    val target = aspect.findTarget("//:weird_bin")
+    assertThat(target.kind).isEqualTo("weird_binary")
+    assertThat(target.hasExecutableInfo()).isTrue()
+    assertThat(target.srcsList).isEmpty()
+    assertThat(target.envMap).isEmpty()
+    assertThat(target.envInheritList).isEmpty()
+  }
+
+  @Test
+  fun testWeirdTestSurvivesHostileAttributes() {
+    val target = aspect.findTarget("//:weird_test_tgt")
+    assertThat(target.kind).isEqualTo("weird_test")
+    assertThat(target.hasExecutableInfo()).isTrue()
+    assertThat(target.srcsList).isEmpty()
+    assertThat(target.hasTestInfo()).isTrue()
+    assertThat(target.testInfo.size).isNotEmpty()
+  }
+
+  @Test
+  fun testWeirdLibraryStillNotDiscovered() {
+    assertThat(aspect.findTargets("//:weird_lib")).isEmpty()
+  }
+
+  @Test
+  fun testMakeVariableExpansionInEnv() {
+    val target = aspect.findTarget("//:makevar_bin")
+    assertThat(target.envMap["PLAIN"]).isEqualTo("value")
+    assertThat(target.envMap["LITERAL"]).isEqualTo("\$HOME")
+    assertThat(target.envMap["MODE"]).isNotEmpty()
+    assertThat(target.envMap["LOC"]).contains("custom_lib")
   }
 }
