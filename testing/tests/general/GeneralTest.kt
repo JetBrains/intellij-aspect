@@ -49,4 +49,14 @@ class GeneralTest {
     assertThat(target.hasExecutableInfo()).isTrue()
     assertThat(target.testonly).isFalse()
   }
+
+  @Test
+  fun testCustom() {
+    val target = aspect.findTarget("//:mycustom_B")
+    assertThat(target.kind).isEqualTo("custom_rule")
+    assertThat(target.generatorName).isEqualTo("mycustom")
+    assertThat(target.hasJavaProvider()).isFalse()
+    assertThat(target.hasCIdeInfo()).isFalse()
+    assertThat(target.testonly).isFalse()
+  }
 }
