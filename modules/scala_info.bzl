@@ -51,6 +51,10 @@ def _source_files(ctx):
     ]
 
 def _is_scala_target(target, ctx):
+    # Check the rule kind first, it is much cheaper than inspecting the srcs attribute.
+    if ctx.rule.kind.startswith("scala_") or ctx.rule.kind.startswith("thrift_"):
+        return True
+
     # As custom Scala rules cannot be detected reliably by a provider (rules_scala only
     # advertises ScalaInfo since version 7 and loading it would break older versions),
     # detect them by the sources they compile.
@@ -58,8 +62,7 @@ def _is_scala_target(target, ctx):
         if f.extension in SCALA_SOURCE_EXTENSIONS:
             return True
 
-    # Fall back to rule kinds for rules without Scala sources, e.g. srcjar-only targets.
-    return ctx.rule.kind.startswith("scala_") or ctx.rule.kind.startswith("thrift_")
+    return False
 
 def contains_substring(strings, name):
     for s in strings:
