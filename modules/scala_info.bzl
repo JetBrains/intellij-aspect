@@ -195,17 +195,10 @@ def _aspect_impl(target, ctx):
         elif hasattr(target.scala, "outputs") and target.scala.outputs:
             java_outputs = target.scala.outputs.jars
 
-    jars = _get_jvm_outputs(java_outputs)
-
+    # The source jars of the scala code scrooge generates are already part of its
+    # JavaInfo java_outputs; they only have to be materialized during sync (see
+    # _get_outputs) so the IDE can use them.
     scrooge_source_jars = _scrooge_source_jars(target)
-    if scrooge_source_jars:
-        # Contributed in addition to the class jars provided via JavaInfo, the
-        # consolidation in java_common merges the entries.
-        jars.append(intellij_common.struct(
-            binary_jars = [],
-            interface_jars = [],
-            source_jars = [artifact_location.from_file(f) for f in scrooge_source_jars],
-        ))
 
     return [intellij_provider.create(
         ctx = ctx,
@@ -224,7 +217,7 @@ def _aspect_impl(target, ctx):
         ),
         internal_value = intellij_common.struct(
             java_common = intellij_common.struct(
-                jars = jars,
+                jars = _get_jvm_outputs(java_outputs),
                 generated_jars = _get_generated_jars(java_outputs),
             ),
         ),
