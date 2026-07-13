@@ -161,12 +161,16 @@ message KotlincPluginInfo {
 message KotlinTargetInfo {
   string language_version = 100;
   string api_version = 200;
-  repeated string associates = 300;
+  // use associated_targets instead
+  repeated string associates = 300 [deprecated=true];
+  repeated TargetKey associated_targets = 301;
   repeated string kotlinc_opts = 400;
   repeated ArtifactLocation stdlibs = 500;
   repeated KotlincPluginInfo kotlinc_plugin_infos = 600;
   string module_name = 700;
-  repeated string exported_compiler_plugin_targets_from_deps = 601;
+  // use exported_compiler_plugin_targets instead
+  repeated string exported_compiler_plugin_targets_from_deps = 601 [deprecated=true];
+  repeated TargetKey exported_compiler_plugin_targets = 602;
 }
 
 message ScalaTargetInfo {

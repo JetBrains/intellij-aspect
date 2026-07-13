@@ -31,12 +31,15 @@ class KspTest {
   val aspect = AspectFixture()
 
   @Test
+  @Suppress("DEPRECATION")
   fun testKspPluginReported() {
     val target = aspect.findTarget("//:A")
     assertThat(target.hasKotlinTargetInfo()).isTrue()
     assertThat(target.kind).isEqualTo("kt_jvm_library")
     assertThat(target.kotlinTargetInfo.exportedCompilerPluginTargetsFromDepsList)
-      .contains("@@//processor:hello-processor")
+      .contains("//processor:hello-processor")
+    assertThat(target.kotlinTargetInfo.exportedCompilerPluginTargetsList.map { it.label })
+      .containsExactly("//processor:hello-processor")
   }
 
   @Test

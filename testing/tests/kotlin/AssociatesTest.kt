@@ -33,13 +33,16 @@ class AssociatesTest {
   val aspect = AspectFixture()
 
   @Test
+  @Suppress("DEPRECATION")
   fun testAssociates() {
     val target = aspect.findTarget("//:A")
     assertThat(target.hasKotlinTargetInfo()).isTrue()
     assertThat(target.kind).isEqualTo("kt_jvm_library")
 
     // Associates reported correctly
-    assertThat(target.kotlinTargetInfo.associatesList).containsExactly("@@//:B", "@@//:C")
+    assertThat(target.kotlinTargetInfo.associatesList).containsExactly("//:B", "//:C")
+    assertThat(target.kotlinTargetInfo.associatedTargetsList)
+      .containsExactly(aspect.findTarget("//:B").key, aspect.findTarget("//:C").key)
 
     // Dependencies reported correctly.
     assertThat(target.depsList).dependencyLabels(DependencyType.COMPILE_TIME).containsExactly("//:B")
