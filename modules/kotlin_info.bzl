@@ -196,6 +196,8 @@ def _get_outputs(target, ctx, plugins):
                 resolve_transitives += [out.source_jars]
             else:
                 resolve_files += out.source_jars
+        if hasattr(out, "source_jar") and out.source_jar != None:
+            resolve_files += [out.source_jar]
     if intellij_common.label_is_external(target.label) or (ctx.rule.kind in IMPORT_RULE_KIND):
         return {intellij_provider.SYNC_OUTPUT: depset(resolve_files, transitive = resolve_transitives + [
             getattr(target[KtJvmInfo], "transitive_source_jars", depset()),
