@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_scala//twitter_scrooge:twitter_scrooge.bzl", "ScroogeInfo")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//common:dependencies.bzl", "intellij_deps")
@@ -55,6 +56,10 @@ def _is_scala_target(target, ctx):
     if ctx.rule.kind.startswith("scala_") or ctx.rule.kind.startswith("thrift_"):
         return True
 
+    # Scrooge rules compile Scala generated from thrift.
+    if ScroogeInfo in target:
+        return True
+
     # As custom Scala rules cannot be detected reliably by a provider (rules_scala only
     # advertises ScalaInfo since version 7 and loading it would break older versions),
     # detect them by the sources they compile.
@@ -63,6 +68,21 @@ def _is_scala_target(target, ctx):
             return True
 
     return False
+
+def _scrooge_source_jars(target):
+    """
+    Source jars of the Scala code scrooge generates from thrift. Scrooge does not
+    register them in its JavaInfo, so they are only reachable via ScroogeInfo. Without
+    them the IDE has no sources for the generated code and falls back to decompiling.
+    """
+    if ScroogeInfo not in target:
+        return []
+
+    aspect_info = getattr(target[ScroogeInfo], "aspect_info", None)
+    if not aspect_info:
+        return []
+
+    return aspect_info.src_jars.to_list()
 
 def contains_substring(strings, name):
     for s in strings:
@@ -175,10 +195,22 @@ def _aspect_impl(target, ctx):
         elif hasattr(target.scala, "outputs") and target.scala.outputs:
             java_outputs = target.scala.outputs.jars
 
+    jars = _get_jvm_outputs(java_outputs)
+
+    scrooge_source_jars = _scrooge_source_jars(target)
+    if scrooge_source_jars:
+        # Contributed in addition to the class jars provided via JavaInfo, the
+        # consolidation in java_common merges the entries.
+        jars.append(intellij_common.struct(
+            binary_jars = [],
+            interface_jars = [],
+            source_jars = [artifact_location.from_file(f) for f in scrooge_source_jars],
+        ))
+
     return [intellij_provider.create(
         ctx = ctx,
         provider = intellij_provider.ScalaInfo,
-        outputs = _get_outputs(target, ctx, java_outputs, extra_sync),
+        outputs = _get_outputs(target, ctx, java_outputs, extra_sync + scrooge_source_jars),
         dependencies = {
             intellij_deps.TOOLCHAIN: intellij_deps.collect(
                 ctx,
@@ -192,7 +224,7 @@ def _aspect_impl(target, ctx):
         ),
         internal_value = intellij_common.struct(
             java_common = intellij_common.struct(
-                jars = _get_jvm_outputs(java_outputs),
+                jars = jars,
                 generated_jars = _get_generated_jars(java_outputs),
             ),
         ),

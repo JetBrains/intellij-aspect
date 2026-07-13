@@ -51,13 +51,18 @@ def _aspect_impl(target, ctx):
     runtime = _get_runtime(ctx)
 
     imports = list(getattr(ctx.rule.attr, "imports", []))
-    generated_sources = []
+    python_srcs = [f for f in _source_files(ctx) if f.extension in PYTHON_SOURCE_EXTENSIONS]
+
+    # Python files in srcs that are produced by other rules, e.g. a code generator
+    # feeding a py_library. They have to be reported as generated sources for the IDE
+    # to resolve imports of the generated code.
+    generated_sources = [f for f in python_srcs if not f.is_source]
 
     # If the rule does not carry Python sources in its srcs attribute, the target's Python
     # code has to come from the PyInfo provider instead. This covers custom rules that
     # generate Python code, whose srcs (if any) are inputs to the generator rather than
     # Python sources, e.g. templates or proto files.
-    if not [f for f in _source_files(ctx) if f.extension in PYTHON_SOURCE_EXTENSIONS]:
+    if not python_srcs:
         def provider_import_to_attr_import(provider_import):
             """\
             Remaps the imports from PyInfo

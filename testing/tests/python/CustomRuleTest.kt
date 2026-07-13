@@ -54,4 +54,14 @@ class CustomRuleTest {
     val syncFiles = aspect.findOutputGroup(OutputGroups.SYNC)
     assertThat(syncFiles.filter { it.endsWith("gen.py") }).isNotEmpty()
   }
+
+  @Test
+  fun testLibraryWithGeneratedSrcsReportsGeneratedSources() {
+    val target = aspect.findTarget("//:wrapped")
+    assertThat(target.kind).isEqualTo("py_library")
+    assertThat(target.hasPythonTargetInfo()).isTrue()
+
+    val generated = target.pythonTargetInfo.generatedSourcesList
+    assertThat(generated.filter { it.relativePath.endsWith("gen.py") }).isNotEmpty()
+  }
 }
