@@ -71,9 +71,9 @@ def _is_scala_target(target, ctx):
 
 def _scrooge_source_jars(target):
     """
-    Source jars of the Scala code scrooge generates from thrift. Scrooge does not
-    register them in its JavaInfo, so they are only reachable via ScroogeInfo. Without
-    them the IDE has no sources for the generated code and falls back to decompiling.
+    Source jars of the Scala code scrooge generates from thrift, as advertised via
+    ScroogeInfo. They have to be materialized during sync, otherwise the IDE has no
+    sources for the generated code and falls back to decompiling the class jars.
     """
     if ScroogeInfo not in target:
         return []
