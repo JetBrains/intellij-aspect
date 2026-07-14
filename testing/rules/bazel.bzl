@@ -14,9 +14,9 @@
 
 # Manually maintained list of latest supported Bazel versions per major release.
 _VERSIONS = {
-    7: "7.7.0",
-    8: "8.6.0",
-    9: "9.1.1",
+    7: "7.7.1",
+    8: "8.7.0",
+    9: "9.2.0",
 }
 
 def _ge(v, t):
