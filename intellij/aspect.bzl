@@ -33,19 +33,23 @@ EXTRA_RULES = ["sh_binary", "sh_library", "genrule", "intellij_plugin_debug_targ
 # by the module aspects and must not be duplicated as generic edges.
 _TYPED_DEP_ATTRS = ["exports", "runtime_deps"]
 
-def _collect_generic_dependencies(builder, ctx):
+def _collect_generic_dependencies(builder, target, ctx):
     """
-    Records dependency edges for all explicit attributes. The aspect propagates
-    information from every attribute, but only standard attributes get serialized as
-    typed dependency edges. Rules that keep their dependencies in custom attributes
-    (e.g. rules forwarding providers of wrapped targets) would have no edges in the
-    model at all, and the IDE could resolve through them only via built jars instead
-    of the dependency graph. Implicit attributes are tools and toolchains and are
-    covered by their own edge types.
+    Records dependency edges for all explicit attributes of targets that carry a
+    language module. Modules declare well known attribute names to collect precisely
+    typed edges from, but rules that keep their dependencies in custom attributes
+    (e.g. rules forwarding providers of wrapped targets) have attribute names no
+    module can know, so their edges are collected generically here, and only for
+    targets a module recognized: the same set of targets an info file is written
+    for. Implicit attributes are tools and toolchains and are covered by their own
+    edge types.
 
     Has to run before the target info is written, unlike _merge_dependencies, which
     merges the dependencies' own edges and must therefore run after.
     """
+    if (not intellij_provider.has_module(target)) and (not ctx.rule.kind in EXTRA_RULES):
+        return
+
     generic_deps = []
     for name in dir(ctx.rule.attr):
         if name.startswith("_") or name in _TYPED_DEP_ATTRS:
@@ -161,7 +165,7 @@ def _aspect_impl(target, ctx):
         intellij_deps.collect(ctx, COMPILE_TIME_DEPS),
     )
 
-    _collect_generic_dependencies(builder, ctx)
+    _collect_generic_dependencies(builder, target, ctx)
     _merge_target_info(builder, target, ctx)
     _merge_dependencies(builder, ctx)
 
