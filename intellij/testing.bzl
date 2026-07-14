@@ -71,6 +71,19 @@ _LANGUAGE_ASPECTS = {
     ],
 }
 
+# To ensure that targets visited under different aspect configurations created by
+# this rule do not cause write conflicts this transition enforces a unique
+# bazel configuration for each aspect configuration.
+def _create_language_transition(language):
+    def _impl(_settings, _attr):
+        return {"//command_line_option:platform_suffix": "intellij_aspect_" + language}
+
+    return transition(
+        implementation = _impl,
+        inputs = [],
+        outputs = ["//command_line_option:platform_suffix"],
+    )
+
 def _intellij_aspect_build_impl(ctx):
     info_files = [
         getattr(dep[OutputGroupInfo], "intellij-info", depset())
@@ -86,6 +99,7 @@ _intellij_aspect_build = rule(
         language: attr.label_list(
             aspects = aspects,
             doc = "%s targets to apply the IntelliJ aspect to." % language,
+            cfg = _create_language_transition(language),
         )
         for language, aspects in _LANGUAGE_ASPECTS.items()
     },

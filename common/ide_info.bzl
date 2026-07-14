@@ -19,7 +19,7 @@ load(":make_variables.bzl", "expand_make_variables")
 def _target_hash(key):
     """Creates a unique hash for the target based on its key."""
     parts = [key.label, getattr(key, "configuration", "")] + key.aspect_ids
-    return hash(".".join(parts))
+    return abs(hash(".".join(parts)))
 
 def _write_info(target, ctx, key, fields):
     """
@@ -34,14 +34,10 @@ def _write_info(target, ctx, key, fields):
         is_external = intellij_common.label_is_external(ctx.label),
     )
 
-    files_to_run = target[DefaultInfo].files_to_run or struct()
-
-    # Make executeable_info a struct if and only if files_to_run.executable is present and not None.
-    # This will ensure the correct signal when observing the presence of the executable_info message.
-    executable_info = intellij_common.struct(
-        executable_file = artifact_location.from_file(files_to_run.executable),
-        runfiles_manifest = artifact_location.from_file(getattr(files_to_run, "runfiles_manifest", None)),
-    ) if getattr(files_to_run, "executable", None) != None else None
+    env = {
+        key: "".join(expand_make_variables(ctx, False, [value]))
+        for key, value in intellij_common.attr_as_string_dict(ctx, "env").items()
+    }
 
     info = fields | {
         "build_file_artifact_location": build_file_location,
@@ -52,12 +48,8 @@ def _write_info(target, ctx, key, fields):
         "workspace_name": ctx.workspace_name,
         "generator_name": getattr(ctx.rule.attr, "generator_name", ""),
         "testonly": getattr(ctx.rule.attr, "testonly", False),
-        "executable_info": executable_info,
-        "env_inherit": getattr(ctx.rule.attr, "env_inherit", []),
-        "env": {
-            k: "".join(expand_make_variables(ctx, False, [v]))
-            for k, v in getattr(ctx.rule.attr, "env", {}).items()
-        },
+        "env_inherit": intellij_common.attr_as_string_list(ctx, "env_inherit", strict = True),
+        "env": env,
         "srcs": artifact_location.from_attr(ctx, "srcs"),
     }
 

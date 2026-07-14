@@ -1,0 +1,33 @@
+load(
+    ":rules.bzl",
+    "custom_binary",
+    "custom_library",
+    "custom_test",
+    "makevar_binary",
+    "weird_binary",
+    "weird_library",
+    "weird_test",
+)
+
+custom_binary(name = "custom_bin")
+
+custom_test(name = "custom_test")
+
+custom_library(name = "custom_lib")
+
+weird_binary(name = "weird_bin")
+
+weird_test(name = "weird_test_tgt")
+
+weird_library(name = "weird_lib")
+
+makevar_binary(
+    name = "makevar_bin",
+    data = [":custom_lib"],
+    env = {
+        "PLAIN": "value",
+        "LITERAL": "$$HOME",
+        "MODE": "$(COMPILATION_MODE)",
+        "LOC": "$(location :custom_lib)",
+    },
+)

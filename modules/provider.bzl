@@ -36,6 +36,7 @@ _IntelliJKotlinInfo = _intellij_module_provider()
 _IntelliJScalaInfo = _intellij_module_provider()
 _IntelliJGoInfo = _intellij_module_provider()
 _IntelliJTestInfo = _intellij_module_provider()
+_IntelliJRunInfo = _intellij_module_provider()
 _IntelliJLegacyRulesProtoInfo = _intellij_module_provider()  # protobuf  information from legacy rules_proto
 _IntelliJProtobufInfo = _intellij_module_provider()  # protobuf information from current protobuf rules
 _IntelliJProtoInfo = _intellij_module_provider()  # consolidated protobuf information
@@ -51,6 +52,7 @@ _MODULE_PROVIDERS = {
     "scala_target_info": _IntelliJScalaInfo,
     "go_target_info": _IntelliJGoInfo,
     "test_info": _IntelliJTestInfo,
+    "executable_info": _IntelliJRunInfo,
     "protobuf_target_info": _IntelliJProtoInfo,
 }
 
@@ -148,6 +150,7 @@ intellij_provider = struct(
     PyInfo = _IntelliJPyInfo,
     PythonInfo = _IntellijPythonInfo,
     TestInfo = _IntelliJTestInfo,
+    RunInfo = _IntelliJRunInfo,
     LegacyRulesProtoInfo = _IntelliJLegacyRulesProtoInfo,
     ProtobufInfo = _IntelliJProtobufInfo,
     ProtoInfo = _IntelliJProtoInfo,

@@ -23,3 +23,12 @@ test_fixture(
     ],
     targets = ["//:all"],
 )
+
+test_fixture(
+    name = "custom_rules",
+    srcs = glob(["custom_rules/**"]),
+    modules = [],
+    rule_sets = [],
+    targets = ["//..."],
+    use_msys2 = True,
+)
