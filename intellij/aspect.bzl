@@ -29,6 +29,36 @@ COMPILE_TIME_DEPS = ["deps"]
 # Rule kinds to include in outputs, even though no special information is available
 EXTRA_RULES = ["sh_binary", "sh_library", "genrule", "intellij_plugin_debug_target", "_plugin_deploy_zip", "intellij_plugin_zip"]
 
+# Attributes whose dependency edges are already serialized with a precise type
+# by the module aspects and must not be duplicated as generic edges.
+_TYPED_DEP_ATTRS = ["exports", "runtime_deps"]
+
+def _collect_generic_dependencies(builder, ctx):
+    """
+    Records dependency edges for all explicit attributes. The aspect propagates
+    information from every attribute, but only standard attributes get serialized as
+    typed dependency edges. Rules that keep their dependencies in custom attributes
+    (e.g. rules forwarding providers of wrapped targets) would have no edges in the
+    model at all, and the IDE could resolve through them only via built jars instead
+    of the dependency graph. Implicit attributes are tools and toolchains and are
+    covered by their own edge types.
+
+    Has to run before the target info is written, unlike _merge_dependencies, which
+    merges the dependencies' own edges and must therefore run after.
+    """
+    generic_deps = []
+    for name in dir(ctx.rule.attr):
+        if name.startswith("_") or name in _TYPED_DEP_ATTRS:
+            continue
+        generic_deps.extend([dep for dep in intellij_common.attr_as_label_list(ctx, name) if IntelliJInfo in dep])
+
+    if generic_deps:
+        intellij_info_builder.append_dependencies(
+            builder,
+            intellij_deps.COMPILE_TIME,
+            depset(generic_deps),
+        )
+
 def _merge_dependencies(builder, ctx):
     """Adds information from all dependencies' intellij info providers."""
     for name in dir(ctx.rule.attr):
@@ -131,6 +161,7 @@ def _aspect_impl(target, ctx):
         intellij_deps.collect(ctx, COMPILE_TIME_DEPS),
     )
 
+    _collect_generic_dependencies(builder, ctx)
     _merge_target_info(builder, target, ctx)
     _merge_dependencies(builder, ctx)
 
