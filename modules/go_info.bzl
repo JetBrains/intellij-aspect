@@ -80,11 +80,7 @@ def _import_path(ctx):
 def _embed(ctx):
     if not getattr(ctx.rule.attr, "embed", None):
         return []
-    return [
-        embed[intellij_common.TargetInfo].partial_key
-        for embed in ctx.rule.attr.embed
-        if intellij_provider.GoInfo in embed
-    ]
+    return intellij_common.target_keys_from(ctx.rule.attr.embed)
 
 def _aspect_impl(target, ctx):
     # Ideally, we would like to check for the presence of a provider to be sure, the target is defined by

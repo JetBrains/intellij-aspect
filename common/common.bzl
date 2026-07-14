@@ -152,6 +152,14 @@ def _is_exec_configuration(ctx):
     """Simple heuristic to detect if a context is building for the exec configuration."""
     return "-exec" in ctx.genfiles_dir.path
 
+def _target_keys_from(targets):
+    """Extracts keys from given list of targets. Omits the targets without TargetInfo provider."""
+    return [
+        target[intellij_common.TargetInfo].partial_key
+        for target in targets
+        if intellij_common.TargetInfo in target
+    ]
+
 intellij_common = struct(
     TargetInfo = _IntelliJTargetInfo,
     struct = _struct,
@@ -165,4 +173,5 @@ intellij_common = struct(
     attr_as_label_list = _attr_as_label_list,
     is_exec_configuration = _is_exec_configuration,
     target_key = _target_key,
+    target_keys_from = _target_keys_from,
 )

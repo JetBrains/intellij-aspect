@@ -134,11 +134,7 @@ def _get_kotlin_stdlibs(ctx):
 def _get_associates(target, ctx):
     associates = intellij_common.attr_as_label_list(ctx, "associates")
     associates_labels = [str(associate.label) for associate in associates]
-    associates_keys = [
-        associate[intellij_common.TargetInfo].partial_key
-        for associate in associates
-        if intellij_common.TargetInfo in associate
-    ]
+    associates_keys = intellij_common.target_keys_from(associates)
     direct_dep_targets_list = [
         intellij_common.attr_as_label_list(ctx, attr)
         for attr in ["deps", "jars", "associates"]
@@ -153,11 +149,8 @@ def _get_associates(target, ctx):
             for provider in intellij_provider.JVM_MODULES:
                 provider_value = intellij_provider.get(dep, provider)
                 if provider_value:
-                    associates_keys = associates_keys + [
-                        export[intellij_common.TargetInfo].partial_key
-                        for export in getattr(provider_value.internal_value, "exports", [])
-                        if intellij_common.TargetInfo in export
-                    ]
+                    exports = getattr(provider_value.internal_value, "exports", [])
+                    associates_keys += intellij_common.target_keys_from(exports)
     return associates_keys
 
 def _normalize_jars(jars):
@@ -230,11 +223,7 @@ def _aspect_impl(target, ctx):
     ]
     plugins = _get_kotlin_plugins(ctx, dep_targets)
     associated_targets = _get_associates(target, ctx)
-    exported_compiler_plugin_targets = [
-        plugin[intellij_common.TargetInfo].partial_key
-        for plugin in plugins
-        if intellij_common.TargetInfo in plugin
-    ]
+    exported_compiler_plugin_targets = intellij_common.target_keys_from(plugins)
 
     return [
         intellij_provider.create(
