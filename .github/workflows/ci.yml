@@ -20,6 +20,7 @@ jobs:
         bazelisk-cache: true
         disk-cache: ${{ github.workflow }}-linux
         repository-cache: true
+        bazelrc: common --repo_contents_cache=
         cache-save: ${{ github.ref == 'refs/heads/main' }}
 
     - name: Build all targets
@@ -62,6 +63,7 @@ jobs:
         bazelisk-cache: true
         disk-cache: ${{ github.workflow }}-macos
         repository-cache: true
+        bazelrc: common --repo_contents_cache=
         cache-save: ${{ github.ref == 'refs/heads/main' }}
 
     - name: Build all targets
@@ -99,6 +101,7 @@ jobs:
         bazelisk-cache: true
         disk-cache: ${{ github.workflow }}-windows
         repository-cache: true
+        bazelrc: common --repo_contents_cache=
         cache-save: ${{ github.ref == 'refs/heads/main' }}
 
     - name: Build all targets

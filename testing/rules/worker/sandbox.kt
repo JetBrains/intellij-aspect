@@ -72,6 +72,10 @@ class Sandbox(
     cmd.add("build")
     cmd.add("--disk_cache=" + server.sharedResources.diskCacheDirectory)
     cmd.add("--repository_cache=" + server.sharedResources.repoCacheDirectory)
+
+    if (majorVersion(version) >= 8) {
+      cmd.add("--repo_contents_cache=" + server.sharedResources.repoContentsCacheDirectory)
+    }
     cmd.add("--registry=" + registryUri())
 
     if (aspects.isNotEmpty()) {
@@ -146,4 +150,8 @@ class Sandbox(
     err.close()
     out.close()
   }
+}
+
+private fun majorVersion(version: String): Int {
+  return version.substringBefore('.').toIntOrNull() ?: 0
 }

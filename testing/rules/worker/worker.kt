@@ -163,6 +163,7 @@ data class SharedResources(
   val bazeliskBinary: Path,
   val registryDirectory: Path,
   val repoCacheDirectory: Path,
+  val repoContentsCacheDirectory: Path,
   val diskCacheDirectory: Path,
   val bazeliskHomeDirectory: Path,
 )
@@ -183,6 +184,7 @@ private fun createResources(cwd: Path, options: WorkerOptions): SharedResources 
     bazeliskBinary = Path.of(options.bazelisk).toAbsolutePath(),
     registryDirectory = registryDirectory,
     repoCacheDirectory = Files.createDirectories(repoCacheDirectory),
+    repoContentsCacheDirectory = Files.createDirectories(cwd.resolve("repo_contents_cache")),
     diskCacheDirectory = Files.createDirectories(cwd.resolve("disk_cache")),
     bazeliskHomeDirectory = Files.createDirectories(cwd.resolve("bazelisk_home")),
   )
