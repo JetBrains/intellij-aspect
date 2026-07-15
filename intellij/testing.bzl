@@ -134,6 +134,7 @@ def intellij_aspect_test(
         proto = [],
         python = [],
         scala = [],
+        tags = [],
         **kwargs):
     """Asserts the IntelliJ aspect builds successfully over the given deps.
 
@@ -165,11 +166,12 @@ def intellij_aspect_test(
         python = python,
         scala = scala,
         testonly = True,
-        tags = ["manual"],
+        tags = ["manual", "no-ide"],
     )
 
     _build_test(
         name = name,
         targets = [build],
+        tags = tags + (["no-ide"] if not "no-ide" in tags else []),
         **kwargs
     )
