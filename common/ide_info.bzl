@@ -19,7 +19,7 @@ load(":make_variables.bzl", "expand_make_variables")
 def _target_hash(key):
     """Creates a unique hash for the target based on its key."""
     parts = [key.label, getattr(key, "configuration", "")] + key.aspect_ids
-    return abs(hash(".".join(parts)))
+    return abs(hash(".".join(["%s" % (hash(part),) for part in parts])))
 
 def _write_info(target, ctx, key, fields):
     """
@@ -53,8 +53,12 @@ def _write_info(target, ctx, key, fields):
         "srcs": artifact_location.from_attr(ctx, "srcs"),
     }
 
-    # bazel allows target names differing only by case, so append a hash to support case-insensitive file systems
-    file_name = "%s-%s.intellij-info.txt" % (target.label.name, _target_hash(key))
+    # Labels, e.g., of filegroups, may overlap with files. So we cannot use the label name as it might start
+    # with a conflicting directory. Instead we purely rely on the  the hash to discrimate output files. To improve
+    # human debuggability, we include the "file name" part of the label (or the first up to 200 characters thereof,
+    # to keep within file-length limit on all supported OSes).
+    short_file_name = target.label.name.split("/")[-1][:200]
+    file_name = "%s.%s.intellij-info.txt" % (_target_hash(key), short_file_name)
 
     file = ctx.actions.declare_file(file_name)
     ctx.actions.write(file, proto.encode_text(struct(**info)))
