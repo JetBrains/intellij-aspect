@@ -67,6 +67,8 @@ class Sandbox(
   ): Map<String, Set<Path>> {
     val cmd = mutableListOf<String>()
     cmd.add(server.sharedResources.bazeliskBinary.toAbsolutePath().toString())
+    cmd.add("--nosystem_rc")
+    cmd.add("--nohome_rc")
     cmd.add("--output_user_root=" + server.outputRootDirectory)
     cmd.add("--output_base=" + server.outputBaseDirectory)
     cmd.add("build")
