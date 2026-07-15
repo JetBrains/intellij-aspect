@@ -54,7 +54,14 @@ def _collect_generic_dependencies(builder, target, ctx):
     for name in dir(ctx.rule.attr):
         if name.startswith("_") or name in _TYPED_DEP_ATTRS:
             continue
-        generic_deps.extend([dep for dep in intellij_common.attr_as_label_list(ctx, name) if IntelliJInfo in dep])
+
+        # only record edges to dependencies that are themselves part of the model,
+        # i.e. that carry a module provider and get an info file of their own
+        generic_deps.extend([
+            dep
+            for dep in intellij_common.attr_as_label_list(ctx, name)
+            if IntelliJInfo in dep and intellij_provider.has_module(dep)
+        ])
 
     if generic_deps:
         intellij_info_builder.append_dependencies(
