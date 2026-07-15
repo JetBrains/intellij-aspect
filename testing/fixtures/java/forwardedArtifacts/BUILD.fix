@@ -1,0 +1,10 @@
+genrule(
+    name = "main",
+    outs = ["out"],
+    cmd = "echo foo > $@"
+)
+
+filegroup(
+    name = "out/files",
+    srcs = [":main"],
+)
