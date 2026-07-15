@@ -24,6 +24,7 @@ import com.intellij.aspect.lib.Rules
 import com.intellij.aspect.lib.deployAspectZip
 import com.intellij.aspect.private.lib.utils.asBazelPath
 import com.intellij.aspect.private.lib.utils.unzip
+import com.intellij.aspect.testing.rules.fixture.FixtureProto
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.AspectDeployment
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.BazelModule
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.OutputGroup
@@ -85,7 +86,7 @@ fun main(args: Array<String>) {
     val prefix = ASPECT_PREFIX.getValue(deployment)
     val aspectLabels = aspects.map { prefix + it.toString() }
 
-    val files = bazelBuild(
+    val buildResult = bazelBuild(
       version,
       targets = input.targetsList,
       aspects = aspectLabels,
@@ -94,6 +95,7 @@ fun main(args: Array<String>) {
       execLog = Path.of(input.outputExecLog),
       flags = input.extraFlagsList,
     )
+    val files = buildResult.outputGroups
     require(files.isNotEmpty()) { "no files were generated" }
 
     val builder = TestFixture.newBuilder().apply {
@@ -103,6 +105,12 @@ fun main(args: Array<String>) {
       files.entries.map(::createOutputGroup).forEach(::addOutputs)
 
       addAllExtraFlags(input.extraFlagsList)
+
+      metrics = FixtureProto.Metrics.newBuilder().apply {
+        buildResult.metrics?.get("buildGraphMetrics")?.get("postInvocationSkyframeNodeCount")?.let {
+          skyframeNodeCount = it.asLong()
+        }
+      }.build()
     }
 
     Files.newOutputStream(Path.of(input.outputProto)).use { outputStream ->

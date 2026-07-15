@@ -59,4 +59,10 @@ class GeneralTest {
     assertThat(target.hasCIdeInfo()).isFalse()
     assertThat(target.testonly).isFalse()
   }
+
+  @Test
+  fun testMetrics() {
+    assertThat(aspect.getMetrics().skyframeNodeCount).isAtLeast(10) // sanity check that the metrics was recorded
+    assertThat(aspect.getMetrics().skyframeNodeCount).isAtMost(35_000)
+  }
 }
