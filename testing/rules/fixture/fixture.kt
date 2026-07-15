@@ -92,6 +92,8 @@ class AspectFixture : ExternalResource() {
 
     return true
   }
+
+  fun getMetrics() = output.metrics
 }
 
 @Throws(IOException::class)
