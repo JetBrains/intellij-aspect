@@ -54,6 +54,16 @@ class ForwardTest {
   }
 
   @Test
+  fun testForwardedDependencyEdges() {
+    // The dependency of `forward` lives in a custom attribute. The model must still
+    // contain the edge: without it the IDE can resolve through such targets only via
+    // their built jars, and reverse reachability (e.g. the classification of targets
+    // as test-only) does not see their dependents at all.
+    val target = aspect.findTarget("//forwarded:fwd")
+    assertThat(target.depsList.map { it.target.label }).contains("//lib:util")
+  }
+
+  @Test
   fun testForward() {
     val target = aspect.findTarget("//forwarded:fwd")
     assertThat(target.hasJavaProvider()).isTrue()
