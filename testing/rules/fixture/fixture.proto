@@ -57,6 +57,8 @@ message OutputGroup {
 
 message Metrics {
   int64 skyframeNodeCount = 1;
+  int64 evaluatedConfiguredTarget = 2;
+  int64 evaluatedArtifactNestedSet = 3;
 }
 
 message TestFixture {
