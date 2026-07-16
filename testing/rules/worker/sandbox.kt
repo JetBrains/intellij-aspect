@@ -57,7 +57,7 @@ class Sandbox(
     return sandboxRoot.resolve(name).toAbsolutePath()
   }
 
-  data class BuildResult(val outputGroups: Map<String, Set<Path>>, val metrics: JsonNode?)
+  data class BuildResult(val outputGroups: Map<String, Set<Path>>, val metrics: JsonNode?, val infoHeap: String)
 
   @Throws(IOException::class)
   fun bazelBuild(
@@ -121,7 +121,25 @@ class Sandbox(
       throw IOException("Bazel build failed: ${cmd.joinToString(" ")}")
     }
 
-    return BuildResult(parseBepOutputGroups(bepFile), parseBepMetrics(bepFile))
+    val outputGroups = parseBepOutputGroups(bepFile)
+    val metrics = parseBepMetrics(bepFile)
+
+    val infoProcess = ProcessBuilder(
+      listOf(
+        server.sharedResources.bazeliskBinary.toAbsolutePath().toString(),
+        "info", "used-heap-size-after-gc",
+      ),
+    )
+      .directory(projectDirectory.toFile())
+      .apply { environment().putAll(createEnvironment(version)) }
+      .start()
+
+    if (process.waitFor() != 0) {
+      throw IOException("Querying bazel heap size failed.")
+    }
+    val heapInfo = infoProcess.inputStream.readAllBytes().decodeToString()
+
+    return BuildResult(outputGroups, metrics, heapInfo)
   }
 
   private fun createEnvironment(version: String): Map<String, String> {

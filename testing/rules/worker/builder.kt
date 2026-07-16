@@ -108,12 +108,13 @@ fun main(args: Array<String>) {
       addAllExtraFlags(input.extraFlagsList)
 
       metrics = FixtureProto.Metrics.newBuilder().apply {
+        usedHeapSizeAfterGc = parseSize(buildResult.infoHeap)
         buildResult.metrics?.get("buildGraphMetrics")?.get("postInvocationSkyframeNodeCount")?.let {
           skyframeNodeCount = it.asLong()
         }
         buildResult.metrics?.get("buildGraphMetrics")?.get("evaluatedValues")?.let {
           it.filter { it.get("skyfunctionName").asText() == "ARTIFACT_NESTED_SET" }.firstOrNull()?.let {
-              evaluatedArtifactNestedSet = it.get("count").asText().toLong()
+            evaluatedArtifactNestedSet = it.get("count").asText().toLong()
           }
           it.filter { it.get("skyfunctionName").asText() == "CONFIGURED_TARGET" }.firstOrNull()?.let {
             evaluatedConfiguredTarget = it.get("count").asText().toLong()
@@ -125,6 +126,21 @@ fun main(args: Array<String>) {
     Files.newOutputStream(Path.of(input.outputProto)).use { outputStream ->
       builder.build().writeTo(outputStream)
     }
+  }
+}
+
+@Throws(NumberFormatException::class)
+private fun parseSize(sizeString: String): Long {
+  // Heap size is "helpfully" reported with SI suffixes and rounded, so we have reverse that encoding (to the extend
+  // possible).
+  // https://github.com/bazelbuild/bazel/blob/deaa7a9352d6a4ebd0e8e644b82a26332f36329f/src/main/java/com/google/devtools/build/lib/util/StringUtilities.java#L96
+  val sizeSI = sizeString.substringBefore("B")
+  return when {
+    sizeSI == "" -> 0
+    sizeSI.endsWith("K") -> sizeSI.substringBefore("K").toLong() * 1000
+    sizeSI.endsWith("M") -> sizeSI.substringBefore("M").toLong() * 1000_000
+    sizeSI.endsWith("G") -> sizeSI.substringBefore("G").toLong() * 1000_000_000
+    else -> sizeString.toLong()
   }
 }
 
