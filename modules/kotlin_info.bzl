@@ -183,7 +183,7 @@ def _get_outputs(target, ctx, plugins):
         sync_transitives = [ctx.toolchains[TOOLCHAIN_TYPE].jvm_stdlibs.compile_jars]
     for plugin in plugins:
         if KtCompilerPluginInfo in plugin:
-            sync_transitives += [plugin[KtCompilerPluginInfo].classpath]
+            resolve_transitives += [plugin[KtCompilerPluginInfo].classpath]
     for out in getattr(getattr(target[KtJvmInfo], "outputs", struct()), "jars", []):
         if getattr(out, "compile_jar", None):
             resolve_files += [out.compile_jar]
@@ -198,13 +198,13 @@ def _get_outputs(target, ctx, plugins):
                 resolve_files += out.source_jars
         if hasattr(out, "source_jar") and out.source_jar != None:
             resolve_files += [out.source_jar]
-    if intellij_common.label_is_external(target.label) or (ctx.rule.kind in IMPORT_RULE_KIND):
-        return {intellij_provider.SYNC_OUTPUT: depset(resolve_files, transitive = resolve_transitives + [
-            getattr(target[KtJvmInfo], "transitive_source_jars", depset()),
-        ] + sync_transitives)}
+        if getattr(target[KtJvmInfo], "transitive_source_jars", None):
+            resolve_transitives += [getattr(target[KtJvmInfo], "transitive_source_jars", depset())]
+    if ctx.rule.kind in IMPORT_RULE_KIND:
+        return {intellij_provider.SYNC_OUTPUT: depset(resolve_files, transitive = resolve_transitives + sync_transitives)}
     else:
         return {
-            intellij_provider.SYNC_OUTPUT: depset(transitive = sync_transitives),
+            intellij_provider.SYNC_OUTPUT: depset([f for f in resolve_files if f.is_source], transitive = sync_transitives),
             intellij_provider.BUILD_OUTPUT: depset(resolve_files, transitive = resolve_transitives),
         }
 
