@@ -37,16 +37,6 @@ def _get_resources(ctx):
 
     return resources
 
-def _get_srcs_depsets(ctx):
-    """
-    Depsets of all files in srcs. Files produced by other rules (e.g. by a code
-    generator) have to be materialized on disk during sync, otherwise the IDE cannot
-    index them. The depsets are passed on as transitives without filtering out source
-    files: flattening them here would be more expensive than including files that
-    already exist on disk anyway.
-    """
-    return [t[DefaultInfo].files for t in intellij_common.attr_as_label_list(ctx, "srcs")]
-
 def _get_jvm_info(ctx):
     resource_files = [artifact_location.from_file(f) for f in _get_resources(ctx)]
     return intellij_common.struct(
@@ -67,7 +57,6 @@ def _aspect_impl(target, ctx):
         value = _get_jvm_info(ctx),
         outputs = {
             intellij_provider.BUILD_OUTPUT: depset(_get_resources(ctx)),
-            intellij_provider.SYNC_OUTPUT: depset(transitive = _get_srcs_depsets(ctx)),
         },
     )]
 

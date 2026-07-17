@@ -41,11 +41,11 @@ class GeneratedSourcesTest {
   }
 
   @Test
-  fun testGeneratedSourceIsMaterializedDuringSync() {
-    // Generated sources have to exist on disk after a sync without a build,
-    // otherwise the IDE cannot index them.
-    val syncFiles = aspect.findOutputGroup(OutputGroups.SYNC)
-    assertThat(syncFiles.filter { it.endsWith("Gen.scala") }).isNotEmpty()
+  fun testGeneratedSourceIsMaterialized() {
+    // Generated sources are materialized by the main aspect via the build output
+    // group so the IDE can index them.
+    val buildFiles = aspect.findOutputGroup(OutputGroups.BUILD)
+    assertThat(buildFiles.filter { it.endsWith("Gen.scala") }).isNotEmpty()
   }
 
   @Test
