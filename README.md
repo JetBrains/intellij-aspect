@@ -93,7 +93,7 @@ that get built with the aspect. A fixture is declared with `test_fixture()`, whi
 specifies the project sources, module dependencies, aspects to apply, and targets to build.
 
 **Test matrix** -- Each fixture is automatically tested across a cartesian product of:
-- **Bazel versions**: 7.7.0, 8.6.0, 9.0.0 (configurable via version specs like `">=8"`)
+- **Bazel versions**: 7.7.1, 8.7.0, 9.2.0 (configurable via version specs like `">=8"`)
 - **Deployment modes**: `bcr`, `materialized`, and optionally `builtin`
 - **Module versions**: different versions of rule sets (e.g. rules_cc 0.1.1 vs 0.2.14)
 
