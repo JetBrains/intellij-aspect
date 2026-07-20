@@ -106,6 +106,10 @@ def _merge_target_info(builder, target, ctx):
     # generate the target key based on the information currently accumulated by the builder
     key = intellij_info_builder.build_target_key(builder, target, ctx)
 
+    # Add toolchain-contributed output
+    for toolchain_info in _collect_toolchain_info(target):
+        intellij_info_builder.append_outputs(builder, toolchain_info.outputs)
+
     # Materialize generated sources
     intellij_info_builder.append_output(
         builder,
