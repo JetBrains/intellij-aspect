@@ -38,6 +38,9 @@ def _aspect_impl(target, ctx):
     return [intellij_provider.create_toolchain(
         provider = intellij_provider.JavaToolchainInfo,
         info_file = ide_info.write_toolchain(target, ctx, "java_toolchain_info", info),
+        outputs = {
+            intellij_provider.SYNC_OUTPUT: toolchain.java_runtime.files,
+        },
         owner = target,
     )]
 

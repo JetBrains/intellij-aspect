@@ -80,6 +80,7 @@ def _intellij_toolchain_provider():
             "info_file": "File - The intellij-info.txt that describes the toolchain.",
             "owner": "Target - The target the produced this toolchain",
             "present": "bool - Whether the provider is present on this target.",
+            "outputs": "dict[str, depset[File]] - Output groups produced by this module.",
         },
     )
 
@@ -124,12 +125,13 @@ def _create(ctx, provider, value, internal_value = None, outputs = None, depende
         aspect_ids = ctx.aspect_ids,
     )
 
-def _create_toolchain(provider, info_file, owner):
+def _create_toolchain(provider, info_file, owner, outputs = None):
     """Creates a new instance of a toolchain provider."""
     return provider(
         present = True,
         info_file = info_file,
         owner = owner,
+        outputs = outputs or {},
     )
 
 # Output groups used
