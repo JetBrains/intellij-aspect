@@ -21,3 +21,17 @@ test_fixture(
     ],
     use_msys2 = True,
 )
+
+test_fixture(
+    name = "generated",
+    srcs = glob(["generated/**"]),
+    bazel = ">=9",
+    modules = _MODULES,
+    output_groups = [
+        "intellij-sync",
+        "intellij-build",
+    ],
+    rule_sets = ["scala"],
+    targets = ["//:all"],
+    use_msys2 = True,
+)

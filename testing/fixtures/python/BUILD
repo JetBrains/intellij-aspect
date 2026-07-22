@@ -36,3 +36,16 @@ test_fixture(
     rule_sets = ["python"],
     targets = ["//:main"],
 )
+
+test_fixture(
+    name = "customRule",
+    srcs = glob(["customRule/**"]),
+    modules = _MODULES,
+    output_groups = [
+        "intellij-sync",
+        "intellij-build",
+    ],
+    rule_sets = ["python"],
+    targets = ["//:all"],
+    use_msys2 = True,
+)

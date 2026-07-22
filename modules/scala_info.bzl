@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_scala//twitter_scrooge:twitter_scrooge.bzl", "ScroogeInfo")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//common:dependencies.bzl", "intellij_deps")
@@ -40,6 +41,48 @@ TOOLCHAIN_DEPS = [
     "_scalatest_runner",
     "_scalatest_reporter",
 ]
+
+SCALA_SOURCE_EXTENSIONS = ["scala", "sc"]
+
+def _source_files(ctx):
+    return [
+        f
+        for t in intellij_common.attr_as_label_list(ctx, "srcs")
+        for f in t[DefaultInfo].files.to_list()
+    ]
+
+def _is_scala_target(target, ctx):
+    # Check the rule kind first, it is much cheaper than inspecting the srcs attribute.
+    if ctx.rule.kind.startswith("scala_") or ctx.rule.kind.startswith("thrift_"):
+        return True
+
+    # Scrooge rules compile Scala generated from thrift.
+    if ScroogeInfo in target:
+        return True
+
+    # As custom Scala rules cannot be detected reliably by a provider (rules_scala only
+    # advertises ScalaInfo since version 7 and loading it would break older versions),
+    # detect them by the sources they compile.
+    for f in _source_files(ctx):
+        if f.extension in SCALA_SOURCE_EXTENSIONS:
+            return True
+
+    return False
+
+def _scrooge_source_jars(target):
+    """
+    Source jars of the Scala code scrooge generates from thrift, as advertised via
+    ScroogeInfo. They have to be materialized during sync, otherwise the IDE has no
+    sources for the generated code and falls back to decompiling the class jars.
+    """
+    if ScroogeInfo not in target:
+        return []
+
+    aspect_info = getattr(target[ScroogeInfo], "aspect_info", None)
+    if not aspect_info:
+        return []
+
+    return aspect_info.src_jars.to_list()
 
 def contains_substring(strings, name):
     for s in strings:
@@ -128,7 +171,7 @@ def _get_outputs(target, ctx, java_outputs, extra_sync):
         }
 
 def _aspect_impl(target, ctx):
-    if not ctx.rule.kind.startswith("scala_") and not ctx.rule.kind.startswith("thrift_"):
+    if not _is_scala_target(target, ctx):
         return [intellij_provider.ScalaInfo(present = False)]
 
     compiler_classpath_info = None
@@ -147,15 +190,20 @@ def _aspect_impl(target, ctx):
 
     java_outputs = []
     if hasattr(target, "scala"):
-        if hasattr(target.scala, "java_outputs") and provider.java_outputs:
+        if hasattr(target.scala, "java_outputs") and target.scala.java_outputs:
             java_outputs = target.scala.java_outputs
-        elif hasattr(target.scala, "outputs") and provider.outputs:
-            java_outputs = provider.outputs.jars
+        elif hasattr(target.scala, "outputs") and target.scala.outputs:
+            java_outputs = target.scala.outputs.jars
+
+    # The source jars of the scala code scrooge generates are already part of its
+    # JavaInfo java_outputs; they only have to be materialized during sync (see
+    # _get_outputs) so the IDE can use them.
+    scrooge_source_jars = _scrooge_source_jars(target)
 
     return [intellij_provider.create(
         ctx = ctx,
         provider = intellij_provider.ScalaInfo,
-        outputs = _get_outputs(target, ctx, java_outputs, extra_sync),
+        outputs = _get_outputs(target, ctx, java_outputs, extra_sync + scrooge_source_jars),
         dependencies = {
             intellij_deps.TOOLCHAIN: intellij_deps.collect(
                 ctx,
