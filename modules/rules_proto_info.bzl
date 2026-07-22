@@ -15,38 +15,13 @@
 load("@rules_proto//proto:defs.bzl", "ProtoInfo", "proto_common")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
+load("//common:third_party/proto_common.bzl", "fallback_get_import_path")
 load(":provider.bzl", "intellij_provider")
 
 def _get_import_path(proto_file):
     if hasattr(proto_common, "get_import_path"):
         return proto_common.get_import_path(proto_file)
-
-    # Fall-back code taken from
-    # https://github.com/protocolbuffers/protobuf/blob/cbaf01ac1604e4bcb12552ca3b52fecd21f3e01b/bazel/common/proto_common.bzl#L58
-    #
-    # Protocol Buffers - Google's data interchange format
-    # Copyright 2024 Google Inc.  All rights reserved.
-    #
-    # Use of this source code is governed by a BSD-style
-    # license that can be found in the LICENSE file or at
-    # https://developers.google.com/open-source/licenses/bsd
-    #
-    def _remove_repo(file):
-        """Removes `../repo/` prefix from path, e.g. `../repo/package/path -> package/path`"""
-        short_path = file.short_path
-        workspace_root = file.owner.workspace_root
-        if workspace_root:
-            if workspace_root.startswith("external/"):
-                workspace_root = "../" + workspace_root.removeprefix("external/")
-            return short_path.removeprefix(workspace_root + "/")
-        return short_path
-
-    repo_path = _remove_repo(proto_file)
-    index = repo_path.find("_virtual_imports/")
-    if index >= 0:
-        index = repo_path.find("/", index + len("_virtual_imports/"))
-        repo_path = repo_path[index + 1:]
-    return repo_path
+    return fallback_get_import_path(proto_file)
 
 def _source_mappings(target):
     mappings = []

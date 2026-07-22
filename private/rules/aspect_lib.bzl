@@ -16,7 +16,7 @@ load("@rules_pkg//pkg:providers.bzl", "PackageFilesInfo")
 
 def _aspect_lib_impl(ctx):
     map = {
-        "%s/%s" % (ctx.label.package, file.basename): file
+        file.short_path: file
         for dep in ctx.attr.files
         for file in dep[DefaultInfo].files.to_list()
     }

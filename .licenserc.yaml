@@ -9,6 +9,7 @@ header:
     - '**/*.proto'
     - '**/*.py'
   paths-ignore:
+    - 'common/third_party/**'
     - 'testing/fixtures/**'
     - 'private/repos/common.bzl'
   comment: on-failure
