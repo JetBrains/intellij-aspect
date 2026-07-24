@@ -100,4 +100,15 @@ class SimpleTest {
     assertThat(buildFiles.filter { it.endsWith("/lib/util.jar") }).isNotEmpty()
     assertThat(buildFiles.filter { it.endsWith("Main.kt") }).isNotEmpty()
   }
+
+  @Test
+  fun testMetrics() {
+    assertThat(aspect.getMetrics().skyframeNodeCount).isAtLeast(10) // sanity check that the metrics was recorded
+    assertThat(aspect.getMetrics().skyframeNodeCount).isAtMost(45_000)
+    assertThat(aspect.getMetrics().usedHeapSizeAfterGc).isAtLeast(1_000_000) // sanity check
+    assertThat(aspect.getMetrics().usedHeapSizeAfterGc).isAtMost(20_000_000)
+    // The following metrics are not always present, so only verify upper bounds
+    assertThat(aspect.getMetrics().evaluatedConfiguredTarget).isAtMost(15_000)
+    assertThat(aspect.getMetrics().evaluatedArtifactNestedSet).isAtMost(60)
+  }
 }

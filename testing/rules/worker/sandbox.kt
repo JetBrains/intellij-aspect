@@ -16,8 +16,10 @@
 
 package com.intellij.aspect.testing.rules.worker
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.intellij.aspect.private.lib.utils.asBazelPath
 import com.intellij.aspect.private.lib.utils.isWindows
+import com.intellij.aspect.private.lib.utils.parseBepMetrics
 import com.intellij.aspect.private.lib.utils.parseBepOutputGroups
 import com.intellij.aspect.private.lib.utils.unzip
 import java.io.IOException
@@ -55,6 +57,8 @@ class Sandbox(
     return sandboxRoot.resolve(name).toAbsolutePath()
   }
 
+  data class BuildResult(val outputGroups: Map<String, Set<Path>>, val metrics: JsonNode?, val infoHeap: String)
+
   @Throws(IOException::class)
   fun bazelBuild(
     version: String,
@@ -64,7 +68,7 @@ class Sandbox(
     flags: List<String> = emptyList(),
     profile: Path? = null,
     execLog: Path? = null,
-  ): Map<String, Set<Path>> {
+  ): BuildResult {
     val cmd = mutableListOf<String>()
     cmd.add(server.sharedResources.bazeliskBinary.toAbsolutePath().toString())
     cmd.add("--nosystem_rc")
@@ -116,7 +120,25 @@ class Sandbox(
       throw IOException("Bazel build failed: ${cmd.joinToString(" ")}")
     }
 
-    return parseBepOutputGroups(bepFile)
+    val outputGroups = parseBepOutputGroups(bepFile)
+    val metrics = parseBepMetrics(bepFile)
+
+    val infoProcess = ProcessBuilder(
+      listOf(
+        server.sharedResources.bazeliskBinary.toAbsolutePath().toString(),
+        "info", "used-heap-size-after-gc",
+      ),
+    )
+      .directory(projectDirectory.toFile())
+      .apply { environment().putAll(createEnvironment(version)) }
+      .start()
+
+    if (process.waitFor() != 0) {
+      throw IOException("Querying bazel heap size failed.")
+    }
+    val heapInfo = infoProcess.inputStream.readAllBytes().decodeToString()
+
+    return BuildResult(outputGroups, metrics, heapInfo)
   }
 
   private fun createEnvironment(version: String): Map<String, String> {
