@@ -18,8 +18,8 @@ IntelliJInfo = provider(
     doc = "Aggregation provider for IntelliJ aspect outputs and dependency edges.",
     fields = {
         "key": "TargetKey - The key to uniquly identify this target taking the configuration and all aspect ids into considadrtion.",
-        "outputs": "dict[str, depset[File]] - Output groups emitted by this target (e.g., intellij-info).",
-        "dependencies": "dict[int, depset[Target]] - Direct dependencies grouped by dependency type (see intellij_deps constants).",
+        "outputs": "dict[str, depset[File]|None] - Output groups emitted by this target (e.g., intellij-info).",
+        "dependencies": "dict[int, depset[Target]|None] - Direct dependencies grouped by dependency type (see intellij_deps constants).",
     },
 )
 
@@ -32,10 +32,11 @@ def _create():
 def _append_depset(dst, src):
     """Appends every depset from the source dict[depset] to the destination dict[list[depset]]."""
     for key in list(src):
-        if key in dst:
-            dst[key].append(src[key])
-        else:
-            dst[key] = [src[key]]
+        if src[key]:
+            if key in dst:
+                dst[key].append(src[key])
+            else:
+                dst[key] = [src[key]]
 
 def _append(builder, src):
     """Appends all data from the source to the builder. Source must be either an IntellijInfo provider or a module provider."""
@@ -54,6 +55,8 @@ def _append_ide_infos(builder, files):
 
 def _append_dependencies(builder, group, deps):
     """Appends all dependencies to the specified dependency group."""
+    if deps == None:
+        return
     _append_depset(builder.dependencies, {group: deps})
 
 def _append_output(builder, group, files):
@@ -64,7 +67,7 @@ def _append_output(builder, group, files):
 def _build_depset(src):
     """Builds one dict[depset] from the source dict[list[depset]]."""
     return {
-        key: depset(transitive = value)
+        key: intellij_common.depset(transitive = value)
         for key, value in src.items()
         if value
     }

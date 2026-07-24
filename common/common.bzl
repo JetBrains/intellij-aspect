@@ -31,6 +31,19 @@ def _struct(**kwargs):
     # TODO: this could be further improved with just `if kwargs[name]` to filter all default values
     return struct(**{name: kwargs[name] for name in kwargs if kwargs[name] != None})
 
+def _depset_or_none(direct = None, *, transitive = None):
+    """Alternative depset constructor
+    Returns None instead of a trivially empty set and forwards the value in case it should be constructed out of
+    precisely one transitive member. Returning None instead of an empty depset allows ignoring those empty sets
+    when accumulating at the next higher level.
+    """
+    if not direct:
+        if not transitive:
+            return None
+        if len(transitive) == 1:
+            return transitive[0]
+    return depset(direct = direct, transitive = transitive)
+
 def _struct_update(s, **kwargs):
     """Return new struct that has the same key-value pairs as the given one, expect where specifed via the keyword args."""
     attrs = dir(s)
@@ -181,6 +194,7 @@ intellij_common = struct(
     TargetInfo = _IntelliJTargetInfo,
     struct = _struct,
     struct_update = _struct_update,
+    depset = _depset_or_none,
     aspect = _aspect,
     label_is_external = _label_is_external,
     label_to_string = _label_to_string,
