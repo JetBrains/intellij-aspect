@@ -17,7 +17,7 @@ load("//common:common.bzl", "intellij_common")
 load("//common:dependencies.bzl", "intellij_deps")
 load(":provider.bzl", "intellij_provider")
 
-TOOLCHAIN_TYPE = "@rules_scala//scala:toolchain_type"
+SCALA_TOOLCHAIN_TYPE = "@rules_scala//scala:toolchain_type"
 
 SCALA_COMPILER_NAMES = [
     "scala3-compiler",
@@ -134,7 +134,7 @@ def _aspect_impl(target, ctx):
     compiler_classpath_info = None
     extra_sync = []
     if hasattr(ctx.rule.attr, "_scala_toolchain"):
-        common_scalac_opts = ctx.toolchains[TOOLCHAIN_TYPE].scalacopts
+        common_scalac_opts = ctx.toolchains[SCALA_TOOLCHAIN_TYPE].scalacopts
         if hasattr(ctx.rule.attr, "_scalac"):
             scalac = ctx.rule.attr._scalac
             compiler_classpath = find_scalac_classpath(scalac.default_runfiles.files.to_list())
@@ -179,6 +179,6 @@ intellij_scala_info_aspect = intellij_common.aspect(
     implementation = _aspect_impl,
     provides = [intellij_provider.ScalaInfo],
     toolchains = [
-        config_common.toolchain_type(TOOLCHAIN_TYPE, mandatory = False),
+        config_common.toolchain_type(SCALA_TOOLCHAIN_TYPE, mandatory = False),
     ],
 )

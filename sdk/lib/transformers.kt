@@ -25,6 +25,8 @@ private const val CC_TOOLCHAIN_LABEL = "@bazel_tools//tools/cpp:toolchain_type"
 private const val PYTHON_TOOLCHAIN_LABEL = "@bazel_tools//tools/python:toolchain_type"
 private const val JAVA_TOOLCHAIN_LABEL = "@bazel_tools//tools/java:toolchain_type"
 private const val JAVA_TOOLCHAIN_KEY = "JAVA_RUNTIME_TOOLCHAIN_TYPE"
+private const val SCALA_TOOLCHAIN_CONSTANT = "SCALA_TOOLCHAIN_TYPE"
+private const val SCALA_TOOLCHAIN_VALUE = "//scala:toolchain_type"
 
 /**
  * Rewrites repo-absolute load paths by prepending the deploy directory prefix.
@@ -128,6 +130,16 @@ object TransformJavaSemantics : Transformer {
 
     if (needsSemantics) {
       lines.add(0, "$JAVA_SEMANTICS_FIELD = struct($JAVA_TOOLCHAIN_KEY = Label(\"$JAVA_TOOLCHAIN_LABEL\"))")
+    }
+  }
+}
+
+class TransformScalaToolchainType(val scalaRepositoryName: String) : Transformer {
+
+  override fun apply(loads: MutableList<LoadStatement>, lines: MutableList<String>) {
+    val needsToolchain = lines.removeAll { line -> line.startsWith("$SCALA_TOOLCHAIN_CONSTANT = ") }
+    if (needsToolchain) {
+      lines.add(0, "$SCALA_TOOLCHAIN_CONSTANT = \"${scalaRepositoryName}$SCALA_TOOLCHAIN_VALUE\"")
     }
   }
 }
