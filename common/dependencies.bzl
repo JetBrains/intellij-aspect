@@ -43,12 +43,12 @@ def _collect_from_attributes(ctx, result, attributes):
         result.extend(intellij_common.attr_as_label_list(ctx, name))
 
 def _collect(ctx, attributes = None, toolchain_types = None):
-    """Collects dependencies from multiple attributes and toolchains into one list. Returns a depset[Target]."""
+    """Collects dependencies from multiple attributes and toolchains into one list. Returns a depset[Target]|None."""
     result = []
     _collect_from_attributes(ctx, result, attributes)
     _collect_from_toolchains(ctx, result, toolchain_types)
 
-    return depset(result)
+    return intellij_common.depset(result)
 
 def _find_toolchains(ctx, *args):
     """Finds the toolchain aspect providers for the specific toolchains type."""
