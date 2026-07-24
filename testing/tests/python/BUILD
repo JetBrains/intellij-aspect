@@ -6,6 +6,11 @@ test_runner(
 )
 
 test_runner(
+    fixture = "//testing/fixtures/python:customRule",
+    test = "CustomRuleTest.kt",
+)
+
+test_runner(
     fixture = "//testing/fixtures/python:simple",
     test = "PyLibraryTest.kt",
 )

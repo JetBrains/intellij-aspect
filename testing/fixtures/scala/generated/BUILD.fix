@@ -1,0 +1,21 @@
+load("@rules_scala//scala:scala.bzl", "scala_library")
+load(":defs.bzl", "my_scala_library")
+
+genrule(
+    name = "gen",
+    outs = ["Gen.scala"],
+    cmd = "echo 'object Gen { val answer = 42 }' > $@",
+)
+
+scala_library(
+    name = "lib",
+    srcs = [
+        "Main.scala",
+        ":gen",
+    ],
+)
+
+my_scala_library(
+    name = "custom",
+    srcs = ["Custom.scala"],
+)
