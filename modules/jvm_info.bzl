@@ -56,7 +56,7 @@ def _aspect_impl(target, ctx):
         provider = intellij_provider.JvmInfo,
         value = _get_jvm_info(ctx),
         outputs = {
-            intellij_provider.BUILD_OUTPUT: depset(_get_resources(ctx)),
+            intellij_provider.BUILD_OUTPUT: intellij_common.depset(_get_resources(ctx)),
         },
     )]
 
