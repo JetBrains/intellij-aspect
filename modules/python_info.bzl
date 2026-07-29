@@ -111,8 +111,8 @@ def _aspect_impl(target, ctx):
             generated_sources = [artifact_location.from_file(f) for f in generated_sources],
         ),
         outputs = {
-            intellij_provider.SYNC_OUTPUT: depset(generated_sources),
-            intellij_provider.BUILD_OUTPUT: depset(generated_sources),
+            intellij_provider.SYNC_OUTPUT: intellij_common.depset(generated_sources),
+            intellij_provider.BUILD_OUTPUT: intellij_common.depset(generated_sources),
         },
     )]
 
