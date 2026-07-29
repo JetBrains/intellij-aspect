@@ -76,9 +76,10 @@ def _collect_compilation_context(ctx, target):
     )
 
 def _contains_toolchain(deps):
-    for it in deps.to_list():
-        if intellij_provider.get(it, intellij_provider.CcToolchainInfo):
-            return True
+    if deps != None:
+        for it in deps.to_list():
+            if intellij_provider.get(it, intellij_provider.CcToolchainInfo):
+                return True
 
     return False
 

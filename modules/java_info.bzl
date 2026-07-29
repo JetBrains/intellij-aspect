@@ -106,11 +106,11 @@ def _runtime_jars(target):
     compilation_info = getattr(target[JavaInfo], "compilation_info", None)
     if compilation_info:
         return compilation_info.runtime_classpath
-    return getattr(target[JavaInfo], "transitive_runtime_jars", depset())
+    return getattr(target[JavaInfo], "transitive_runtime_jars", None)
 
 def _compile_jars(target):
     compilation_info = getattr(target[JavaInfo], "compilation_info", None)
-    return compilation_info.compilation_classpath if compilation_info else depset()
+    return compilation_info.compilation_classpath if compilation_info else None
 
 def _get_outputs(target, ctx, jdeps):
     generated_outputs = [
@@ -122,7 +122,7 @@ def _get_outputs(target, ctx, jdeps):
         [output.generated_class_jar for output in generated_outputs] +
         [output.generated_source_jar for output in generated_outputs]
     )
-    resolve_transitives = [_runtime_jars(target), _compile_jars(target)]
+    resolve_transitives = [jarset for jarset in [_runtime_jars(target), _compile_jars(target)] if jarset]
     for out in target[JavaInfo].java_outputs:
         if getattr(out, "compile_jar", None):
             resolve_files += [out.compile_jar]
@@ -136,11 +136,11 @@ def _get_outputs(target, ctx, jdeps):
             else:
                 resolve_files += out.source_jars
     if intellij_common.label_is_external(target.label) or (ctx.rule.kind in IMPORT_RULE_KIND):
-        return {intellij_provider.SYNC_OUTPUT: depset(resolve_files, transitive = resolve_transitives + [
+        return {intellij_provider.SYNC_OUTPUT: intellij_common.depset(resolve_files, transitive = resolve_transitives + [
             target[JavaInfo].transitive_source_jars,
         ])}
     else:
-        return {intellij_provider.BUILD_OUTPUT: depset(
+        return {intellij_provider.BUILD_OUTPUT: intellij_common.depset(
             resolve_files + jdeps,
             transitive = resolve_transitives,
         )}
