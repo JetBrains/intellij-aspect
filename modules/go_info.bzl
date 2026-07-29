@@ -107,7 +107,7 @@ def _aspect_impl(target, ctx):
             ),
         },
         outputs = {
-            intellij_provider.SYNC_OUTPUT: depset(sources),
+            intellij_provider.SYNC_OUTPUT: intellij_common.depset(sources),
         },
     )]
 

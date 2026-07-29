@@ -126,7 +126,7 @@ def _aspect_impl(target, ctx):
         ),
         dependencies = {
             intellij_deps.COMPILE_TIME: dependencies,
-            intellij_deps.TOOLCHAIN: depset([ctx.attr._cc_toolchain]) if add_fallback_toolchain else depset(),
+            intellij_deps.TOOLCHAIN: intellij_common.depset([ctx.attr._cc_toolchain]) if add_fallback_toolchain else None,
         },
         toolchains = toolchains,
     )]
