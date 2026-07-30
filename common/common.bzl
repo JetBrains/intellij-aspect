@@ -26,10 +26,8 @@ _IntelliJTargetInfo = provider(
 )
 
 def _struct(**kwargs):
-    """A replacement for standard `struct` function that omits the fields with None value."""
-
-    # TODO: this could be further improved with just `if kwargs[name]` to filter all default values
-    return struct(**{name: kwargs[name] for name in kwargs if kwargs[name] != None})
+    """A replacement for standard `struct` function that omits the fields with false truth valuse."""
+    return struct(**{name: kwargs[name] for name in kwargs if kwargs[name]})
 
 def _depset_or_none(direct = None, *, transitive = None):
     """Alternative depset constructor
@@ -56,7 +54,7 @@ def _struct_update(s, **kwargs):
     data = {key: getattr(s, key) for key in attrs}
     for k, v in kwargs.items():
         data[k] = v
-    return _struct(**data)
+    return struct(**data)
 
 def _label_is_external(label):
     """Determines whether a label corresponds to an external artifact."""
