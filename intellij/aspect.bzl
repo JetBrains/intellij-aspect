@@ -87,7 +87,7 @@ def _merge_target_info(builder, target, ctx):
 
         toolchain_infos = [
             info
-            for toolchain_target in provider.toolchains
+            for toolchain_target in (provider.toolchains or [])
             for info in _collect_toolchain_info(toolchain_target)
         ]
 

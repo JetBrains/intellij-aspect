@@ -118,9 +118,9 @@ def _create(ctx, provider, value, internal_value = None, outputs = None, depende
         present = True,
         value = value,
         internal_value = internal_value,
-        outputs = outputs or {},
-        dependencies = dependencies or {},
-        toolchains = toolchains or [],
+        outputs = outputs,
+        dependencies = dependencies,
+        toolchains = toolchains,
         aspect_ids = ctx.aspect_ids,
     )
 

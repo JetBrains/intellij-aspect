@@ -31,6 +31,8 @@ def _create():
 
 def _append_depset(dst, src):
     """Appends every depset from the source dict[depset] to the destination dict[list[depset]]."""
+    if not src:
+        return
     for key in list(src):
         if src[key]:
             if key in dst:
