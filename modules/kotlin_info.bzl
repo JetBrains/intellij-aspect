@@ -34,6 +34,23 @@ def _get_additional_javac_options(ctx):
 
     return javac_options_to_flags(javac_opts)
 
+def _struct_update(s, **kwargs):
+    """Return new struct that has the same key-value pairs as the given one, expect where specifed via the keyword args."""
+    attrs = dir(s)
+
+    # two deprecated methods of struct
+    if "to_json" in attrs:
+        attrs.remove("to_json")
+    if "to_proto" in attrs:
+        attrs.remove("to_proto")
+    data = {key: getattr(s, key) for key in attrs}
+    for k, v in kwargs.items():
+        data[k] = v
+
+    # We have to keep all atributes, even empty lists, etc, as kotlinc_options_to_flags assumes a fixed set of keys
+    # with values of a fixed type.
+    return struct(**data)
+
 def _get_kotlinc_options(ctx):
     if TOOLCHAIN_TYPE not in ctx.toolchains:
         return []
@@ -44,7 +61,7 @@ def _get_kotlinc_options(ctx):
 
     # if not specifically set, the default value of "jvm_target" in kotlinc_opts is an empty string.
     if not getattr(kotlinc_opts, "jvm_target", None) and getattr(kotlin_toolchain, "jvm_target", ""):
-        kotlinc_opts = intellij_common.struct_update(kotlinc_opts, jvm_target = getattr(kotlin_toolchain, "jvm_target"))
+        kotlinc_opts = _struct_update(kotlinc_opts, jvm_target = getattr(kotlin_toolchain, "jvm_target"))
     return kotlinc_options_to_flags(kotlinc_opts)
 
 def _source_jars(output):

@@ -42,20 +42,6 @@ def _depset_or_none(direct = None, *, transitive = None):
             return transitive[0]
     return depset(direct = direct, transitive = transitive)
 
-def _struct_update(s, **kwargs):
-    """Return new struct that has the same key-value pairs as the given one, expect where specifed via the keyword args."""
-    attrs = dir(s)
-
-    # two deprecated methods of struct
-    if "to_json" in attrs:
-        attrs.remove("to_json")
-    if "to_proto" in attrs:
-        attrs.remove("to_proto")
-    data = {key: getattr(s, key) for key in attrs}
-    for k, v in kwargs.items():
-        data[k] = v
-    return struct(**data)
-
 def _label_is_external(label):
     """Determines whether a label corresponds to an external artifact."""
     return label.workspace_root.startswith("external/")
@@ -191,7 +177,6 @@ def _target_keys_from(targets):
 intellij_common = struct(
     TargetInfo = _IntelliJTargetInfo,
     struct = _struct,
-    struct_update = _struct_update,
     depset = _depset_or_none,
     aspect = _aspect,
     label_is_external = _label_is_external,
