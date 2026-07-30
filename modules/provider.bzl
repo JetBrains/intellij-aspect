@@ -19,7 +19,7 @@ def _intellij_module_provider():
             "outputs": "dict[str, depset[File]] - Output groups produced by this module.",
             "dependencies": "dict[int, depset[Target]] - Direct dependencies grouped by dependency type.",
             "value": "struct - Module-specific value serializable to protobuf.",
-            "internal_value": "struct - Module-specific value that can be read by other module aspects, but is not serialized",
+            "internal_value": "struct|None - Module-specific value that can be read by other module aspects, but is not serialized",
             "present": "bool - Whether the provider is present on this target.",
             "toolchains": "list[ToolchainAspectProvider] - Toolchains used by the specified target.",
             "aspect_ids": "list[str] - All aspects request by the module aspect i.e. ctx.aspect_ids in the context of the module.",
@@ -117,7 +117,7 @@ def _create(ctx, provider, value, internal_value = None, outputs = None, depende
     return provider(
         present = True,
         value = value,
-        internal_value = internal_value or struct(),
+        internal_value = internal_value,
         outputs = outputs or {},
         dependencies = dependencies or {},
         toolchains = toolchains or [],
