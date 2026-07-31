@@ -36,7 +36,7 @@ def _merge_dependencies(builder, ctx):
             if not IntelliJInfo in dep:
                 continue
 
-            intellij_info_builder.append(builder, dep[IntelliJInfo])
+            intellij_info_builder.append_outputs(builder, dep[IntelliJInfo])
 
 def _serialize_dependencies(builder):
     """Serializes all dependencies currently tracked by the builder."""
