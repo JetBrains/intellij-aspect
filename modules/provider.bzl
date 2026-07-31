@@ -41,6 +41,17 @@ _IntelliJLegacyRulesProtoInfo = _intellij_module_provider()  # protobuf  informa
 _IntelliJProtobufInfo = _intellij_module_provider()  # protobuf information from current protobuf rules
 _IntelliJProtoInfo = _intellij_module_provider()  # consolidated protobuf information
 
+_IntelliJEmpty0Info = _intellij_module_provider()
+_IntelliJEmpty1Info = _intellij_module_provider()
+_IntelliJEmpty2Info = _intellij_module_provider()
+_IntelliJEmpty3Info = _intellij_module_provider()
+_IntelliJEmpty4Info = _intellij_module_provider()
+_IntelliJEmpty5Info = _intellij_module_provider()
+_IntelliJEmpty6Info = _intellij_module_provider()
+_IntelliJEmpty7Info = _intellij_module_provider()
+_IntelliJEmpty8Info = _intellij_module_provider()
+_IntelliJEmpty9Info = _intellij_module_provider()
+
 _MODULE_PROVIDERS = {
     "c_ide_info": _IntelliJCcInfo,
     "py_ide_info": _IntelliJPyInfo,
@@ -54,6 +65,16 @@ _MODULE_PROVIDERS = {
     "test_info": _IntelliJTestInfo,
     "executable_info": _IntelliJRunInfo,
     "protobuf_target_info": _IntelliJProtoInfo,
+    "empty_module_0": _IntelliJEmpty0Info,
+    "empty_module_1": _IntelliJEmpty1Info,
+    "empty_module_2": _IntelliJEmpty2Info,
+    "empty_module_3": _IntelliJEmpty3Info,
+    "empty_module_4": _IntelliJEmpty4Info,
+    "empty_module_5": _IntelliJEmpty5Info,
+    "empty_module_6": _IntelliJEmpty6Info,
+    "empty_module_7": _IntelliJEmpty7Info,
+    "empty_module_8": _IntelliJEmpty8Info,
+    "empty_module_9": _IntelliJEmpty9Info,
 }
 
 # Modules implying that jvm_info should run on the respective targets to obtain
@@ -154,6 +175,16 @@ intellij_provider = struct(
     LegacyRulesProtoInfo = _IntelliJLegacyRulesProtoInfo,
     ProtobufInfo = _IntelliJProtobufInfo,
     ProtoInfo = _IntelliJProtoInfo,
+    Empty0Info = _IntelliJEmpty0Info,
+    Empty1Info = _IntelliJEmpty1Info,
+    Empty2Info = _IntelliJEmpty2Info,
+    Empty3Info = _IntelliJEmpty3Info,
+    Empty4Info = _IntelliJEmpty4Info,
+    Empty5Info = _IntelliJEmpty5Info,
+    Empty6Info = _IntelliJEmpty6Info,
+    Empty7Info = _IntelliJEmpty7Info,
+    Empty8Info = _IntelliJEmpty8Info,
+    Empty9Info = _IntelliJEmpty9Info,
     PROTO_MODULES = _PROTO_MODULES,
     JVM_MODULES = _JVM_MODULES,
     MODULE_MAP = _MODULE_PROVIDERS,
