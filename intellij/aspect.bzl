@@ -95,7 +95,7 @@ def _merge_target_info(builder, target, ctx):
         intellij_info_builder.append_dependencies(
             builder,
             intellij_deps.TOOLCHAIN,
-            depset([it.owner for it in toolchain_infos]),
+            intellij_common.depset([it.owner for it in toolchain_infos]),
         )
 
         # append the already generated info from the toolchains
