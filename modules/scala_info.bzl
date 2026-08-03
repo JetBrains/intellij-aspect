@@ -127,6 +127,14 @@ def _get_outputs(target, ctx, java_outputs, extra_sync):
             intellij_provider.BUILD_OUTPUT: intellij_common.depset(resolve_files, transitive = resolve_transitives),
         }
 
+def get_plugins(rule_attr):
+    result = []
+    plugins = getattr(rule_attr, "plugins", [])
+    for plugin in plugins:
+        for f in plugin.files.to_list():
+            result.append("-Xplugin:%s" % f.path)
+    return result
+
 def _aspect_impl(target, ctx):
     if not ctx.rule.kind.startswith("scala_") and not ctx.rule.kind.startswith("thrift_"):
         return [intellij_provider.ScalaInfo(present = False)]
@@ -163,7 +171,7 @@ def _aspect_impl(target, ctx):
             ),
         },
         value = intellij_common.struct(
-            scalac_opts = common_scalac_opts + getattr(ctx.rule.attr, "scalacopts", []),
+            scalac_opts = common_scalac_opts + getattr(ctx.rule.attr, "scalacopts", []) + get_plugins(ctx.rule.attr),
             compiler_classpath = compiler_classpath_info,
             scalatest_classpath_targets = extract_scalatest_classpath_targets(ctx.rule.attr),
         ),
