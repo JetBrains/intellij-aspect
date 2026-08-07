@@ -20,7 +20,7 @@ load("@rules_cc//cc:defs.bzl", "cc_common")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_TYPE")
 load("//common:common.bzl", "intellij_common")
 load("//common:ide_info.bzl", "ide_info")
-load(":provider.bzl", "intellij_provider")
+load("//modules:module.bzl", "intellij_module")
 
 # Defensive list of features that can appear in the C++ toolchain, but which we
 # definitely don't want to enable (when enabled, they'd contribute command line
@@ -44,9 +44,9 @@ def _aspect_guard(target, ctx):
 
     return True
 
-def _aspect_impl(target, ctx):
+def _implementation(target, ctx, attr):
     if not _aspect_guard(target, ctx):
-        return [intellij_provider.CcToolchainInfo(present = False)]
+        return None
 
     cc_toolchain = target[cc_common.CcToolchainInfo]
     cpp_fragment = ctx.fragments.cpp
@@ -113,15 +113,12 @@ def _aspect_impl(target, ctx):
         sysroot = cc_toolchain.sysroot,
     )
 
-    return [intellij_provider.create_toolchain(
-        provider = intellij_provider.CcToolchainInfo,
-        info_file = ide_info.write_toolchain(target, ctx, "c_toolchain_ide_info", info),
-        owner = target,
-    )]
+    return intellij_module.result(info)
 
-intellij_cc_toolchain_info_aspect = intellij_common.aspect(
-    implementation = _aspect_impl,
+toolchain_module = intellij_module.rule(
+    name = "cc_toolchain",
+    implementation = _implementation,
+    field = "c_toolchain_ide_info",
     fragments = ["cpp"],
-    provides = [intellij_provider.CcToolchainInfo],
-    toolchains_aspects = [str(CC_TOOLCHAIN_TYPE)],
+    toolchains = [CC_TOOLCHAIN_TYPE],
 )
