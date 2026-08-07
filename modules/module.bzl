@@ -19,14 +19,12 @@ def _rule(name, implementation, field = None, setup = None, attrs = None, toolch
             attr = {name: getattr(ctx.attr, name) for name in list(attrs or [])},
         )]
 
-    rule = rule(
+    return rule(
         implementation = rule_implementation,
         provides = [_IntelliJModule],
         attrs = attrs or {},
         toolchains = toolchains or [],
     )
-
-    return rule
 
 def _declare(name, rule, fragments = None, toolchains = None, **kwargs):
     """Declares a module definition."""
@@ -41,14 +39,7 @@ def _declare(name, rule, fragments = None, toolchains = None, **kwargs):
         **kwargs
     )
 
-    return struct(
-        name = name,
-        target = native.package_relative_label(name),
-        fragments = fragments,
-        toolchains = toolchains,
-    )
-
-def _result(value = None, internal_value = None, outputs = None, dependencies = None, toolchains = None):
+def _result(value, *, internal_value = None, outputs = None, dependencies = None, toolchains = None):
     # TODO: this could be optimized by returning none here if nothing is provided
 
     return struct(

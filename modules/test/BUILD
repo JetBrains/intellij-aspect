@@ -2,6 +2,6 @@ load("//modules:module.bzl", "intellij_module")
 load(":impl.bzl", "module")
 
 intellij_module.declare(
-    name = "cc",
+    name = "test",
     rule = module,
 )

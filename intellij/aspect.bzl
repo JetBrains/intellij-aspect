@@ -82,7 +82,7 @@ def _merge_target_info(builder, target, ctx, results):
     intellij_info_builder.append_ide_infos(builder, [it.info_file for it in _collect_toolchain_info(target)])
 
     info = {
-        module.filed: result
+        module.field: result
         for (module, result) in results.items()
         if module.field
     }
@@ -153,11 +153,14 @@ def _aspect_impl(target, ctx):
 
 intellij_info_aspect = intellij_common.aspect(
     implementation = _aspect_impl,
-    requires = [intellij_test_info_aspect, intellij_run_info_aspect],
+    fragments = ["cpp", "java", "py"],
     provides = [IntelliJInfo],
     attrs = {
         "_modules": attr.label_list(
-            default = ["//modules/cc"],
+            default = [
+                "//modules/cc",
+                "//modules/test",
+            ],
             providers = [intellij_module.Module],
         ),
     },
