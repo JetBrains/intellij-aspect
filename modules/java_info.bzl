@@ -42,8 +42,6 @@ RUNTIME_DEPS = [
     "runtime_deps",
 ]
 
-IMPORT_RULE_KIND = ["java_import", "jvm_import", "kt_jvm_import"]
-
 PROVIDERLESS_JAVA_RULES = ["java_binary", "java_test", "java_plugin"]
 
 def _get_javacopts_from_context(ctx):
@@ -137,15 +135,15 @@ def _get_outputs(target, ctx, jdeps):
                 resolve_transitives += [out.source_jars]
             else:
                 resolve_files += out.source_jars
-    if intellij_common.label_is_external(target.label) or (ctx.rule.kind in IMPORT_RULE_KIND):
-        return {intellij_output_groups.SYNC: intellij_common.depset(resolve_files, transitive = resolve_transitives + [
-            target[JavaInfo].transitive_source_jars,
-        ])}
-    else:
-        return {intellij_output_groups.BUILD: intellij_common.depset(
+    return {
+        intellij_output_groups.SYNC: intellij_common.depset(
+            [f for f in resolve_files if f.is_source],
+        ),
+        intellij_output_groups.BUILD: intellij_common.depset(
             resolve_files + jdeps,
             transitive = resolve_transitives,
-        )}
+        ),
+    }
 
 def _get_jdeps(target, ctx):
     jdeps = [jo.jdeps for jo in target[JavaInfo].java_outputs if jo.jdeps != None]
