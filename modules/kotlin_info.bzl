@@ -177,13 +177,12 @@ def _get_generated_jars(target, ctx):
 
 def _get_outputs(target, ctx, plugins):
     resolve_files = []
-    resolve_transitives = []
-    sync_transitives = []
+    transitives = []
     if TOOLCHAIN_TYPE in ctx.toolchains and hasattr(ctx.toolchains[TOOLCHAIN_TYPE], "jvm_stdlibs"):
-        sync_transitives = [ctx.toolchains[TOOLCHAIN_TYPE].jvm_stdlibs.compile_jars]
+        transitives += [ctx.toolchains[TOOLCHAIN_TYPE].jvm_stdlibs.compile_jars]
     for plugin in plugins:
         if KtCompilerPluginInfo in plugin:
-            sync_transitives += [plugin[KtCompilerPluginInfo].classpath]
+            transitives += [plugin[KtCompilerPluginInfo].classpath]
     for out in getattr(getattr(target[KtJvmInfo], "outputs", struct()), "jars", []):
         if getattr(out, "compile_jar", None):
             resolve_files += [out.compile_jar]
@@ -193,19 +192,21 @@ def _get_outputs(target, ctx, plugins):
             resolve_files += [out.class_jar]
         if getattr(out, "source_jars", None):
             if type(out.source_jars) == "depset":
-                resolve_transitives += [out.source_jars]
+                transitives += [out.source_jars]
             else:
                 resolve_files += out.source_jars
         if hasattr(out, "source_jar") and out.source_jar != None:
             resolve_files += [out.source_jar]
-    if intellij_common.label_is_external(target.label) or (ctx.rule.kind in IMPORT_RULE_KIND):
-        return {intellij_provider.SYNC_OUTPUT: intellij_common.depset(resolve_files, transitive = resolve_transitives + (
+    if ctx.rule.kind in IMPORT_RULE_KIND:
+        return {intellij_provider.SYNC_OUTPUT: intellij_common.depset(resolve_files, transitive = transitives + (
             [target[KtJvmInfo].transitive_source_jars] if hasattr(target[KtJvmInfo], "transitive_source_jars") else []
-        ) + sync_transitives)}
+        ))}
     else:
         return {
-            intellij_provider.SYNC_OUTPUT: intellij_common.depset(transitive = sync_transitives),
-            intellij_provider.BUILD_OUTPUT: intellij_common.depset(resolve_files, transitive = resolve_transitives),
+            intellij_provider.SYNC_OUTPUT: intellij_common.depset(
+                [f for f in resolve_files if f.is_source],
+            ),
+            intellij_provider.BUILD_OUTPUT: intellij_common.depset(resolve_files, transitive = transitives),
         }
 
 def _aspect_impl(target, ctx):
