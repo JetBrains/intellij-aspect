@@ -15,15 +15,12 @@
 #
 # Derived from: https://github.com/bazelbuild/intellij/blob/5ec21e640ed59b316b58559d8e79cb0858e519bd/aspect/intellij_info_impl.bzl
 
-# TODO: move this
-load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_TYPE")
+load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_TYPE")  # TODO: move this
 load("//common:common.bzl", "intellij_common")
 load("//common:dependencies.bzl", "intellij_deps")
 load("//common:ide_info.bzl", "ide_info")
 load("//common:provider.bzl", "intellij_provider")
 load("//modules:module.bzl", "intellij_module")
-load("//modules:run_info.bzl", "intellij_run_info_aspect")
-load("//modules:test_info.bzl", "intellij_test_info_aspect")
 load(":provider.bzl", "intellij_info_builder")
 
 # compile time dependencies collected for every target
@@ -82,13 +79,6 @@ def _run_modules(target, ctx):
 
     return results
 
-def _collect_toolchain_info(target):
-    return [
-        target[provider]
-        for provider in intellij_provider.TOOLCHAINS
-        if provider in target and target[provider].present
-    ]
-
 def _merge_target_info(builder, target, ctx, results):
     """Adds information collected from the current target's module providers."""
 
@@ -96,9 +86,6 @@ def _merge_target_info(builder, target, ctx, results):
         # We are not allowed to create an action (including a file-write action) for a target
         # defined by an analysis-test rule.
         return
-
-    # for backwards compatibility with Bazel 8 and below, toolchains are dependencies
-    # intellij_info_builder.append_ide_infos(builder, [it.info_file for it in _collect_toolchain_info(target)])
 
     info = {
         module.field: result.value
@@ -114,22 +101,6 @@ def _merge_target_info(builder, target, ctx, results):
     for result in results.values():
         # merge all information provided by the module provider into the main provider
         intellij_info_builder.append(builder, result)
-
-        # toolchain_infos = [
-        #     info
-        #     for toolchain_target in provider.toolchains
-        #     for info in _collect_toolchain_info(toolchain_target)
-        # ]
-
-        # add toolchains as dependencies to the current target
-        # intellij_info_builder.append_dependencies(
-        #     builder,
-        #     intellij_deps.TOOLCHAIN,
-        #     depset([it.owner for it in toolchain_infos]),
-        # )
-
-        # append the already generated info from the toolchains
-        # intellij_info_builder.append_ide_infos(builder, [it.info_file for it in toolchain_infos])
 
     info["deps"] = _serialize_dependencies(builder)
 
@@ -170,23 +141,32 @@ def _aspect_impl(target, ctx):
 
     return [intellij_info, OutputGroupInfo(**intellij_info.outputs)]
 
-intellij_info_aspect = intellij_common.aspect(
-    implementation = _aspect_impl,
+def intellij_aspect(modules, fragments = None, toolchains = None):
+    return intellij_common.aspect(
+        implementation = _aspect_impl,
+        fragments = fragments or [],
+        provides = [intellij_provider.Info],
+        attr_aspects = ["*"],
+        toolchains_aspects = [str(it) for it in toolchains or []],
+        attrs = {
+            "_modules": attr.label_list(
+                default = modules,
+                providers = [intellij_provider.Module],
+            ),
+            "_toolchains": attr.label_list(
+                default = toolchains or [],
+            ),
+        },
+    )
+
+intellij_info_aspect = intellij_aspect(
+    modules = [
+        "//modules/cc",
+        "//modules/test",
+        "//modules/run",
+    ],
     fragments = ["cpp", "java", "py"],
-    provides = [intellij_provider.Info],
-    toolchains_aspects = [str(CC_TOOLCHAIN_TYPE)],
-    attrs = {
-        "_modules": attr.label_list(
-            default = [
-                "//modules/cc",
-                "//modules/test",
-            ],
-            providers = [intellij_provider.Module],
-        ),
-        "_toolchains": attr.label_list(
-            default = [
-                CC_TOOLCHAIN_TYPE,
-            ],
-        ),
-    },
+    toolchains = [
+        CC_TOOLCHAIN_TYPE,
+    ],
 )
