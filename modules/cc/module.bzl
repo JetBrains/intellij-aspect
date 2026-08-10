@@ -1,0 +1,140 @@
+# Copyright 2025 The Bazel Authors.
+# Copyright 2026 JetBrains s.r.o.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# Derived from: https://github.com/bazelbuild/intellij/blob/5ec21e640ed59b316b58559d8e79cb0858e519bd/aspect/intellij_info_impl.bzl
+
+load("@rules_cc//cc:defs.bzl", "CcInfo", "cc_common")
+load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_TYPE")
+load("//common:artifact_location.bzl", "artifact_location")
+load("//common:common.bzl", "intellij_common")
+load("//common:dependencies.bzl", "intellij_deps")
+load("//common:make_variables.bzl", "expand_make_variables")
+load("//modules:module.bzl", "intellij_module")
+
+# additional compile time dependencies collected for cc targets
+COMPILE_TIME_DEPS = [
+    "_stl",
+    "_cc_toolchain",
+    "implementation_deps",  # for cc_library
+    "malloc",  # for cc_binary
+]
+
+def _collect_rule_context(ctx):
+    """Collect additional information from the rule attributes of cc_xxx rules."""
+    if not ctx.rule.kind.startswith("cc_"):
+        return struct()
+
+    return intellij_common.struct(
+        headers = artifact_location.from_attr(ctx, "hdrs"),
+        textual_headers = artifact_location.from_attr(ctx, "textual_hdrs"),
+        copts = expand_make_variables(ctx, True, intellij_common.attr_as_list(ctx, "copts")),
+        conlyopts = expand_make_variables(ctx, True, intellij_common.attr_as_list(ctx, "conlyopts")),
+        cxxopts = expand_make_variables(ctx, True, intellij_common.attr_as_list(ctx, "cxxopts")),
+        args = expand_make_variables(ctx, True, intellij_common.attr_as_list(ctx, "args")),
+        include_prefix = intellij_common.attr_as_str(ctx, "include_prefix"),
+        strip_include_prefix = intellij_common.attr_as_str(ctx, "strip_include_prefix"),
+    )
+
+def _collect_compilation_context(ctx, target):
+    """Collect information from the compilation context provided by the CcInfo provider."""
+    compilation_context = target[CcInfo].compilation_context
+
+    # collect non-propagated attributes before potentially merging with implementation deps
+    local_defines = compilation_context.local_defines.to_list()
+
+    # merge current compilation context with context of implementation dependencies
+    if ctx.rule.kind.startswith("cc_") and hasattr(ctx.rule.attr, "implementation_deps"):
+        impl_deps = ctx.rule.attr.implementation_deps
+
+        compilation_context = cc_common.merge_compilation_contexts(
+            compilation_contexts = [compilation_context] + [it[CcInfo].compilation_context for it in impl_deps],
+        )
+
+    # external_includes available since bazel 7
+    external_includes = getattr(compilation_context, "external_includes", depset()).to_list()
+
+    return intellij_common.struct(
+        headers = [artifact_location.from_file(it) for it in compilation_context.headers.to_list()],
+        defines = compilation_context.defines.to_list() + local_defines,
+        includes = compilation_context.includes.to_list(),
+        quote_includes = compilation_context.quote_includes.to_list(),
+        # both system and external includes are added using `-isystem`
+        system_includes = compilation_context.system_includes.to_list() + external_includes,
+    )
+
+def _contains_toolchain(deps):
+    if deps != None:
+        for it in deps.to_list():
+            if intellij_module.lookup(it, "cc_toolchain"):
+                return True
+
+    return False
+
+def _aspect_guard(target, ctx):
+    """Returns true if the aspect should be applied to the current target."""
+    if CcInfo not in target:
+        return False
+
+    # go targets always provide CcInfo, usually it's empty and even if it isn't we don't handle it
+    if ctx.rule.kind.startswith("go_"):
+        return False
+
+    # targets built under exec configuration are most likely used as local tool
+    if intellij_common.is_exec_configuration(ctx):
+        return False
+
+    return True
+
+def _implementation(target, ctx, attrs):
+    if not _aspect_guard(target, ctx):
+        return None
+
+    resolve_files = target[CcInfo].compilation_context.headers
+
+    dependencies = intellij_deps.collect(
+        ctx,
+        attributes = COMPILE_TIME_DEPS,
+        toolchain_types = [CC_TOOLCHAIN_TYPE],
+    )
+
+    toolchains = intellij_deps.find_toolchains(ctx, CC_TOOLCHAIN_TYPE)
+    add_fallback_toolchain = not toolchains and not _contains_toolchain(dependencies)
+
+    return intellij_module.result(
+        outputs = {
+            intellij_module.BUILD_OUTPUT: resolve_files,
+            intellij_module.SYNC_OUTPUT: resolve_files,
+        },
+        value = intellij_common.struct(
+            rule_context = _collect_rule_context(ctx),
+            compilation_context = _collect_compilation_context(ctx, target),
+        ),
+        dependencies = {
+            intellij_deps.COMPILE_TIME: dependencies,
+            intellij_deps.TOOLCHAIN: intellij_common.depset([ctx.attr._cc_toolchain]) if add_fallback_toolchain else None,
+        },
+        toolchains = toolchains,
+    )
+
+module = intellij_module.rule(
+    name = "cc",
+    implementation = _implementation,
+    field = "c_ide_info",
+    attrs = {
+        # Used to resolve the cc toolchain for targets whose rule does not declare it (e.g.
+        # proto_library / cc_proto_library, which get their CcInfo from protobuf's cc_proto_aspect).
+        "_toolchain": attr.label(default = Label("@rules_cc//cc:optional_current_cc_toolchain")),
+    },
+)

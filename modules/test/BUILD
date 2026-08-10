@@ -1,5 +1,5 @@
 load("//modules:module.bzl", "intellij_module")
-load(":impl.bzl", "module")
+load(":module.bzl", "module")
 
 intellij_module.declare(
     name = "test",

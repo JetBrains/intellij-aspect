@@ -13,6 +13,7 @@
 # limitations under the License.
 
 load(":common.bzl", "intellij_common")
+load(":provider.bzl", "intellij_provider")
 
 # DependencyType enum; must match Dependency.DependencyType
 _COMPILE_TIME = 0
@@ -32,7 +33,7 @@ def _collect_from_toolchains(ctx, result, toolchain_types):
 
     for toolchain_type in toolchain_types:
         if toolchain_type in toolchains:
-            result.append(toolchains[toolchain_type][intellij_common.TargetInfo].owner)
+            result.append(toolchains[toolchain_type][intellij_provider.Info].owner)
 
 def _collect_from_attributes(ctx, result, attributes):
     """Collects dependencies from the rule attributes."""

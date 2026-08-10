@@ -15,14 +15,16 @@
 #
 # Derived from: https://github.com/bazelbuild/intellij/blob/5ec21e640ed59b316b58559d8e79cb0858e519bd/aspect/intellij_info_impl.bzl
 
+# TODO: move this
+load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_TYPE")
 load("//common:common.bzl", "intellij_common")
 load("//common:dependencies.bzl", "intellij_deps")
 load("//common:ide_info.bzl", "ide_info")
+load("//common:provider.bzl", "intellij_provider")
 load("//modules:module.bzl", "intellij_module")
-load("//modules:provider.bzl", "intellij_provider")
 load("//modules:run_info.bzl", "intellij_run_info_aspect")
 load("//modules:test_info.bzl", "intellij_test_info_aspect")
-load(":provider.bzl", "IntelliJInfo", "intellij_info_builder")
+load(":provider.bzl", "intellij_info_builder")
 
 # compile time dependencies collected for every target
 COMPILE_TIME_DEPS = ["deps"]
@@ -34,10 +36,21 @@ def _merge_dependencies(builder, ctx):
     """Adds information from all dependencies' intellij info providers."""
     for name in dir(ctx.rule.attr):
         for dep in intellij_common.attr_as_label_list(ctx, name):
-            if not IntelliJInfo in dep:
+            if not intellij_provider.Info in dep:
                 continue
 
-            intellij_info_builder.append(builder, dep[IntelliJInfo])
+            intellij_info_builder.append(builder, dep[intellij_provider.Info])
+
+    # toolchains attribute only available in Bazel 8+
+    toolchains = getattr(ctx.rule, "toolchains", None)
+    if not toolchains:
+        return
+
+    for toolchain_type in ctx.attr._toolchains:
+        label = toolchain_type.label
+
+        if label in toolchains:
+            intellij_info_builder.append(builder, toolchains[label][intellij_provider.Info])
 
 def _serialize_dependencies(builder):
     """Serializes all dependencies currently tracked by the builder."""
@@ -53,13 +66,19 @@ def _run_modules(target, ctx):
     """Runs every module of the aspect over the current target, in the order they are declared."""
     results = {}
 
-    for dep in ctx.attr._modules:
-        it = dep[intellij_module.Module]
-
-        result = it.impl(target, ctx, it.attr)
+    def exec(module):
+        result = module.impl(target, ctx, module.attr)
 
         if result:
-            results[it] = result
+            results[module] = result
+
+    for dep in ctx.attr._modules:
+        module = dep[intellij_provider.Module]
+
+        for child in module.deps.to_list():
+            exec(child)
+
+        exec(module)
 
     return results
 
@@ -79,10 +98,10 @@ def _merge_target_info(builder, target, ctx, results):
         return
 
     # for backwards compatibility with Bazel 8 and below, toolchains are dependencies
-    intellij_info_builder.append_ide_infos(builder, [it.info_file for it in _collect_toolchain_info(target)])
+    # intellij_info_builder.append_ide_infos(builder, [it.info_file for it in _collect_toolchain_info(target)])
 
     info = {
-        module.field: result
+        module.field: result.value
         for (module, result) in results.items()
         if module.field
     }
@@ -120,7 +139,7 @@ def _merge_target_info(builder, target, ctx, results):
     # Materialize generated sources
     intellij_info_builder.append_output(
         builder,
-        intellij_provider.BUILD_OUTPUT,
+        intellij_module.BUILD_OUTPUT,
         [
             f
             for target in intellij_common.attr_as_label_list(ctx, "srcs")
@@ -147,21 +166,27 @@ def _aspect_impl(target, ctx):
     _merge_target_info(builder, target, ctx, results)
     _merge_dependencies(builder, ctx)
 
-    intellij_info = intellij_info_builder.build(builder, target, ctx)
+    intellij_info = intellij_info_builder.build(builder, target, ctx, results)
 
     return [intellij_info, OutputGroupInfo(**intellij_info.outputs)]
 
 intellij_info_aspect = intellij_common.aspect(
     implementation = _aspect_impl,
     fragments = ["cpp", "java", "py"],
-    provides = [IntelliJInfo],
+    provides = [intellij_provider.Info],
+    toolchains_aspects = [str(CC_TOOLCHAIN_TYPE)],
     attrs = {
         "_modules": attr.label_list(
             default = [
                 "//modules/cc",
                 "//modules/test",
             ],
-            providers = [intellij_module.Module],
+            providers = [intellij_provider.Module],
+        ),
+        "_toolchains": attr.label_list(
+            default = [
+                CC_TOOLCHAIN_TYPE,
+            ],
         ),
     },
 )

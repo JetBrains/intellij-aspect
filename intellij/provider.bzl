@@ -13,15 +13,7 @@
 # limitations under the License.
 
 load("//common:common.bzl", "intellij_common")
-
-IntelliJInfo = provider(
-    doc = "Aggregation provider for IntelliJ aspect outputs and dependency edges.",
-    fields = {
-        "key": "TargetKey - The key to uniquly identify this target taking the configuration and all aspect ids into considadrtion.",
-        "outputs": "dict[str, depset[File]|None] - Output groups emitted by this target (e.g., intellij-info).",
-        "dependencies": "dict[int, depset[Target]|None] - Direct dependencies grouped by dependency type (see intellij_deps constants).",
-    },
-)
+load("//common:provider.bzl", "intellij_provider")
 
 _IDE_INFO_FILE_OUTPUT_GROUP = "intellij-info"
 
@@ -77,12 +69,14 @@ def _build_target_key(builder, target, ctx):
     aspect_ids = {id: True for id in ctx.aspect_ids} | builder.aspect_ids
     return intellij_common.target_key(target, ctx, aspect_ids.keys())
 
-def _build(builder, target, ctx):
+def _build(builder, target, ctx, results):
     """Builds a new IntelliJInfo provider."""
-    return IntelliJInfo(
+    return intellij_provider.Info(
         key = _build_target_key(builder, target, ctx),
         outputs = _build_depset(builder.outputs),
         dependencies = _build_depset(builder.dependencies),
+        modules = results,
+        owner = target,
     )
 
 intellij_info_builder = struct(
