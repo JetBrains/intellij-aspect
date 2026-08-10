@@ -4,37 +4,58 @@ load("//common:provider.bzl", "intellij_provider")
 _SYNC_OUTPUT = "intellij-sync"
 _BUILD_OUTPUT = "intellij-build"
 
-def _rule(name, implementation, field = None, setup = None, attrs = None, toolchains = None):
+def _rule(name, implementation, field = None, setup = None, attrs = None, fragments = None, toolchains = None):
     """Declares a module rule."""
 
     def rule_implementation(ctx):
-        return [intellij_provider.Module(
+        module = intellij_provider.Module(
             name = name,
             field = field,
             impl = implementation,
             attr = {name: getattr(ctx.attr, name) for name in list(attrs or [])},
-            deps = depset([it[intellij_provider.Module] for it in ctx.attr.deps]),
-        )]
+            fragments = fragments or [],
+            toolchains = toolchains or [],
+        )
+
+        return [module, intellij_provider.ModuleGroup(deps = [module], owner = ctx.label)]
 
     return rule(
         implementation = rule_implementation,
-        provides = [intellij_provider.Module],
-        attrs = (attrs or {}) | {"deps": attr.label_list(providers = [intellij_provider.Module])},
+        provides = [intellij_provider.Module, intellij_provider.ModuleGroup],
+        attrs = (attrs or {}) | {"deps": attr.label_list(providers = [intellij_provider.ModuleGroup])},
         toolchains = toolchains or [],
     )
 
-def _declare(name, rule, fragments = None, toolchains = None, **kwargs):
+def _filegroup():
+    native.filegroup(
+        name = "files",
+        srcs = ["BUILD"] + native.glob(["**/*.bzl"]),
+        visibility = ["//visibility:public"],
+    )
+
+def _declare(name, rule, **kwargs):
     """Declares a module definition."""
 
-    visibility = kwargs.pop("visibility", ["//visibility:public"])
     tags = kwargs.pop("tags", []) + ["intellij-aspect-module"]
+    rule(name = name, tags = tags, **kwargs)
 
-    rule(
-        name = name,
-        visibility = visibility,
-        tags = tags,
-        **kwargs
-    )
+def _module_group_impl(ctx):
+    return [intellij_provider.ModuleGroup(
+        deps = [dep[intellij_provider.Module] for dep in ctx.attr.deps],
+        owner = ctx.label,
+    )]
+
+_module_group = rule(
+    implementation = _module_group_impl,
+    provides = [intellij_provider.ModuleGroup],
+    attrs = {"deps": attr.label_list(providers = [intellij_provider.Module])},
+)
+
+def _group(**kwargs):
+    """docs."""
+
+    visibility = kwargs.pop("visibility", ["//visibility:public"])
+    _module_group(visibility = visibility, **kwargs)
 
 def _result(value, *, internal_value = None, outputs = None, dependencies = None, toolchains = None):
     # TODO: this could be optimized by returning none here if nothing is provided
@@ -63,5 +84,8 @@ intellij_module = struct(
     BUILD_OUTPUT = _BUILD_OUTPUT,
     rule = _rule,
     declare = _declare,
+    group = _group,
     result = _result,
+    lookup = _lookup,
+    filegroup = _filegroup,
 )

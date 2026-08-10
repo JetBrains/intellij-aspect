@@ -132,6 +132,7 @@ module = intellij_module.rule(
     name = "cc",
     implementation = _implementation,
     field = "c_ide_info",
+    toolchains = [CC_TOOLCHAIN_TYPE],
     attrs = {
         # Used to resolve the cc toolchain for targets whose rule does not declare it (e.g.
         # proto_library / cc_proto_library, which get their CcInfo from protobuf's cc_proto_aspect).

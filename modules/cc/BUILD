@@ -8,7 +8,16 @@ intellij_module.declare(
 )
 
 intellij_module.declare(
-    name = "cc",
+    name = "info",
     rule = module,
-    deps = [":toolchain"],
 )
+
+intellij_module.group(
+    name = "cc",
+    deps = [
+        ":info",
+        ":toolchain",
+    ],
+)
+
+intellij_module.filegroup()

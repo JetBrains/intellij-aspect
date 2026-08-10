@@ -12,63 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_TYPE")
 load("//common:platform.bzl", "platform")
-load("//modules:cc_info.bzl", "intellij_cc_info_aspect")
-load("//modules:go_info.bzl", "intellij_go_info_aspect")
-load("//modules:java_common_info.bzl", "intellij_java_common_info_aspect")
-load("//modules:java_info.bzl", "intellij_java_info_aspect")
-load("//modules:jvm_info.bzl", "intellij_jvm_info_aspect")
-load("//modules:kotlin_info.bzl", "intellij_kotlin_info_aspect")
-load("//modules:proto_info.bzl", "intellij_proto_info_aspect")
-load("//modules:protobuf_info.bzl", "intellij_protobuf_info_aspect")
-load("//modules:py_info.bzl", "intellij_py_info_aspect")
-load("//modules:python_info.bzl", "intellij_python_info_aspect")
-load("//modules:scala_info.bzl", "intellij_scala_info_aspect")
-load("//modules:xcode_info.bzl", "intellij_xcode_info_aspect")
-load(":aspect.bzl", "intellij_info_aspect")
+load(":aspect.bzl", "intellij_aspect")
 
 # Aspects are grouped per language so that a target only runs the aspects for
 # its own language. This matters because some aspects (e.g. go, scala) force
 # resolution of their toolchain; keeping them off unrelated deps means a consumer
 # only needs declare the toolchains for the languages they test.
-_LANGUAGE_ASPECTS = {
-    "cc": [
-        intellij_xcode_info_aspect,
-        intellij_cc_info_aspect,
-        intellij_info_aspect,
-    ],
-    "go": [
-        intellij_go_info_aspect,
-        intellij_info_aspect,
-    ],
-    "java": [
-        intellij_java_info_aspect,
-        intellij_jvm_info_aspect,
-        intellij_java_common_info_aspect,
-        intellij_info_aspect,
-    ],
-    "kotlin": [
-        intellij_kotlin_info_aspect,
-        intellij_jvm_info_aspect,
-        intellij_java_common_info_aspect,
-        intellij_info_aspect,
-    ],
-    "proto": [
-        intellij_proto_info_aspect,
-        intellij_protobuf_info_aspect,
-        intellij_info_aspect,
-    ],
-    "python": [
-        intellij_py_info_aspect,
-        intellij_python_info_aspect,
-        intellij_info_aspect,
-    ],
-    "scala": [
-        intellij_scala_info_aspect,
-        intellij_jvm_info_aspect,
-        intellij_java_common_info_aspect,
-        intellij_info_aspect,
-    ],
+_LANGUAGE_ASPECT = {
+    "cc": intellij_aspect(
+        modules = [
+            "//modules/cc",
+            "//modules/test",
+            "//modules/run",
+        ],
+        fragments = ["cpp"],
+        toolchains = [CC_TOOLCHAIN_TYPE],
+    ),
+    "go": None,
+    "java": None,
+    "kotlin": None,
+    "proto": None,
+    "python": None,
+    "scala": None,
 }
 
 # To ensure that targets visited under different aspect configurations created by
@@ -87,7 +54,7 @@ def _create_language_transition(language):
 def _intellij_aspect_build_impl(ctx):
     info_files = [
         getattr(dep[OutputGroupInfo], "intellij-info", depset())
-        for language in _LANGUAGE_ASPECTS
+        for language in _LANGUAGE_ASPECT
         for dep in getattr(ctx.attr, language)
     ]
 
@@ -97,11 +64,11 @@ _intellij_aspect_build = rule(
     implementation = _intellij_aspect_build_impl,
     attrs = {
         language: attr.label_list(
-            aspects = aspects,
+            aspects = [aspect],
             doc = "%s targets to apply the IntelliJ aspect to." % language,
             cfg = _create_language_transition(language),
         )
-        for language, aspects in _LANGUAGE_ASPECTS.items()
+        for language, aspect in _LANGUAGE_ASPECT.items()
     },
 )
 

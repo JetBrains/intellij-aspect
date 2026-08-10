@@ -63,19 +63,14 @@ def _run_modules(target, ctx):
     """Runs every module of the aspect over the current target, in the order they are declared."""
     results = {}
 
-    def exec(module):
-        result = module.impl(target, ctx, module.attr)
-
-        if result:
-            results[module] = result
-
     for dep in ctx.attr._modules:
-        module = dep[intellij_provider.Module]
+        group = dep[intellij_provider.ModuleGroup]
 
-        for child in module.deps.to_list():
-            exec(child)
+        for module in group.deps.to_list():
+            result = module.impl(target, ctx, module.attr)
 
-        exec(module)
+            if result:
+                results[module] = result
 
     return results
 
@@ -151,7 +146,7 @@ def intellij_aspect(modules, fragments = None, toolchains = None):
         attrs = {
             "_modules": attr.label_list(
                 default = modules,
-                providers = [intellij_provider.Module],
+                providers = [intellij_provider.ModuleGroup],
             ),
             "_toolchains": attr.label_list(
                 default = toolchains or [],
@@ -161,8 +156,7 @@ def intellij_aspect(modules, fragments = None, toolchains = None):
 
 intellij_info_aspect = intellij_aspect(
     modules = [
-        "//modules/cc",
-        "//modules/test",
+        "//modules/default",
         "//modules/run",
     ],
     fragments = ["cpp", "java", "py"],

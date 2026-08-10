@@ -5,7 +5,18 @@ _IntelliJModule = provider(
         "field": "str|None - Field of intellij-info.txt the value is written to. None for modules that only feed other modules.",
         "impl": "function - impl(target, ctx, attrs) -> struct|None, called for every visited target.",
         "attr": "dict - Collection of module attributes.",
-        "deps": "depset[_IntelliJModule] - All modules that are required by this module."
+
+        # build time fileds - used to generate aspect configurations
+        "fragments": "list[str] - List of fragments required by this module.",
+        "toolchains": "list[Target] - List of toolchain types required by this module.",
+    },
+)
+
+_IntelliJModuleGroup = provider(
+    doc = "A collection of releated modules.",
+    fields = {
+        "deps": "list[_IntelliJModule] - List of modules in this group.",
+        "owner": "Label - The target that owns this group.",
     },
 )
 
@@ -22,5 +33,6 @@ _IntelliJInfo = provider(
 
 intellij_provider = struct(
     Module = _IntelliJModule,
+    ModuleGroup = _IntelliJModuleGroup,
     Info = _IntelliJInfo,
 )

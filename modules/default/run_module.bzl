@@ -12,17 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//modules:module.bzl", "intellij_module")
 
 def _implementation(target, ctx, attrs):
-    if not ctx.rule.kind.endswith("_test"):
+    # targets built under exec configuration are most likely used as local tool
+    if intellij_common.is_exec_configuration(ctx):
         return None
 
-    return intellij_module.result(intellij_common.struct(size = ctx.rule.attr.size))
+    files_to_run = target[DefaultInfo].files_to_run
 
-module = intellij_module.rule(
-    name = "test",
+    # files_to_run.executable is None for non-executable targets
+    if not files_to_run or getattr(files_to_run, "executable", None) == None:
+        return None
+
+    return intellij_module.result(
+        intellij_common.struct(
+            executable_file = artifact_location.from_file(files_to_run.executable),
+            runfiles_manifest = artifact_location.from_file(getattr(files_to_run, "runfiles_manifest", None)),
+        ),
+    )
+
+run_module = intellij_module.rule(
+    name = "run",
     implementation = _implementation,
-    field = "test_info",
+    field = "executable_info",
 )

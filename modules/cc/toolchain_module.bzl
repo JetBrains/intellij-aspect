@@ -119,4 +119,6 @@ toolchain_module = intellij_module.rule(
     name = "cc_toolchain",
     implementation = _implementation,
     field = "c_toolchain_ide_info",
+    fragments = ["cpp"],
+    toolchains = [CC_TOOLCHAIN_TYPE],
 )
