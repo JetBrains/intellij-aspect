@@ -20,7 +20,7 @@ import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.DependencyType
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
-import com.intellij.aspect.testing.rules.utils.dependencyLabels
+import com.intellij.aspect.testing.rules.utils.assertThatDeps
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -47,7 +47,7 @@ class SimpleTest {
     assertThat(target.srcsList[0].relativePath).isEqualTo("Main.java")
 
     // Dependencies are reported correctly
-    assertThat(target.depsList).dependencyLabels(DependencyType.COMPILE_TIME).contains("//lib:util")
+    assertThatDeps(target.depsList).withType(DependencyType.COMPILE_TIME).labels().contains("//lib:util")
 
     // JVM-info is reported correctly
     val jvmInfo = target.jvmTargetInfo
@@ -114,7 +114,7 @@ class SimpleTest {
     assertThat(target.testonly).isTrue()
 
     // Dependencies are reported correctly
-    assertThat(target.depsList).dependencyLabels(DependencyType.COMPILE_TIME).contains("//lib:util")
+    assertThatDeps(target.depsList).withType(DependencyType.COMPILE_TIME).labels().contains("//lib:util")
 
     // Test environment is reported correctly
     assertThat(target.envInheritList).isEqualTo(listOf("PROPERTIES"))

@@ -18,8 +18,8 @@ package com.intellij.aspect.testing.tests.go
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.DependencyType
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
-import com.intellij.aspect.testing.rules.utils.dependencyLabels
-import com.intellij.aspect.testing.rules.utils.relativeArtifactPath
+import com.intellij.aspect.testing.rules.utils.assertThatArtifacts
+import com.intellij.aspect.testing.rules.utils.assertThatDeps
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,15 +35,15 @@ class CustomRule {
   fun testMain() {
     val target = aspect.findTarget("//:main")
     assertThat(target.kind).isEqualTo("go_library")
-    assertThat(target.goTargetInfo.sourcesList).relativeArtifactPath().containsExactly("main.go")
-    assertThat(target.depsList).dependencyLabels(DependencyType.COMPILE_TIME).containsExactly("//:generated_lib")
+    assertThatArtifacts(target.goTargetInfo.sourcesList).relativePaths().containsExactly("main.go")
+    assertThatDeps(target.depsList).withType(DependencyType.COMPILE_TIME).labels().containsExactly("//:generated_lib")
   }
 
   @Test
   fun testGeneratedLib() {
     val target = aspect.findTarget("//:generated_lib")
     assertThat(target.kind).isEqualTo("simple_gen")
-    assertThat(target.goTargetInfo.sourcesList).relativeArtifactPath()
+    assertThatArtifacts(target.goTargetInfo.sourcesList).relativePaths()
       .containsExactly("generated_lib_/generated_lib.go")
   }
 }
