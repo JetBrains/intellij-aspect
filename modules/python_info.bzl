@@ -111,7 +111,6 @@ def _implementation(target, ctx, attr):
             generated_sources = [artifact_location.from_file(f) for f in generated_sources],
         ),
         outputs = {
-            intellij_output_groups.SYNC: intellij_common.depset(generated_sources),
             intellij_output_groups.BUILD: intellij_common.depset(generated_sources),
         },
     )

@@ -64,7 +64,6 @@ def _implementation(target, ctx, attr):
     return intellij_module.result(
         outputs = {
             intellij_output_groups.BUILD: to_build,
-            intellij_output_groups.SYNC: to_build,
         },
         value = intellij_common.struct(
             launcher = _get_py_launcher(ctx),
