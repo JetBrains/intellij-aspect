@@ -121,13 +121,10 @@ def _get_outputs(target, ctx, java_outputs, extra_sync):
                 resolve_transitives += [out.source_jars]
             else:
                 resolve_files += out.source_jars
-    if intellij_common.label_is_external(target.label):
-        return {intellij_output_groups.SYNC: intellij_common.depset(resolve_files + extra_sync, transitive = resolve_transitives)}
-    else:
-        return {
-            intellij_output_groups.SYNC: intellij_common.depset(extra_sync),
-            intellij_output_groups.BUILD: intellij_common.depset(resolve_files, transitive = resolve_transitives),
-        }
+    return {
+        intellij_output_groups.SYNC: intellij_common.depset([f for f in extra_sync if f.is_source]),
+        intellij_output_groups.BUILD: intellij_common.depset(resolve_files, transitive = resolve_transitives),
+    }
 
 def _compiler_plugin_options(rule_attr):
     return [
