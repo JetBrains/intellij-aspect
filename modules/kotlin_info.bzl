@@ -19,7 +19,6 @@ load("//common:common.bzl", "intellij_common")
 load("//common:dependencies.bzl", "intellij_deps")
 load(":provider.bzl", "intellij_provider")
 
-IMPORT_RULE_KIND = ["kt_jvm_import"]
 COMPILE_DEPS = ["associates"]
 EXPORTED_COMPILE_TIME_DEPS = ["exports"]
 RUNTIME_DEPS = ["resource_jars"]
@@ -197,17 +196,12 @@ def _get_outputs(target, ctx, plugins):
                 resolve_files += out.source_jars
         if hasattr(out, "source_jar") and out.source_jar != None:
             resolve_files += [out.source_jar]
-    if ctx.rule.kind in IMPORT_RULE_KIND:
-        return {intellij_provider.SYNC_OUTPUT: intellij_common.depset(resolve_files, transitive = transitives + (
-            [target[KtJvmInfo].transitive_source_jars] if hasattr(target[KtJvmInfo], "transitive_source_jars") else []
-        ))}
-    else:
-        return {
-            intellij_provider.SYNC_OUTPUT: intellij_common.depset(
-                [f for f in resolve_files if f.is_source],
-            ),
-            intellij_provider.BUILD_OUTPUT: intellij_common.depset(resolve_files, transitive = transitives),
-        }
+    return {
+        intellij_provider.SYNC_OUTPUT: intellij_common.depset(
+            [f for f in resolve_files if f.is_source],
+        ),
+        intellij_provider.BUILD_OUTPUT: intellij_common.depset(resolve_files, transitive = transitives),
+    }
 
 def _aspect_impl(target, ctx):
     if not KtJvmInfo in target:
