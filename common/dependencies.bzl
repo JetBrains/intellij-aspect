@@ -33,7 +33,7 @@ def _collect_from_toolchains(ctx, result, toolchain_types):
 
     for toolchain_type in toolchain_types:
         if toolchain_type in toolchains:
-            result.append(toolchains[toolchain_type][intellij_provider.Info].owner)
+            result.append(toolchains[toolchain_type][intellij_provider.Info])
 
 def _collect_from_attributes(ctx, result, attributes):
     """Collects dependencies from the rule attributes."""
@@ -41,7 +41,7 @@ def _collect_from_attributes(ctx, result, attributes):
         return
 
     for name in attributes or []:
-        result.extend(intellij_common.attr_as_label_list(ctx, name))
+        result.extend(intellij_common.attr_as_info_list(ctx, name))
 
 def _collect(ctx, attributes = None, toolchain_types = None):
     """Collects dependencies from multiple attributes and toolchains into one list. Returns a depset[Target]|None."""

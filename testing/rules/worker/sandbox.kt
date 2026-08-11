@@ -104,6 +104,8 @@ class Sandbox(
     cmd.addAll(flags)
     cmd.addAll(targets)
 
+    err.println("Running command: ${cmd.joinToString(" ")}")
+
     val process = ProcessBuilder(cmd)
       .directory(projectDirectory.toFile())
       .redirectErrorStream(true)

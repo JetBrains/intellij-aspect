@@ -15,9 +15,12 @@
  */
 package com.intellij.aspect.tools.differ
 
+import com.intellij.aspect.lib.ASPECT_CONFIG_FILE
 import com.intellij.aspect.lib.AspectConfig
 import com.intellij.aspect.lib.Rules
+import com.intellij.aspect.lib.aspectConfigName
 import com.intellij.aspect.lib.deployAspectZip
+import com.intellij.aspect.lib.moduleGroupsForRules
 import com.intellij.aspect.tools.RunfilesRepo
 import com.intellij.aspect.tools.lib.executeBuild
 import com.intellij.aspect.tools.lib.executeCommand
@@ -69,11 +72,16 @@ private val REFERENCE_ASPECT = Aspect(
 private val CURRENT_ASPECT = Aspect(
   deployDirectory = ASPECTS_DIRECTORY.resolve("current"),
   runfilesLocation = "archive_ide.zip",
-  aspectTargets = listOf(
-    "intellij:aspect.bzl%intellij_info_aspect",
-  ),
+  aspectTargets = listOf(currentAspectTarget(Rules.entries.toSet())),
   outputGroups = listOf("intellij-info"),
 )
+
+/**
+ * The aspect configuration generated for the given rule sets while deploying the current aspect.
+ */
+fun currentAspectTarget(rules: Set<Rules>): String {
+  return "$ASPECT_CONFIG_FILE%${aspectConfigName(moduleGroupsForRules(rules))}"
+}
 
 /**
  * Temporary workspace that manages the .aspect directory lifecycle.
@@ -119,12 +127,13 @@ class TemporaryWorkspace(private val workspace: Path, private val bazelExecutabl
    * the workspace and generate the configuration.
    */
   @Throws(IOException::class)
-  fun deployCurrentAspect(repoMapping: Map<Rules, String>) {
+  fun deployCurrentAspect(repoMapping: Map<Rules, String>, rules: Set<Rules> = Rules.entries.toSet()) {
     val version = executeCommand(bazelExecutable, "--version", pwd = workspace).removePrefix("bazel").trim()
     val config = AspectConfig(
       bazelVersion = version,
       repoMapping = repoMapping,
       useBuiltin = emptySet(),
+      rules = rules,
     )
 
     val archive = RunfilesRepo.rlocation(CURRENT_ASPECT.runfilesLocation)

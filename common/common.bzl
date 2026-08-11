@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load(":provider.bzl", "intellij_provider")
 load(":version.bzl", "bazel_version")
 
 _FALLBACK_CONFIG = "00000f1"
@@ -104,6 +105,10 @@ def _attr_as_label_list(ctx, name, strict = False):
     """Returns the attr as a list of targets. Filters out everything except targets."""
     return [it for it in _attr_as_list(ctx, name, strict) if type(it) == "Target"]
 
+def _attr_as_info_list(ctx, name, strict = False):
+    """Returns the attr as a list of IntellijInfo providers. Filters out everything else."""
+    return [it[intellij_provider.Info] for it in _attr_as_list(ctx, name, strict) if type(it) == "Target" and intellij_provider.Info in it]
+
 def _attr_as_string_list(ctx, name, strict = False):
     """Returns the attr as a list of strings. Filters out everything except strings."""
     return [it for it in _attr_as_list(ctx, name, strict) if type(it) == "string"]
@@ -180,6 +185,7 @@ intellij_common = struct(
     attr_as_target = _attr_as_target,
     attr_as_list = _attr_as_list,
     attr_as_label_list = _attr_as_label_list,
+    attr_as_info_list = _attr_as_info_list,
     attr_as_string_list = _attr_as_string_list,
     attr_as_dict = _attr_as_dict,
     attr_as_string_dict = _attr_as_string_dict,

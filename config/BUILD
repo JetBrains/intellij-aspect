@@ -1,8 +1,9 @@
+load("//private/rules:aspect_gen.bzl", "aspect_gen_config")
 load("//private/rules:aspect_lib.bzl", "aspect_lib")
-load(":aspect.bzl", "aspect_config")
 
-aspect_config(
-    name = "aspect",
+aspect_gen_config(
+    name = "aspect_config",
+    out = "aspect.bzl",
     modules = [
         "//modules/default",
         "//modules/cc",
@@ -11,11 +12,9 @@ aspect_config(
 
 aspect_lib(
     name = "config",
-    files = [
-        "config.bzl",
-        "config.tpl",
-        "extension.bzl",
-        ":aspect",
-    ],
+    files = [":aspect_config"] + glob([
+        "*.bzl",
+        "*.tpl",
+    ]),
     visibility = ["//:__pkg__"],
 )

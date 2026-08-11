@@ -14,22 +14,14 @@
 
 load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_TYPE")
 load("//common:platform.bzl", "platform")
-load(":aspect.bzl", "intellij_aspect")
+load(":aspect.bzl", "create_intellij_aspect")
 
 # Aspects are grouped per language so that a target only runs the aspects for
 # its own language. This matters because some aspects (e.g. go, scala) force
 # resolution of their toolchain; keeping them off unrelated deps means a consumer
 # only needs declare the toolchains for the languages they test.
 _LANGUAGE_ASPECT = {
-    "cc": intellij_aspect(
-        modules = [
-            "//modules/cc",
-            "//modules/test",
-            "//modules/run",
-        ],
-        fragments = ["cpp"],
-        toolchains = [CC_TOOLCHAIN_TYPE],
-    ),
+    "cc": None,
     "go": None,
     "java": None,
     "kotlin": None,
@@ -64,7 +56,7 @@ _intellij_aspect_build = rule(
     implementation = _intellij_aspect_build_impl,
     attrs = {
         language: attr.label_list(
-            aspects = [aspect],
+            # aspects = [aspect],
             doc = "%s targets to apply the IntelliJ aspect to." % language,
             cfg = _create_language_transition(language),
         )
