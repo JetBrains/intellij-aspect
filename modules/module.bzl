@@ -61,7 +61,6 @@ def _result(value, *, internal_value = None, outputs = None, dependencies = None
     # TODO: this could be optimized by returning none here if nothing is provided
 
     return struct(
-        present = True,
         value = value,
         internal_value = internal_value or struct(),
         outputs = outputs or {},

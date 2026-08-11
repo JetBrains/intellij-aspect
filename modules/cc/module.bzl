@@ -74,17 +74,13 @@ def _collect_compilation_context(ctx, target):
         system_includes = compilation_context.system_includes.to_list() + external_includes,
     )
 
-def _contains_toolchain(deps):
-    if deps != None:
-        for it in deps.to_list():
-            if intellij_module.lookup(it, "cc_toolchain"):
-                return True
-
-    return False
-
 def _aspect_guard(target, ctx):
     """Returns true if the aspect should be applied to the current target."""
     if CcInfo not in target:
+        return False
+
+    # ignore cc_proto_library, attach to proto_library with aspect attached instead
+    if ctx.rule.kind == "cc_proto_library":
         return False
 
     # go targets always provide CcInfo, usually it's empty and even if it isn't we don't handle it
@@ -103,15 +99,6 @@ def _implementation(target, ctx, attrs):
 
     resolve_files = target[CcInfo].compilation_context.headers
 
-    dependencies = intellij_deps.collect(
-        ctx,
-        attributes = COMPILE_TIME_DEPS,
-        toolchain_types = [CC_TOOLCHAIN_TYPE],
-    )
-
-    toolchains = intellij_deps.find_toolchains(ctx, CC_TOOLCHAIN_TYPE)
-    add_fallback_toolchain = not toolchains and not _contains_toolchain(dependencies)
-
     return intellij_module.result(
         outputs = {
             intellij_module.BUILD_OUTPUT: resolve_files,
@@ -122,10 +109,13 @@ def _implementation(target, ctx, attrs):
             compilation_context = _collect_compilation_context(ctx, target),
         ),
         dependencies = {
-            intellij_deps.COMPILE_TIME: dependencies,
-            intellij_deps.TOOLCHAIN: intellij_common.depset([ctx.attr._cc_toolchain]) if add_fallback_toolchain else None,
+            intellij_deps.COMPILE_TIME: intellij_deps.collect(
+                ctx,
+                attributes = COMPILE_TIME_DEPS,
+                toolchain_types = [CC_TOOLCHAIN_TYPE],
+            ),
         },
-        toolchains = toolchains,
+        toolchains = intellij_deps.find_toolchains(ctx, CC_TOOLCHAIN_TYPE),
     )
 
 module = intellij_module.rule(

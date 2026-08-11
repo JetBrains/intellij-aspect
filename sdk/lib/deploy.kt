@@ -41,6 +41,11 @@ data class AspectConfig(
    * Languages for which to use the builtin rule, i.e., for which to strip rule set loads.
    */
   val useBuiltin: Set<Rules>,
+  /**
+   * Rule sets the aspect is used for. Determines the modules of the generated aspect
+   * configuration; rule sets without a module contribute nothing.
+   */
+  val rules: Set<Rules>,
 )
 
 /**
@@ -92,7 +97,7 @@ fun deployAspectZip(
   requireNotNull(archiveStream)
 
   extractZipArchive(destination, archiveStream, transformers)
-  writeAspectConfig(destination, config)
+  writeAspectConfig(destination, relativeDestination, config)
 }
 
 @Throws(IOException::class)

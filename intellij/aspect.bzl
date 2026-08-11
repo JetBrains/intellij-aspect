@@ -15,7 +15,6 @@
 #
 # Derived from: https://github.com/bazelbuild/intellij/blob/5ec21e640ed59b316b58559d8e79cb0858e519bd/aspect/intellij_info_impl.bzl
 
-load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_TYPE")  # TODO: move this
 load("//common:common.bzl", "intellij_common")
 load("//common:dependencies.bzl", "intellij_deps")
 load("//common:ide_info.bzl", "ide_info")
@@ -29,8 +28,11 @@ COMPILE_TIME_DEPS = ["deps"]
 # Rule kinds to include in outputs, even though no special information is available
 EXTRA_RULES = ["sh_binary", "sh_library", "genrule", "intellij_plugin_debug_target", "_plugin_deploy_zip", "intellij_plugin_zip"]
 
-def _merge_dependencies(builder, ctx):
+def _merge_dependencies(builder, ctx, results):
     """Adds information from all dependencies' intellij info providers."""
+    for result in results.values():
+        intellij_info_builder.append(builder, result)
+
     for name in dir(ctx.rule.attr):
         for dep in intellij_common.attr_as_label_list(ctx, name):
             if not intellij_provider.Info in dep:
@@ -52,11 +54,10 @@ def _merge_dependencies(builder, ctx):
 def _serialize_dependencies(builder):
     """Serializes all dependencies currently tracked by the builder."""
     return depset([
-        struct(target = dep[intellij_common.TargetInfo].partial_key, dependency_type = key)
+        struct(target = dep.key, dependency_type = key)
         for key, list_of_sets in builder.dependencies.items()
         for set in list_of_sets
         for dep in set.to_list()
-        if intellij_common.TargetInfo in dep
     ]).to_list()
 
 def _run_modules(target, ctx):
@@ -66,7 +67,7 @@ def _run_modules(target, ctx):
     for dep in ctx.attr._modules:
         group = dep[intellij_provider.ModuleGroup]
 
-        for module in group.deps.to_list():
+        for module in group.deps:
             result = module.impl(target, ctx, module.attr)
 
             if result:
@@ -102,15 +103,15 @@ def _merge_target_info(builder, target, ctx, results):
     # generate the target key based on the information currently accumulated by the builder
     key = intellij_info_builder.build_target_key(builder, target, ctx)
 
-    # Materialize generated sources
+    # materialize generated sources
     intellij_info_builder.append_output(
         builder,
         intellij_module.BUILD_OUTPUT,
         [
-            f
+            file
             for target in intellij_common.attr_as_label_list(ctx, "srcs")
-            for f in (target[DefaultInfo].files or depset()).to_list()
-            if not f.is_source
+            for file in (target[DefaultInfo].files or depset()).to_list()
+            if not file.is_source
         ],
     )
 
@@ -130,13 +131,14 @@ def _aspect_impl(target, ctx):
     results = _run_modules(target, ctx)
 
     _merge_target_info(builder, target, ctx, results)
-    _merge_dependencies(builder, ctx)
+    _merge_dependencies(builder, ctx, results)
 
     intellij_info = intellij_info_builder.build(builder, target, ctx, results)
 
     return [intellij_info, OutputGroupInfo(**intellij_info.outputs)]
 
-def intellij_aspect(modules, fragments = None, toolchains = None):
+def create_intellij_aspect(modules, fragments = None, toolchains = None):
+    """Creates an aspect running the given module groups."""
     return intellij_common.aspect(
         implementation = _aspect_impl,
         fragments = fragments or [],
@@ -153,14 +155,3 @@ def intellij_aspect(modules, fragments = None, toolchains = None):
             ),
         },
     )
-
-intellij_info_aspect = intellij_aspect(
-    modules = [
-        "//modules/default",
-        "//modules/run",
-    ],
-    fragments = ["cpp", "java", "py"],
-    toolchains = [
-        CC_TOOLCHAIN_TYPE,
-    ],
-)

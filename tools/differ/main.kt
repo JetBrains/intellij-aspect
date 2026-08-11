@@ -17,7 +17,6 @@ package com.intellij.aspect.tools.differ
 
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
 import com.google.protobuf.TextFormat
-import com.intellij.aspect.lib.Aspects
 import com.intellij.aspect.lib.Rules
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
@@ -117,7 +116,8 @@ fun main(args: Array<String>) {
   parser.parse(args)
 
   try {
-    val currentAspectsToRun = deployLanguages?.let { Aspects.forRules(parseLanguages(it)).map(Aspects::toString) }
+    val currentRules = deployLanguages?.let(::parseLanguages) ?: Rules.entries.toSet()
+    val currentAspectsToRun = deployLanguages?.let { listOf(currentAspectTarget(currentRules)) }
     System.err.println("Running differ on project: $projectPath")
 
     // set up the temporary workspace
@@ -145,7 +145,7 @@ fun main(args: Array<String>) {
       System.err.println("Reference aspect generated: ${referenceFiles.size} files")
 
       System.err.println("Deploying current aspect...")
-      workspace.deployCurrentAspect(repoMapping?.let { parseRepoMapping(it) } ?: emptyMap())
+      workspace.deployCurrentAspect(repoMapping?.let { parseRepoMapping(it) } ?: emptyMap(), currentRules)
 
       val currentFiles = workspace.runCurrentAspect(
         targetPattern,
