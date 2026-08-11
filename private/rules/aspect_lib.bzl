@@ -13,10 +13,11 @@
 # limitations under the License.
 
 load("@rules_pkg//pkg:providers.bzl", "PackageFilesInfo")
+load("//common:artifact_location.bzl", "artifact_location")
 
 def _aspect_lib_impl(ctx):
     map = {
-        file.short_path: file
+        artifact_location.from_file(file).relative_path: file
         for dep in ctx.attr.files
         for file in dep[DefaultInfo].files.to_list()
     }
