@@ -20,8 +20,8 @@ import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.DependencyType
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
-import com.intellij.aspect.testing.rules.utils.dependencyLabels
-import com.intellij.aspect.testing.rules.utils.relativeArtifactPath
+import com.intellij.aspect.testing.rules.utils.assertThatArtifacts
+import com.intellij.aspect.testing.rules.utils.assertThatDeps
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,8 +40,8 @@ class PluginTest {
     assertThat(target.hasJavaProvider()).isTrue()
     assertThat(target.kind).isEqualTo("java_library")
     assertThat(target.hasExecutableInfo()).isFalse()
-    assertThat(target.srcsList).relativeArtifactPath().containsExactly("JavaLib.java")
-    assertThat(target.depsList).dependencyLabels(DependencyType.COMPILE_TIME).contains("//helper:lib")
+    assertThatArtifacts(target.srcsList).relativePaths().containsExactly("JavaLib.java")
+    assertThatDeps(target.depsList).withType(DependencyType.COMPILE_TIME).labels().contains("//helper:lib")
 
     // JavaCommon
     val binaryJars = target.javaCommon.jarsList.flatMap { it.binaryJarsList }
@@ -59,7 +59,7 @@ class PluginTest {
     val target = aspect.findTarget("//helper:lib")
     assertThat(target.kind).isEqualTo("java_library")
     assertThat(target.hasExecutableInfo()).isFalse()
-    assertThat(target.srcsList).relativeArtifactPath().containsExactly(
+    assertThatArtifacts(target.srcsList).relativePaths().containsExactly(
       "helper/src/com/example/processor/GenerateHelper.java",
       "helper/src/com/example/processor/HelperProcessor.java",
     )

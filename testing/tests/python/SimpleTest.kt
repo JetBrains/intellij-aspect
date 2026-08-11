@@ -18,7 +18,7 @@ package com.intellij.aspect.testing.tests.python
 import com.google.common.truth.Truth.assertThat
 import com.intellij.aspect.private.lib.utils.isWindows
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
-import com.intellij.aspect.testing.rules.utils.relativeArtifactPath
+import com.intellij.aspect.testing.rules.utils.assertThatArtifacts
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -36,7 +36,7 @@ class SimpleTest {
   fun testMain() {
     val target = aspect.findTarget("//:main")
     assertThat(target.kind).isEqualTo("py_binary")
-    assertThat(target.srcsList).relativeArtifactPath().containsExactly("main.py")
+    assertThatArtifacts(target.srcsList).relativePaths().containsExactly("main.py")
     assertThat(target.executableInfo.executableFile.relativePath).startsWith("main")
     assertThat(target.executableInfo.runfilesManifest.relativePath).startsWith("main")
     assertThat(target.executableInfo.runfilesManifest.relativePath.lowercase(getDefault())).contains("manifest")
@@ -52,7 +52,7 @@ class SimpleTest {
   fun testLibrary() {
     val target = aspect.findTarget("//:lib")
     assertThat(target.kind).isEqualTo("py_library")
-    assertThat(target.srcsList).relativeArtifactPath().containsExactly("lib.py")
+    assertThatArtifacts(target.srcsList).relativePaths().containsExactly("lib.py")
     assertThat(target.executableInfo.executableFile.relativePath).isEmpty()
     assertThat(target.executableInfo.runfilesManifest.relativePath).isEmpty()
 
@@ -66,7 +66,7 @@ class SimpleTest {
   fun testTest() {
     val target = aspect.findTarget("//:test")
     assertThat(target.kind).isEqualTo("py_test")
-    assertThat(target.srcsList).relativeArtifactPath().containsExactly("test.py")
+    assertThatArtifacts(target.srcsList).relativePaths().containsExactly("test.py")
     assertThat(target.executableInfo.executableFile.relativePath).startsWith("test")
     assertThat(target.executableInfo.runfilesManifest.relativePath).startsWith("test")
     assertThat(target.executableInfo.runfilesManifest.relativePath.lowercase(getDefault())).contains("manifest")

@@ -19,8 +19,8 @@ import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.PyIdeInfo.PythonSrcsVersion
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.PyIdeInfo.PythonVersion
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
+import com.intellij.aspect.testing.rules.utils.assertThatArtifacts
 import com.intellij.aspect.testing.rules.utils.findPyIdeInfo
-import com.intellij.aspect.testing.rules.utils.relativeArtifactPath
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,7 +39,7 @@ class PyBinaryTest {
     assertThat(target.hasPyIdeInfo()).isTrue()
 
     assertThat(target.kind).isEqualTo("py_binary")
-    assertThat(target.srcsList).relativeArtifactPath().containsExactly("simple.py")
+    assertThatArtifacts(target.srcsList).relativePaths().containsExactly("simple.py")
     assertThat(target.pyIdeInfo.srcsVersion).isEqualTo(PythonSrcsVersion.SRC_PY2AND3)
     assertThat(target.pyIdeInfo.pythonVersion).isEqualTo(PythonVersion.PY3)
   }

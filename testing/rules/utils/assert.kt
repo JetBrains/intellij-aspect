@@ -16,8 +16,12 @@
 package com.intellij.aspect.testing.rules.utils
 
 import com.google.common.truth.Correspondence
+import com.google.common.truth.FailureMetadata
 import com.google.common.truth.IterableSubject
+import com.google.common.truth.Subject
+import com.google.common.truth.Truth.assertAbout
 import com.google.devtools.intellij.aspect.Common.ArtifactLocation
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.DependencyType
 
@@ -25,20 +29,44 @@ inline fun <reified T : Any> assertNotNull(value: T?): T {
   return value ?: throw AssertionError("value of type ${T::class} is null")
 }
 
-fun IterableSubject.relativeArtifactPath(
-  relativePath: String? = null,
-): IterableSubject.UsingCorrespondence<ArtifactLocation, String> {
-  val predicate = Correspondence.BinaryPredicate<ArtifactLocation, String> { location, path ->
-    location.relativePath == path && (relativePath == null || location.relativePath == relativePath)
+class ArtifactLocationsSubject(
+  metadata: FailureMetadata,
+  private val actual: Iterable<ArtifactLocation>?,
+) : IterableSubject(metadata, actual) {
+
+  fun relativePaths(): UsingCorrespondence<ArtifactLocation, String> {
+    return comparingElementsUsing(Correspondence.transforming({ it?.relativePath }, "has relative path"))
   }
-  return comparingElementsUsing(Correspondence.from(predicate, "artifact relative path"))
 }
 
-fun IterableSubject.dependencyLabels(
-  type: DependencyType,
-): IterableSubject.UsingCorrespondence<Dependency, String> {
-  val predicate = Correspondence.BinaryPredicate<Dependency, String> { dependency, label ->
-    dependency.dependencyType != type || dependency.target.label == label
+private val ARTIFACT_LOCATIONS_SUBJECT_FACTORY = Subject.Factory(::ArtifactLocationsSubject)
+
+fun assertThatArtifacts(actual: Iterable<ArtifactLocation>): ArtifactLocationsSubject {
+  return assertAbout(ARTIFACT_LOCATIONS_SUBJECT_FACTORY).that(actual)
+}
+
+class DependenciesSubject(
+  metadata: FailureMetadata,
+  private val actual: Iterable<Dependency>?,
+) : IterableSubject(metadata, actual) {
+
+  fun labels(): UsingCorrespondence<Dependency, String> {
+    return comparingElementsUsing(Correspondence.transforming({ it?.target?.label }, "has target label"))
   }
-  return comparingElementsUsing(Correspondence.from(predicate, "dependency label"))
+
+  fun keys(): UsingCorrespondence<Dependency, IntellijIdeInfo.TargetKey> {
+    return comparingElementsUsing(Correspondence.transforming({ it?.target }, "has target key"))
+  }
+
+  fun withType(type: DependencyType): DependenciesSubject {
+    return check("dependencies of type %s", type)
+      .about(DEPENDENCIES_SUBJECT_FACTORY)
+      .that(actual?.filter { it.dependencyType == type })
+  }
+}
+
+private val DEPENDENCIES_SUBJECT_FACTORY = Subject.Factory(::DependenciesSubject)
+
+fun assertThatDeps(actual: Iterable<Dependency>): DependenciesSubject {
+  return assertAbout(DEPENDENCIES_SUBJECT_FACTORY).that(actual)
 }

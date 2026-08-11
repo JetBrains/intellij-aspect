@@ -18,8 +18,8 @@ package com.intellij.aspect.testing.tests.go
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.DependencyType
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
-import com.intellij.aspect.testing.rules.utils.dependencyLabels
-import com.intellij.aspect.testing.rules.utils.relativeArtifactPath
+import com.intellij.aspect.testing.rules.utils.assertThatArtifacts
+import com.intellij.aspect.testing.rules.utils.assertThatDeps
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -36,7 +36,7 @@ class SimpleTest {
   fun testMain() {
     val target = aspect.findTarget("//:binary")
     assertThat(target.kind).isEqualTo("go_binary")
-    assertThat(target.srcsList).relativeArtifactPath().containsExactly("bin.go")
+    assertThatArtifacts(target.srcsList).relativePaths().containsExactly("bin.go")
 
     assertThat(target.goTargetInfo.sdkHomePath.relativePath).containsMatch("bin/go(|.exe)$")
   }
@@ -45,7 +45,7 @@ class SimpleTest {
   fun testLibrary() {
     val target = aspect.findTarget("//:library")
     assertThat(target.kind).isEqualTo("go_library")
-    assertThat(target.goTargetInfo.sourcesList).relativeArtifactPath().containsExactly("lib.go")
+    assertThatArtifacts(target.goTargetInfo.sourcesList).relativePaths().containsExactly("lib.go")
     assertThat(target.goTargetInfo.sdkHomePath.relativePath).containsMatch("bin/go(|.exe)$")
   }
 
@@ -53,7 +53,7 @@ class SimpleTest {
   fun testTest() {
     val target = aspect.findTarget("//:test")
     assertThat(target.kind).isEqualTo("go_test")
-    assertThat(target.goTargetInfo.sourcesList).relativeArtifactPath().containsExactly("test.go")
+    assertThatArtifacts(target.goTargetInfo.sourcesList).relativePaths().containsExactly("test.go")
     assertThat(target.goTargetInfo.sdkHomePath.relativePath).containsMatch("bin/go(|.exe)$")
   }
 
@@ -61,16 +61,16 @@ class SimpleTest {
   fun testA() {
     val target = aspect.findTarget("//testa:testa")
     assertThat(target.kind).isEqualTo("go_library")
-    assertThat(target.depsList).dependencyLabels(DependencyType.COMPILE_TIME).contains("//testa:srcs")
+    assertThatDeps(target.depsList).withType(DependencyType.COMPILE_TIME).labels().contains("//testa:srcs")
     assertThat(target.goTargetInfo.embedList).contains(aspect.findTarget("//testa:srcs").key)
     // Don't roll up sources, that's handled by the Bazel plugin
-    assertThat(target.goTargetInfo.sourcesList).relativeArtifactPath().containsExactly("testa/testa.go")
+    assertThatArtifacts(target.goTargetInfo.sourcesList).relativePaths().containsExactly("testa/testa.go")
   }
 
   @Test
   fun testSrcs() {
     val target = aspect.findTarget("//testa:srcs")
     assertThat(target.kind).isEqualTo("go_source")
-    assertThat(target.goTargetInfo.sourcesList).relativeArtifactPath().containsExactly("testa/src.go", "testa/gen.go")
+    assertThatArtifacts(target.goTargetInfo.sourcesList).relativePaths().containsExactly("testa/src.go", "testa/gen.go")
   }
 }

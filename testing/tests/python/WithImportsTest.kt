@@ -18,8 +18,8 @@ package com.intellij.aspect.testing.tests.python
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.DependencyType
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
-import com.intellij.aspect.testing.rules.utils.dependencyLabels
-import com.intellij.aspect.testing.rules.utils.relativeArtifactPath
+import com.intellij.aspect.testing.rules.utils.assertThatArtifacts
+import com.intellij.aspect.testing.rules.utils.assertThatDeps
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -36,7 +36,7 @@ class WithImportsTest {
   fun testMain() {
     val target = aspect.findTarget("//:main")
     assertThat(target.kind).isEqualTo("py_binary")
-    assertThat(target.depsList).dependencyLabels(DependencyType.COMPILE_TIME).containsExactly("//:lib")
+    assertThatDeps(target.depsList).withType(DependencyType.COMPILE_TIME).labels().containsExactly("//:lib")
 
     assertThat(target.pythonTargetInfo.version).isEqualTo("PY3")
     assertThat(target.pythonTargetInfo.interpreter.rootPath).containsMatch("rules_python")
@@ -47,10 +47,10 @@ class WithImportsTest {
   fun testLib() {
     val target = aspect.findTarget("//:lib")
     assertThat(target.kind).isEqualTo("py_library")
-    assertThat(target.depsList).dependencyLabels(DependencyType.COMPILE_TIME).containsExactly("//:pure_lib")
+    assertThatDeps(target.depsList).withType(DependencyType.COMPILE_TIME).labels().containsExactly("//:pure_lib")
     assertThat(target.pythonTargetInfo.version).isEqualTo("PY3")
     assertThat(target.pythonTargetInfo.importsList).containsExactly("src")
-    assertThat(target.pythonTargetInfo.generatedSourcesList).relativeArtifactPath()
+    assertThatArtifacts(target.pythonTargetInfo.generatedSourcesList).relativePaths()
       .containsExactly("src/lib/foo/__init__.py", "src/lib/foo/foo.py")
   }
 
@@ -59,6 +59,7 @@ class WithImportsTest {
     val target = aspect.findTarget("//:pure_lib")
     assertThat(target.kind).isEqualTo("py_library")
     assertThat(target.depsList).isEmpty()
-    assertThat(target.srcsList).relativeArtifactPath().containsExactly("src/lib/foo/__init__.py", "src/lib/foo/foo.py")
+    assertThatArtifacts(target.srcsList).relativePaths()
+      .containsExactly("src/lib/foo/__init__.py", "src/lib/foo/foo.py")
   }
 }

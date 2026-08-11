@@ -19,7 +19,7 @@ package com.intellij.aspect.testing.tests.kotlin
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.DependencyType
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
-import com.intellij.aspect.testing.rules.utils.dependencyLabels
+import com.intellij.aspect.testing.rules.utils.assertThatDeps
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,8 +45,8 @@ class AssociatesTest {
       .containsExactly(aspect.findTarget("//:B").key, aspect.findTarget("//:C").key)
 
     // Dependencies reported correctly.
-    assertThat(target.depsList).dependencyLabels(DependencyType.COMPILE_TIME).containsExactly("//:B")
-    assertThat(target.depsList.filter { it.dependencyType == DependencyType.EXPORTED_COMPILE_TIME }).isEmpty()
+    assertThatDeps(target.depsList).withType(DependencyType.COMPILE_TIME).labels().containsExactly("//:B")
+    assertThatDeps(target.depsList).withType(DependencyType.EXPORTED_COMPILE_TIME).isEmpty()
   }
 
   @Test
@@ -56,13 +56,13 @@ class AssociatesTest {
     assertThat(targetB.srcsList.size).isEqualTo(1)
     assertThat(targetB.srcsList[0].isSource).isTrue()
     assertThat(targetB.srcsList[0].relativePath).isEqualTo("B.kt")
-    assertThat(targetB.depsList).dependencyLabels(DependencyType.EXPORTED_COMPILE_TIME).containsExactly("//:C")
+    assertThatDeps(targetB.depsList).withType(DependencyType.EXPORTED_COMPILE_TIME).labels().containsExactly("//:C")
 
     val targetC = aspect.findTarget("//:C")
     assertThat(targetC.hasKotlinTargetInfo()).isTrue()
     assertThat(targetC.srcsList.size).isEqualTo(1)
     assertThat(targetC.srcsList[0].isSource).isTrue()
     assertThat(targetC.srcsList[0].relativePath).isEqualTo("C.kt")
-    assertThat(targetC.depsList).isEmpty()
+    assertThatDeps(targetC.depsList).isEmpty()
   }
 }
