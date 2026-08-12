@@ -1,0 +1,10 @@
+load("//modules:module.bzl", "intellij_module")
+
+def _implementation(target, ctx, attrs):
+    return None
+
+empty_4 = intellij_module.rule(
+    name = "empty_4",
+    implementation = _implementation,
+    field = "empty_4",
+)

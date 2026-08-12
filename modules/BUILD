@@ -5,6 +5,7 @@ aspect_lib(
     files = [
         "//modules/cc:files",
         "//modules/default:files",
+        "//modules/empty:files",
     ] + glob(["*.bzl"]),
     visibility = ["//:__pkg__"],
 )
