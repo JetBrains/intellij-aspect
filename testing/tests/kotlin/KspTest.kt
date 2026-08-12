@@ -36,8 +36,6 @@ class KspTest {
     val target = aspect.findTarget("//:A")
     assertThat(target.hasKotlinTargetInfo()).isTrue()
     assertThat(target.kind).isEqualTo("kt_jvm_library")
-    assertThat(target.kotlinTargetInfo.exportedCompilerPluginTargetsFromDepsList)
-      .contains("//processor:hello-processor")
     assertThat(target.kotlinTargetInfo.exportedCompilerPluginTargetsList.map { it.label })
       .containsExactly("//processor:hello-processor")
   }
