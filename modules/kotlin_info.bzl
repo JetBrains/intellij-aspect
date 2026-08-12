@@ -224,8 +224,6 @@ def _aspect_impl(target, ctx):
         for target in target_list
     ]
     plugins = _get_kotlin_plugins(ctx, dep_targets)
-    associated_targets = _get_associates(target, ctx)
-    exported_compiler_plugin_targets = intellij_common.target_keys_from(plugins)
 
     return [
         intellij_provider.create(
@@ -235,8 +233,7 @@ def _aspect_impl(target, ctx):
             value = intellij_common.struct(
                 language_version = getattr(target[KtJvmInfo], "language_version", None),
                 api_version = getattr(target[KtJvmInfo], "language_version", None),  # API version currently not exposed
-                associates = [key.label for key in associated_targets],
-                associated_targets = associated_targets,
+                associated_targets = _get_associates(target, ctx),
                 kotlinc_opts = _get_kotlinc_options(ctx),
                 stdlibs = _get_kotlin_stdlibs(ctx),
                 kotlinc_plugin_infos = [
@@ -244,8 +241,7 @@ def _aspect_impl(target, ctx):
                     for info in [_extract_kt_compiler_plugin_info(plugin) for plugin in plugins]
                     if info != None
                 ],
-                exported_compiler_plugin_targets_from_deps = [key.label for key in exported_compiler_plugin_targets],
-                exported_compiler_plugin_targets = exported_compiler_plugin_targets,
+                exported_compiler_plugin_targets = intellij_common.target_keys_from(plugins),
                 module_name = getattr(target[KtJvmInfo], "module_name", None),
             ),
             dependencies = {

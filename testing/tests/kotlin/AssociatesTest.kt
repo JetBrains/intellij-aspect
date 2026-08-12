@@ -40,7 +40,6 @@ class AssociatesTest {
     assertThat(target.kind).isEqualTo("kt_jvm_library")
 
     // Associates reported correctly
-    assertThat(target.kotlinTargetInfo.associatesList).containsExactly("//:B", "//:C")
     assertThat(target.kotlinTargetInfo.associatedTargetsList)
       .containsExactly(aspect.findTarget("//:B").key, aspect.findTarget("//:C").key)
 
