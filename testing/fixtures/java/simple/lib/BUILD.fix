@@ -5,4 +5,12 @@ java_library(
   srcs = ["Util.java"],
   javacopts = ["-Xep:ReturnValueIgnored:WARN"],
   visibility = ["//visibility:public"],
+  deps = [":moreutils"],
+)
+
+java_library(
+  name = "moreutils",
+  srcs = ["MoreUtils.java"],
+  javacopts = ["-Xep:ReturnValueIgnored:WARN"],
+  visibility = ["//visibility:public"],
 )
