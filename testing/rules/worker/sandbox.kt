@@ -74,6 +74,7 @@ class Sandbox(
     cmd.add("build")
     cmd.add("--disk_cache=" + server.sharedResources.diskCacheDirectory)
     cmd.add("--repository_cache=" + server.sharedResources.repoCacheDirectory)
+    cmd.add("--norun_validations")
 
     if (majorVersion(version) >= 8) {
       cmd.add("--repo_contents_cache=" + server.sharedResources.repoContentsCacheDirectory)
