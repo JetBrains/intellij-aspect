@@ -17,6 +17,7 @@ load("@rules_go//go/private:common.bzl", "GO_TOOLCHAIN_LABEL")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//common:dependencies.bzl", "intellij_deps")
+load("//common:output_groups.bzl", "intellij_output_groups")
 load(":provider.bzl", "intellij_provider")
 
 # As go targets do not reliably have a provider, we need to detect go targets by rule_kind as well
@@ -107,7 +108,7 @@ def _aspect_impl(target, ctx):
             ),
         },
         outputs = {
-            intellij_provider.SYNC_OUTPUT: intellij_common.depset(sources),
+            intellij_output_groups.SYNC: intellij_common.depset(sources),
         },
     )]
 

@@ -19,6 +19,7 @@ load("//common:common.bzl", "intellij_common")
 load("//common:copy.bzl", "copy")
 load("//common:dependencies.bzl", "intellij_deps")
 load("//common:make_variables.bzl", "expand_make_variables")
+load("//common:output_groups.bzl", "intellij_output_groups")
 load(":java_toolchain_info.bzl", "JAVA_TOOLCHAIN_TYPE", "intellij_java_toolchain_info_aspect")
 load(":provider.bzl", "intellij_provider")
 
@@ -136,11 +137,11 @@ def _get_outputs(target, ctx, jdeps):
             else:
                 resolve_files += out.source_jars
     if intellij_common.label_is_external(target.label) or (ctx.rule.kind in IMPORT_RULE_KIND):
-        return {intellij_provider.SYNC_OUTPUT: intellij_common.depset(resolve_files, transitive = resolve_transitives + [
+        return {intellij_output_groups.SYNC: intellij_common.depset(resolve_files, transitive = resolve_transitives + [
             target[JavaInfo].transitive_source_jars,
         ])}
     else:
-        return {intellij_provider.BUILD_OUTPUT: intellij_common.depset(
+        return {intellij_output_groups.BUILD: intellij_common.depset(
             resolve_files + jdeps,
             transitive = resolve_transitives,
         )}

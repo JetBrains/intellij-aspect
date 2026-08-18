@@ -18,6 +18,7 @@
 load("//common:common.bzl", "intellij_common")
 load("//common:dependencies.bzl", "intellij_deps")
 load("//common:ide_info.bzl", "ide_info")
+load("//common:output_groups.bzl", "intellij_output_groups")
 load("//modules:provider.bzl", "intellij_provider")
 load("//modules:run_info.bzl", "intellij_run_info_aspect")
 load("//modules:test_info.bzl", "intellij_test_info_aspect")
@@ -109,7 +110,7 @@ def _merge_target_info(builder, target, ctx):
     # Materialize generated sources
     intellij_info_builder.append_output(
         builder,
-        intellij_provider.BUILD_OUTPUT,
+        intellij_output_groups.BUILD,
         [
             f
             for target in intellij_common.attr_as_label_list(ctx, "srcs")

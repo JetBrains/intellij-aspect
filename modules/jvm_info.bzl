@@ -15,6 +15,7 @@
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//common:make_variables.bzl", "expand_make_variables")
+load("//common:output_groups.bzl", "intellij_output_groups")
 load(":provider.bzl", "intellij_provider")
 
 def _get_reosource_strip_prefix(ctx):
@@ -56,7 +57,7 @@ def _aspect_impl(target, ctx):
         provider = intellij_provider.JvmInfo,
         value = _get_jvm_info(ctx),
         outputs = {
-            intellij_provider.BUILD_OUTPUT: intellij_common.depset(_get_resources(ctx)),
+            intellij_output_groups.BUILD: intellij_common.depset(_get_resources(ctx)),
         },
     )]
 

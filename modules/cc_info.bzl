@@ -21,6 +21,7 @@ load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//common:dependencies.bzl", "intellij_deps")
 load("//common:make_variables.bzl", "expand_make_variables")
+load("//common:output_groups.bzl", "intellij_output_groups")
 load(":cc_toolchain_info.bzl", "intellij_cc_toolchain_info_aspect")
 load(":provider.bzl", "intellij_provider")
 
@@ -105,8 +106,8 @@ def _aspect_impl(target, ctx):
         ctx = ctx,
         provider = intellij_provider.CcInfo,
         outputs = {
-            intellij_provider.BUILD_OUTPUT: resolve_files,
-            intellij_provider.SYNC_OUTPUT: resolve_files,
+            intellij_output_groups.BUILD: resolve_files,
+            intellij_output_groups.SYNC: resolve_files,
         },
         value = intellij_common.struct(
             rule_context = _collect_rule_context(ctx),

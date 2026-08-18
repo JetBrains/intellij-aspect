@@ -19,6 +19,7 @@ load("@rules_python//python:defs.bzl", "PyInfo")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//common:make_variables.bzl", "expand_make_variables")
+load("//common:output_groups.bzl", "intellij_output_groups")
 load(":provider.bzl", "intellij_provider")
 
 # PythonVersion enum; must match PyIdeInfo.PythonVersion
@@ -63,8 +64,8 @@ def _aspect_impl(target, ctx):
         ctx = ctx,
         provider = intellij_provider.PyInfo,
         outputs = {
-            intellij_provider.BUILD_OUTPUT: to_build,
-            intellij_provider.SYNC_OUTPUT: to_build,
+            intellij_output_groups.BUILD: to_build,
+            intellij_output_groups.SYNC: to_build,
         },
         value = intellij_common.struct(
             launcher = _get_py_launcher(ctx),
