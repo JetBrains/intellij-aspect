@@ -16,6 +16,7 @@ load("@rules_python//python:defs.bzl", "PyInfo")
 load("@rules_python//python/private:toolchain_types.bzl", PYTHON_TOOLCHAIN_TYPE = "TARGET_TOOLCHAIN_TYPE")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
+load("//common:output_groups.bzl", "intellij_output_groups")
 load(":provider.bzl", "intellij_provider")
 
 TOOLCHAIN_TYPE = str(PYTHON_TOOLCHAIN_TYPE)
@@ -111,8 +112,8 @@ def _aspect_impl(target, ctx):
             generated_sources = [artifact_location.from_file(f) for f in generated_sources],
         ),
         outputs = {
-            intellij_provider.SYNC_OUTPUT: intellij_common.depset(generated_sources),
-            intellij_provider.BUILD_OUTPUT: intellij_common.depset(generated_sources),
+            intellij_output_groups.SYNC: intellij_common.depset(generated_sources),
+            intellij_output_groups.BUILD: intellij_common.depset(generated_sources),
         },
     )]
 
