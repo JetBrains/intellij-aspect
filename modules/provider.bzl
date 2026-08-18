@@ -132,10 +132,6 @@ def _create_toolchain(provider, info_file, owner):
         owner = owner,
     )
 
-# Output groups used
-_sync_output = "intellij-sync"
-_build_output = "intellij-build"
-
 intellij_provider = struct(
     CcInfo = _IntelliJCcInfo,
     CcToolchainInfo = _IntelliJCcToolchainInfo,

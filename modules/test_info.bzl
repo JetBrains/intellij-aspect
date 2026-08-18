@@ -13,21 +13,19 @@
 # limitations under the License.
 
 load("//common:common.bzl", "intellij_common")
-load(":provider.bzl", "intellij_provider")
+load("//common:provider.bzl", "intellij_provider")
+load(":module.bzl", "intellij_module")
 
-def _aspect_impl(target, ctx):
+def _implementation(target, ctx, attr):
     if not ctx.rule.kind.endswith("_test"):
-        return [intellij_provider.TestInfo(present = False)]
+        return None
 
-    return [intellij_provider.create(
-        ctx = ctx,
-        provider = intellij_provider.TestInfo,
-        value = intellij_common.struct(
-            size = ctx.rule.attr.size,
-        ),
-    )]
+    return intellij_module.result(intellij_common.struct(size = ctx.rule.attr.size))
 
-intellij_test_info_aspect = intellij_common.aspect(
-    implementation = _aspect_impl,
-    provides = [intellij_provider.TestInfo],
+_aspect = intellij_module.aspect(
+    provider = intellij_provider.TestInfo,
+    implementation = _implementation,
+    field = "test_info",
 )
+
+module = intellij_module.define(_aspect)
