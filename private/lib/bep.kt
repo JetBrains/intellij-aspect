@@ -77,6 +77,13 @@ fun parseBepOutputGroups(bepFile: Path): Map<String, Set<Path>> {
   return parser.build()
 }
 
+fun parseBepMetrics(bepFile: Path): JsonNode? =
+  Files.newBufferedReader(bepFile).use { reader ->
+    reader.lineSequence().map {
+      MAPPER.readTree(it)
+    }.firstNotNullOf { it.get("buildMetrics") }
+  }
+
 private fun parseBepFileEvent(event: String): List<Path> {
   val root = MAPPER.readTree(event)
   val files = root.get("namedSetOfFiles")?.get("files") ?: return emptyList()
