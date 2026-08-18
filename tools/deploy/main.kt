@@ -24,6 +24,7 @@ import com.intellij.aspect.tools.lib.executeCommand
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.default
+import kotlinx.cli.required
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -45,12 +46,12 @@ fun main(args: Array<String>) {
     description = "Target directory path",
   )
 
-  val bazelExecutable by parser.option(
+  val bazelVersion by parser.option(
     ArgType.String,
     shortName = "b",
-    fullName = "bazel",
-    description = "Path to bazel executable",
-  ).default("bazel")
+    fullName = "bazel_version",
+    description = "The Bazel version to deploy",
+  ).default("9.2.0")
 
   val verbose by parser.option(
     ArgType.Boolean,
@@ -59,15 +60,35 @@ fun main(args: Array<String>) {
     description = "Show detailed progress and stack traces",
   ).default(false)
 
+  val relativeDestination by parser.option(
+    ArgType.String,
+    fullName = "relative_path",
+    description = "Relative path inside the project",
+  )
+
+  val languages by parser.option(
+    ArgType.String,
+    shortName = "l",
+    fullName = "languages",
+    description = "Comma separated list of languages to deploy",
+  ).required()
+
   parser.parse(args)
 
   val targetPath = Path.of(path).toAbsolutePath()
+  val relativePath = relativeDestination?.let(Path::of)
+
+  val rulesets = languages.split(",").mapNotNull {
+    language -> Rules.entries.firstOrNull() { it.name.equals(language, ignoreCase = true) }
+  }.toSet()
+
+  System.err.println("Selected languages: ${rulesets.joinToString(", ")}")
 
   try {
     when (method) {
       "bcr" -> deployBcr(targetPath)
-      "materialized" -> deployIde(targetPath, bazelExecutable, useBuiltin = false)
-      "builtin" -> deployIde(targetPath, bazelExecutable, useBuiltin = true)
+      "materialized" -> deployIde(targetPath, relativePath, rulesets, bazelVersion, useBuiltin = false)
+      "builtin" -> deployIde(targetPath, relativePath, rulesets, bazelVersion, useBuiltin = true)
     }
 
     System.err.println("Deployed aspect ($method) to $targetPath")
@@ -94,18 +115,17 @@ private fun deployBcr(targetPath: Path) {
 }
 
 @Throws(IOException::class)
-private fun deployIde(targetPath: Path, bazelExecutable: String, useBuiltin: Boolean) {
-  val version = executeCommand(bazelExecutable, "--version").removePrefix("bazel").trim()
-
+private fun deployIde(targetPath: Path, relativePath: Path?, rulesets: Set<Rules>, bazelVersion: String, useBuiltin: Boolean) {
   val config = AspectConfig(
-    bazelVersion = version,
+    bazelVersion = bazelVersion,
     repoMapping = emptyMap(),
     useBuiltin = if (useBuiltin) Rules.entries.toSet() else emptySet(),
+    rulesets = rulesets,
   )
 
   deployAspectZip(
     workspaceRoot = targetPath,
-    relativeDestination = Path.of("aspect", if (useBuiltin) "builtin" else "default"),
+    relativeDestination = relativePath ?: Path.of("aspect", if (useBuiltin) "builtin" else "default"),
     archiveZip = RunfilesRepo.rlocation(ARCHIVE_IDE),
     config = config,
   )

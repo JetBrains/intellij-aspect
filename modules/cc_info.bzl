@@ -122,7 +122,9 @@ _aspect = intellij_module.aspect(
 )
 
 module = intellij_module.define(
+    file = "cc_info",
     aspect = _aspect,
     toolchains = [CC_TOOLCHAIN_TYPE],
     aspect_providers = [CcInfo],
+    rulesets = ["@rules_cc"],
 )

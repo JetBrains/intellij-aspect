@@ -5,16 +5,27 @@ load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files")
 load("@rules_pkg//pkg:pkg.bzl", "pkg_tar", "pkg_zip")
 load("//private/rules:local_registry.bzl", "local_registry")
 
+load("//modules:module.bzl", "intellij_module")
+
+intellij_module.container(
+    name = "module_container",
+    visibility = ["//visibility:public"],
+)
+
 BCR_NAME = "intellij_aspect"
 
 BCR_VERSION = "0.0.1"
 
-exports_files(["MODULE.bazel.bcr"])
-
 pkg_files(
     name = "bcr_module",
-    srcs = ["MODULE.bazel.bcr"],
-    renames = {"MODULE.bazel.bcr": "MODULE.bazel"},
+    srcs = [
+        "BUILD.bcr",
+        "MODULE.bazel.bcr",
+    ],
+    renames = {
+        "BUILD.bcr": "BUILD",
+        "MODULE.bazel.bcr": "MODULE.bazel",
+    },
 )
 
 pkg_filegroup(

@@ -37,10 +37,12 @@ def _aspect(provider, implementation, field = None, attrs = None):
         attrs = attrs or {},
     )
 
-def _define(aspect, *, fragments = None, toolchains = None, aspect_providers = None):
+def _define(file, aspect, rulesets = None, fragments = None, toolchains = None, aspect_providers = None):
     """Creates a struct that descirbes the requirements for this module."""
     return struct(
+        file = file,
         aspect = aspect,
+        rulesets = rulesets or [],
         fragments = fragments or [],
         toolchains = toolchains or [],
         aspect_providers = aspect_providers or [],

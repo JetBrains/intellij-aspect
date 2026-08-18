@@ -142,14 +142,14 @@ def _implemenation(target, ctx):
     return [intellij_info, OutputGroupInfo(**intellij_info.outputs)]
 
 def _unique_flatten(modules, field):
-    """Creats a list of all unique values of that field for all modules."""
+    """Creats a list of all unique values based on the string represnetation of that field for all modules."""
     return {
-        value: None
+        str(value): value
         for module in modules
         for value in getattr(module, field)
-    }.keys()
+    }.values()
 
-def intellij_configure_aspect(modules):
+def intellij_configure_aspect(modules, container):
     """Creates an aspect running the given module groups."""
     toolchains = _unique_flatten(modules, "toolchains")
     aspect_providers = _unique_flatten(modules, "aspect_providers")
@@ -163,7 +163,7 @@ def intellij_configure_aspect(modules):
         required_aspect_providers = [[it] for it in aspect_providers],
         attrs = {
             "_container": attr.label(
-                default = "//intellij:module_container",
+                default = container,
                 aspects = [it.aspect for it in modules],
             ),
             "_toolchains": attr.label_list(

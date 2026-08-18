@@ -41,6 +41,10 @@ data class AspectConfig(
    * Languages for which to use the builtin rule, i.e., for which to strip rule set loads.
    */
   val useBuiltin: Set<Rules>,
+  /**
+   * Available rulesets. All modules that apply for the given rulesets will be enabled.
+   */
+  val rulesets: Set<Rules>,
 )
 
 /**
@@ -80,8 +84,9 @@ fun deployAspectZip(
     transformers.add(TransformJavaSemantics)
   }
   if (Rules.SCALA in config.repoMapping) {
-    transformers.add(TransformScalaToolchainType(config.repoMapping[Rules.SCALA]!!))
+    transformers.add(TransformScalaToolchainType(config.repoMapping.getValue(Rules.SCALA)))
   }
+
   transformers.add(TransformBuiltinRules(config.useBuiltin))
 
   val archiveStream = if (archiveZip == null) {
@@ -92,7 +97,7 @@ fun deployAspectZip(
   requireNotNull(archiveStream)
 
   extractZipArchive(destination, archiveStream, transformers)
-  writeAspectConfig(destination, config)
+  writeAspectConfig(destination, relativeDestination, config)
 }
 
 @Throws(IOException::class)
