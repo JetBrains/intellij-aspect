@@ -110,14 +110,23 @@ fun main(args: Array<String>) {
       metrics = FixtureProto.Metrics.newBuilder().apply {
         usedHeapSizeAfterGc = parseSize(buildResult.infoHeap)
         buildResult.metrics?.get("buildGraphMetrics")?.get("postInvocationSkyframeNodeCount")?.let {
-          skyframeNodeCount = it.asLong()
+          try {
+            skyframeNodeCount = it.asLong()
+          } catch (_: Throwable) {
+          }
         }
         buildResult.metrics?.get("buildGraphMetrics")?.get("evaluatedValues")?.let {
           it.filter { it.get("skyfunctionName").asText() == "ARTIFACT_NESTED_SET" }.firstOrNull()?.let {
-            evaluatedArtifactNestedSet = it.get("count").asText().toLong()
+            try {
+              evaluatedArtifactNestedSet = it.get("count").asText().toLong()
+            } catch (_: Throwable) {
+            }
           }
           it.filter { it.get("skyfunctionName").asText() == "CONFIGURED_TARGET" }.firstOrNull()?.let {
-            evaluatedConfiguredTarget = it.get("count").asText().toLong()
+            try {
+              evaluatedConfiguredTarget = it.get("count").asText().toLong()
+            } catch (_: Throwable) {
+            }
           }
         }
       }.build()
