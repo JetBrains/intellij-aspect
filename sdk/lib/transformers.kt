@@ -18,16 +18,6 @@ package com.intellij.aspect.lib
 import com.intellij.aspect.private.lib.utils.asBazelPath
 import java.nio.file.Path
 
-private const val CC_TOOLCHAIN_FIELD = "CC_TOOLCHAIN_TYPE"
-private const val PYTHON_TOOLCHAIN_FIELD = "PYTHON_TOOLCHAIN_TYPE"
-private const val JAVA_SEMANTICS_FIELD = "JAVA_SEMANTICS"
-private const val CC_TOOLCHAIN_LABEL = "@bazel_tools//tools/cpp:toolchain_type"
-private const val PYTHON_TOOLCHAIN_LABEL = "@bazel_tools//tools/python:toolchain_type"
-private const val JAVA_TOOLCHAIN_LABEL = "@bazel_tools//tools/java:toolchain_type"
-private const val JAVA_TOOLCHAIN_KEY = "JAVA_RUNTIME_TOOLCHAIN_TYPE"
-private const val SCALA_TOOLCHAIN_CONSTANT = "SCALA_TOOLCHAIN_TYPE"
-private const val SCALA_TOOLCHAIN_VALUE = "//scala:toolchain_type"
-
 /**
  * Rewrites repo-absolute load paths by prepending the deploy directory prefix.
  */
@@ -47,7 +37,7 @@ class TransformRelativePaths(private val prefix: Path) : Transformer {
 /**
  *  Remaps external repository names according to the provided mapping.
  */
-class TransformExternalRepositories(private val mapping: Map<Rules, String>) : Transformer {
+class TransformExternalRepositories(mapping: Map<Rules, String>) : Transformer {
 
   val nameMapping = mapping.mapKeys { (language, _) -> language.rulesetName }
 
@@ -67,6 +57,7 @@ class TransformExternalRepositories(private val mapping: Map<Rules, String>) : T
  * loads when the user's project uses the builtin rules.
  */
 class TransformBuiltinRules(useBuiltin: Set<Rules>) : Transformer {
+
   val repoNamesToRemove = useBuiltin.map { it.rulesetName }
 
   override fun apply(loads: MutableList<LoadStatement>, lines: MutableList<String>) {
@@ -77,69 +68,39 @@ class TransformBuiltinRules(useBuiltin: Set<Rules>) : Transformer {
 }
 
 /**
- * Replaces CC_TOOLCHAIN_TYPE load from rules_cc with a direct Label assignment. Used for replacing
- * the load from rules_cc with a direct Label assignment when the user's project uses the builtin
- * rules.
+ * Replaces a loaded field with a top-level variable for builtin deployment.
  */
-object TransformCcToolchainType : Transformer {
+abstract class TransformFieldLoad(private val fieldName: String, private val replacement: String) : Transformer {
 
   override fun apply(loads: MutableList<LoadStatement>, lines: MutableList<String>) {
-    val needsToolchainType = loads.removeAll { stmt ->
-      stmt.repository is Repository.External && stmt.repository.name == "@rules_cc" && stmt.arguments.contains(
-        CC_TOOLCHAIN_FIELD,
-      )
+    val needsField = loads.removeAll { stmt ->
+      stmt.repository is Repository.External && stmt.arguments.contains(fieldName)
     }
 
-    if (needsToolchainType) {
-      lines.add(0, "$CC_TOOLCHAIN_FIELD = Label(\"$CC_TOOLCHAIN_LABEL\")")
+    if (needsField) {
+      lines.add(0, "$fieldName = $replacement")
     }
   }
 }
 
-/**
- * Replaces PYTHON_TOOLCHAIN_TYPE load from rules_python with a direct Label assignment. Used for replacing
- * the load from rules_python with a direct Label assignment when the user's project uses the builtin
- * rules.
- */
-object TransformPythonToolchainType : Transformer {
+object TransformCcToolchainType : TransformFieldLoad(
+  fieldName = "CC_TOOLCHAIN_TYPE",
+  replacement = label("@bazel_tools//tools/cpp:toolchain_type"),
+)
 
-  override fun apply(loads: MutableList<LoadStatement>, lines: MutableList<String>) {
-    val needsToolchainType = loads.removeAll { stmt ->
-      stmt.repository is Repository.External && stmt.repository.name == "@rules_python" && stmt.arguments.contains(
-        PYTHON_TOOLCHAIN_FIELD,
-      )
-    }
+object TransformPythonToolchainType : TransformFieldLoad(
+  fieldName = "PYTHON_TOOLCHAIN_TYPE",
+  replacement = label("@bazel_tools//tools/python:toolchain_type"),
+)
 
-    if (needsToolchainType) {
-      lines.add(0, "$PYTHON_TOOLCHAIN_FIELD = Label(\"$PYTHON_TOOLCHAIN_LABEL\")")
-    }
-  }
-}
+object TransformJavaSemantics : TransformFieldLoad(
+  fieldName = "JAVA_SEMANTICS",
+  replacement = "struct(JAVA_RUNTIME_TOOLCHAIN_TYPE = ${label("@bazel_tools//tools/java:toolchain_type")})"
+)
 
-/**
- * Replace JAVA_SEMANTICS load by an explicit struct assigning the toolchain key to a direct Label when the user's
- * project uses the builtin rules.
- */
-object TransformJavaSemantics : Transformer {
+class TransformScalaToolchainType(scalaRepositoryName: String) : TransformFieldLoad(
+  fieldName = "SCALA_TOOLCHAIN_TYPE",
+  replacement = label("$scalaRepositoryName//scala:toolchain_type")
+)
 
-  override fun apply(loads: MutableList<LoadStatement>, lines: MutableList<String>) {
-    val needsSemantics = loads.removeAll { stmt ->
-      stmt.repository is Repository.External && stmt.repository.name == "@rules_java" &&
-        stmt.arguments.contains(JAVA_SEMANTICS_FIELD)
-    }
-
-    if (needsSemantics) {
-      lines.add(0, "$JAVA_SEMANTICS_FIELD = struct($JAVA_TOOLCHAIN_KEY = Label(\"$JAVA_TOOLCHAIN_LABEL\"))")
-    }
-  }
-}
-
-class TransformScalaToolchainType(val scalaRepositoryName: String) : Transformer {
-
-  override fun apply(loads: MutableList<LoadStatement>, lines: MutableList<String>) {
-    val needsToolchain = lines.removeAll { line -> line.startsWith("$SCALA_TOOLCHAIN_CONSTANT = ") }
-    if (needsToolchain) {
-      lines.add(0, "$SCALA_TOOLCHAIN_CONSTANT = \"${scalaRepositoryName}$SCALA_TOOLCHAIN_VALUE\"")
-    }
-  }
-}
+private fun label(value: String): String = "Label(\"$value\")"
