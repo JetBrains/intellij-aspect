@@ -19,11 +19,13 @@ def _create_module_provider():
 _IntelliJRunInfo = _create_module_provider()
 _IntelliJTestInfo = _create_module_provider()
 _IntelliJCcInfo = _create_module_provider()
+_IntelliJCcToolchainInfo = _create_module_provider()
 
 # all providers in the order they should be executed, i.e. dependenceis need to be listed before dependeants
 _ORDERED = [
     _IntelliJRunInfo,
     _IntelliJTestInfo,
+    _IntelliJCcToolchainInfo,
     _IntelliJCcInfo,
 ]
 
@@ -32,5 +34,6 @@ intellij_provider = struct(
     RunInfo = _IntelliJRunInfo,
     TestInfo = _IntelliJTestInfo,
     CcInfo = _IntelliJCcInfo,
+    CcToolchainInfo = _IntelliJCcToolchainInfo,
     ORDERED = _ORDERED,
 )

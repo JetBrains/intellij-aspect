@@ -13,6 +13,7 @@
 # limitations under the License.
 
 load(":common.bzl", "intellij_common")
+load(":provider.bzl", "intellij_provider")
 
 # DependencyType enum; must match Dependency.DependencyType
 _COMPILE_TIME = 0
@@ -20,49 +21,28 @@ _EXPORTED_COPILE_TIME = 3
 _RUNTIME = 1
 _TOOLCHAIN = 2
 
-def _collect_from_toolchains(ctx, result, toolchain_types):
-    """Collects dependencies from the toolchains context."""
-    if not toolchain_types:
-        return
-
-    # toolchains attribute only available in Bazel 8+
-    toolchains = getattr(ctx.rule, "toolchains", None)
-    if not toolchains:
-        return
-
-    for toolchain_type in toolchain_types:
-        if toolchain_type in toolchains:
-            result.append(toolchains[toolchain_type][intellij_common.TargetInfo].owner)
-
-def _collect_from_attributes(ctx, result, attributes):
-    """Collects dependencies from the rule attributes."""
-    if not attributes:
-        return
-
-    for name in attributes or []:
-        result.extend(intellij_common.attr_as_label_list(ctx, name))
-
-def _collect(ctx, attributes = None, toolchain_types = None):
-    """Collects dependencies from multiple attributes and toolchains into one list. Returns a depset[Target]|None."""
+def _collect(ctx, attributes):
+    """Collects dependencies from multiple attributes into one list. Returns a depset[IntelliJInfo]|None."""
     result = []
-    _collect_from_attributes(ctx, result, attributes)
-    _collect_from_toolchains(ctx, result, toolchain_types)
+
+    for name in attributes:
+        result.extend(intellij_common.attr_as_info_list(ctx, name))
 
     return intellij_common.depset(result)
 
-def _find_toolchains(ctx, *args):
-    """Finds the toolchain aspect providers for the specific toolchains type."""
+def _collect_toolchains(ctx, toolchain_types):
+    """Collects dependencies from multiple toolchains into one list. Returns a depset[IntelliJInfo]|None."""
 
     # toolchains attribute only available in Bazel 8+
     toolchains = getattr(ctx.rule, "toolchains", None)
     if not toolchains:
         return
 
-    return [
-        toolchains[type]
-        for type in args
-        if type in toolchains
-    ]
+    return intellij_common.depset([
+        toolchains[toolchain_type.label][intellij_provider.IntelliJInfo]
+        for toolchain_type in toolchain_types 
+        if toolchain_type.label in toolchains
+    ])
 
 intellij_deps = struct(
     COMPILE_TIME = _COMPILE_TIME,
@@ -70,5 +50,5 @@ intellij_deps = struct(
     RUNTIME = _RUNTIME,
     TOOLCHAIN = _TOOLCHAIN,
     collect = _collect,
-    find_toolchains = _find_toolchains,
+    collect_toolchains = _collect_toolchains,
 )

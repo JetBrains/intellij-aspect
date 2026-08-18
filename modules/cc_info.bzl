@@ -21,8 +21,9 @@ load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//common:dependencies.bzl", "intellij_deps")
 load("//common:make_variables.bzl", "expand_make_variables")
-load(":cc_toolchain_info.bzl", "intellij_cc_toolchain_info_aspect")
-load(":provider.bzl", "intellij_provider")
+load("//common:provider.bzl", "intellij_provider")
+load("//common:output_groups.bzl", "intellij_output_groups")
+load(":module.bzl", "intellij_module")
 
 # additional compile time dependencies collected for cc targets
 COMPILE_TIME_DEPS = [
@@ -94,38 +95,34 @@ def _aspect_guard(target, ctx):
 
     return True
 
-def _aspect_impl(target, ctx):
+def _implementation(target, ctx, attr):
     if not _aspect_guard(target, ctx):
-        return [intellij_provider.CcInfo(present = False)]
+        return None
 
-    # TODO(brendandouglas): target to cpp files only
     resolve_files = target[CcInfo].compilation_context.headers
 
-    return [intellij_provider.create(
-        ctx = ctx,
-        provider = intellij_provider.CcInfo,
+    return intellij_module.result(
         outputs = {
-            intellij_provider.BUILD_OUTPUT: resolve_files,
-            intellij_provider.SYNC_OUTPUT: resolve_files,
+            intellij_output_groups.BUILD: resolve_files,
+            intellij_output_groups.SYNC: resolve_files,
         },
         value = intellij_common.struct(
             rule_context = _collect_rule_context(ctx),
             compilation_context = _collect_compilation_context(ctx, target),
         ),
         dependencies = {
-            intellij_deps.COMPILE_TIME: intellij_deps.collect(
-                ctx,
-                attributes = COMPILE_TIME_DEPS,
-                toolchain_types = [CC_TOOLCHAIN_TYPE],
-            ),
+            intellij_deps.COMPILE_TIME: intellij_deps.collect(ctx, COMPILE_TIME_DEPS),
         },
-        toolchains = intellij_deps.find_toolchains(ctx, CC_TOOLCHAIN_TYPE),
-    )]
+    )
 
-intellij_cc_info_aspect = intellij_common.aspect(
-    implementation = _aspect_impl,
-    provides = [intellij_provider.CcInfo],
-    requires = [intellij_cc_toolchain_info_aspect],
-    required_aspect_providers = [[CcInfo], [intellij_provider.XcodeToolchainInfo]],
-    toolchains_aspects = [str(CC_TOOLCHAIN_TYPE)],
+_aspect = intellij_module.aspect(
+    provider = intellij_provider.CcInfo,
+    implementation = _implementation,
+    field = "c_ide_info",
+)
+
+module = intellij_module.define(
+    aspect = _aspect,
+    toolchains = [CC_TOOLCHAIN_TYPE],
+    aspect_providers = [CcInfo],
 )

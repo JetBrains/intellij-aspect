@@ -30,7 +30,7 @@ def _append_depset(dst, src):
                 dst[key] = [src[key]]
 
 def _append(builder, src):
-    """Appends all data from the source to the builder. Source must be either an IntellijInfo provider or a module provider."""
+    """Appends all data from the source to the builder. Source must be either an IntellijInfo provider or a module result struct."""
     _append_depset(builder.outputs, src.outputs)
     _append_depset(builder.dependencies, src.dependencies)
 
@@ -38,6 +38,7 @@ def _append(builder, src):
     builder.aspect_ids.update({id: True for id in getattr(src, "aspect_ids", [])})
 
 def _append_outputs(builder, src):
+    """Appends only the outputs of the sources to the builder. Source must be either an IntellijInfo provider or a module result struct."""
     _append_depset(builder.outputs, src.outputs)
 
 def _append_ide_infos(builder, files):

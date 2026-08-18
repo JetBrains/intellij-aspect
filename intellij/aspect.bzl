@@ -18,8 +18,8 @@
 load("//common:common.bzl", "intellij_common")
 load("//common:dependencies.bzl", "intellij_deps")
 load("//common:ide_info.bzl", "ide_info")
-load("//common:provider.bzl", "intellij_provider")
 load("//common:output_groups.bzl", "intellij_output_groups")
+load("//common:provider.bzl", "intellij_provider")
 load(":provider.bzl", "intellij_info_builder")
 
 # compile time dependencies collected for every target
@@ -51,7 +51,7 @@ def _merge_dependencies(builder, ctx, results):
 def _serialize_dependencies(builder):
     """Serializes all dependencies currently tracked by the builder."""
     return depset([
-        struct(target = dep[intellij_provider.IntelliJInfo].key, dependency_type = key)
+        struct(target = dep.key, dependency_type = key)
         for key, list_of_sets in builder.dependencies.items()
         for set in list_of_sets
         for dep in set.to_list()
@@ -126,6 +126,12 @@ def _implemenation(target, ctx):
         intellij_deps.collect(ctx, COMPILE_TIME_DEPS),
     )
 
+    intellij_info_builder.append_dependencies(
+        builder,
+        intellij_deps.TOOLCHAIN,
+        intellij_deps.collect_toolchains(ctx, ctx.attr._toolchains),
+    )
+
     results = _run_modules(target, ctx)
 
     _merge_target_info(builder, target, ctx, results)
@@ -146,6 +152,7 @@ def _unique_flatten(modules, field):
 def intellij_configure_aspect(modules):
     """Creates an aspect running the given module groups."""
     toolchains = _unique_flatten(modules, "toolchains")
+    aspect_providers = _unique_flatten(modules, "aspect_providers")
 
     return intellij_common.aspect(
         implementation = _implemenation,
@@ -153,6 +160,7 @@ def intellij_configure_aspect(modules):
         provides = [intellij_provider.IntelliJInfo],
         attr_aspects = ["*"],
         toolchains_aspects = [str(it) for it in toolchains or []],
+        required_aspect_providers = [[it] for it in aspect_providers],
         attrs = {
             "_container": attr.label(
                 default = "//intellij:module_container",

@@ -37,22 +37,22 @@ def _aspect(provider, implementation, field = None, attrs = None):
         attrs = attrs or {},
     )
 
-def _define(aspect, *, fragments = None, toolchains = None):
+def _define(aspect, *, fragments = None, toolchains = None, aspect_providers = None):
     """Creates a struct that descirbes the requirements for this module."""
     return struct(
         aspect = aspect,
         fragments = fragments or [],
         toolchains = toolchains or [],
+        aspect_providers = aspect_providers or [],
     )
 
-def _result(value, *, internal_value = None, outputs = None, dependencies = None, toolchains = None):
+def _result(value, *, internal_value = None, outputs = None, dependencies = None):
     """Creates the result struct of a module."""
     return struct(
         value = value,
         internal_value = internal_value or struct(),
         outputs = outputs or {},
         dependencies = dependencies or {},
-        toolchains = toolchains or [],
     )
 
 intellij_module = struct(

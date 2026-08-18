@@ -13,6 +13,7 @@
 # limitations under the License.
 
 load(":version.bzl", "bazel_version")
+load(":provider.bzl", "intellij_provider")
 
 # fallback configurations if short id is not available
 _FALLBACK_CONFIG = "00000f1"
@@ -97,6 +98,11 @@ def _attr_as_label_list(ctx, name, strict = False):
     """Returns the attr as a list of targets. Filters out everything except targets."""
     return [it for it in _attr_as_list(ctx, name, strict) if type(it) == "Target"]
 
+def _attr_as_info_list(ctx, name, strict = False):
+    """Returns the attr as a list of IntelliJInfo. Filters out everything except targets."""
+    # note: it is safe to assume that every target carries the IntelliJInfo provider since we walk aspect_attr = ["*"]
+    return [it[intellij_provider.IntelliJInfo] for it in _attr_as_list(ctx, name, strict) if type(it) == "Target"]
+
 def _attr_as_string_list(ctx, name, strict = False):
     """Returns the attr as a list of strings. Filters out everything except strings."""
     return [it for it in _attr_as_list(ctx, name, strict) if type(it) == "string"]
@@ -172,6 +178,7 @@ intellij_common = struct(
     attr_as_target = _attr_as_target,
     attr_as_list = _attr_as_list,
     attr_as_label_list = _attr_as_label_list,
+    attr_as_info_list = _attr_as_info_list,
     attr_as_string_list = _attr_as_string_list,
     attr_as_dict = _attr_as_dict,
     attr_as_string_dict = _attr_as_string_dict,
