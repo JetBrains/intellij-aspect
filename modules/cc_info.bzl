@@ -106,7 +106,6 @@ def _aspect_impl(target, ctx):
         provider = intellij_provider.CcInfo,
         outputs = {
             intellij_provider.BUILD_OUTPUT: resolve_files,
-            intellij_provider.SYNC_OUTPUT: resolve_files,
         },
         value = intellij_common.struct(
             rule_context = _collect_rule_context(ctx),
