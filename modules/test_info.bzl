@@ -28,4 +28,7 @@ _aspect = intellij_module.aspect(
     field = "test_info",
 )
 
-module = intellij_module.define(_aspect)
+module = intellij_module.define(
+    file = "test_info",
+    aspect = _aspect,
+)

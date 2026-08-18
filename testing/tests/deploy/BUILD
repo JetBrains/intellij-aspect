@@ -15,7 +15,10 @@ junit_test(
 
 junit_test(
     test = "DeployFileTest.kt",
-    deps = [
-        "//sdk/lib:deploy",
-    ],
+    deps = ["//sdk/lib:deploy"],
+)
+
+junit_test(
+    test = "ModuleEnumTest.kt",
+    deps = ["//sdk/lib:deploy"],
 )

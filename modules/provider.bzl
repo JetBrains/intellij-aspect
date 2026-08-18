@@ -157,8 +157,6 @@ intellij_provider = struct(
     ALL = _MODULE_PROVIDERS.values() + _TOOLCHAIN_PROVIDERS,
     has_module = _has_module_provider,
     get = _get_provider_or_none,
-    SYNC_OUTPUT = _sync_output,
-    BUILD_OUTPUT = _build_output,
     create = _create,
     create_toolchain = _create_toolchain,
 )

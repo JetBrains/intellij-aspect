@@ -41,4 +41,7 @@ _aspect = intellij_module.aspect(
     field = "executable_info",
 )
 
-module = intellij_module.define(_aspect)
+module = intellij_module.define(
+    file = "run_info",
+    aspect = _aspect,
+)

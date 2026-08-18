@@ -1,4 +1,6 @@
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+load("//config:aspect.bzl", "MODULES")
+load("//private/rules:kt_aspect_enum.bzl", "kt_aspect_enum")
 
 # Package archive_ide.zip into a jar with the file at the jar root.
 #
@@ -12,6 +14,12 @@ genrule(
     tools = ["@bazel_tools//tools/zip:zipper"],
 )
 
+kt_aspect_enum(
+    name = "aspectenum",
+    modules = MODULES,
+    package = "com.intellij.aspect.lib",
+)
+
 kt_jvm_library(
     name = "deploy",
     srcs = [
@@ -21,6 +29,7 @@ kt_jvm_library(
         "loads.kt",
         "transformers.kt",
         "utils.kt",
+        ":aspectenum",
     ],
     resource_jars = [":sdk_resource_jar"],
     visibility = ["//visibility:public"],
