@@ -36,7 +36,7 @@ def _merge_dependencies(builder, ctx):
             if not IntelliJInfo in dep:
                 continue
 
-            intellij_info_builder.append(builder, dep[IntelliJInfo])
+            intellij_info_builder.append_outputs(builder, dep[IntelliJInfo])
 
 def _serialize_dependencies(builder):
     """Serializes all dependencies currently tracked by the builder."""
@@ -95,7 +95,7 @@ def _merge_target_info(builder, target, ctx):
         intellij_info_builder.append_dependencies(
             builder,
             intellij_deps.TOOLCHAIN,
-            depset([it.owner for it in toolchain_infos]),
+            intellij_common.depset([it.owner for it in toolchain_infos]),
         )
 
         # append the already generated info from the toolchains

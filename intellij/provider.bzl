@@ -46,6 +46,9 @@ def _append(builder, src):
     # only the module provider exposes the aspect ids
     builder.aspect_ids.update({id: True for id in getattr(src, "aspect_ids", [])})
 
+def _append_outputs(builder, src):
+    _append_depset(builder.outputs, src.outputs)
+
 def _append_ide_infos(builder, files):
     """Appends a list intellij ide info files."""
     if not files:
@@ -88,6 +91,7 @@ def _build(builder, target, ctx):
 intellij_info_builder = struct(
     create = _create,
     append = _append,
+    append_outputs = _append_outputs,
     append_output = _append_output,
     append_ide_infos = _append_ide_infos,
     append_dependencies = _append_dependencies,

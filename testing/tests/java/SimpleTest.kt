@@ -48,6 +48,7 @@ class SimpleTest {
 
     // Dependencies are reported correctly
     assertThatDeps(target.depsList).withType(DependencyType.COMPILE_TIME).labels().contains("//lib:util")
+    assertThatDeps(target.depsList).labels().doesNotContain("//lib:moreutils")
 
     // JVM-info is reported correctly
     val jvmInfo = target.jvmTargetInfo
@@ -79,6 +80,9 @@ class SimpleTest {
     assertThat(target.srcsList[0].isSource).isTrue()
     assertThat(target.srcsList[0].relativePath).isEqualTo("lib/Util.java")
 
+    // Dependencies are reported correctly
+    assertThatDeps(target.depsList).withType(DependencyType.COMPILE_TIME).labels().contains("//lib:moreutils")
+
     // JavaInfo related information is reported correctly
     assertThat(target.javaProvider.fullCompileJarsCount).isEqualTo(1)
     assertThat(target.javaProvider.fullCompileJarsList[0].relativePath).isEqualTo("lib/libutil.jar")
@@ -105,6 +109,14 @@ class SimpleTest {
   }
 
   @Test
+  fun testFindsSubLib() {
+    val target = aspect.findTarget("//lib:moreutils")
+    assertThat(target.hasJavaProvider()).isTrue()
+    assertThat(target.kind).isEqualTo("java_library")
+    assertThat(target.hasExecutableInfo()).isFalse()
+  }
+
+  @Test
   fun testFindTest() {
     val target = aspect.findTarget("//test:util")
 
@@ -115,6 +127,7 @@ class SimpleTest {
 
     // Dependencies are reported correctly
     assertThatDeps(target.depsList).withType(DependencyType.COMPILE_TIME).labels().contains("//lib:util")
+    assertThatDeps(target.depsList).labels().doesNotContain("//lib:moreutils")
 
     // Test environment is reported correctly
     assertThat(target.envInheritList).isEqualTo(listOf("PROPERTIES"))
