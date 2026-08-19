@@ -15,7 +15,9 @@
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//common:make_variables.bzl", "expand_make_variables")
-load(":provider.bzl", "intellij_provider")
+load("//common:output_groups.bzl", "intellij_output_groups")
+load("//common:provider.bzl", "intellij_provider")
+load(":module.bzl", "intellij_module")
 
 def _get_reosource_strip_prefix(ctx):
     prefix = getattr(ctx.rule.attr, "resource_strip_prefix", None)
@@ -47,21 +49,25 @@ def _get_jvm_info(ctx):
         resources = resource_files,
     )
 
-def _aspect_impl(target, ctx):
-    if not any([intellij_provider.get(target, it) for it in intellij_provider.JVM_MODULES]):
-        return [intellij_provider.JvmInfo(present = False)]
+def _implementation(target, ctx, attr):
+    if not any([intellij_module.lookup(attr, it) for it in intellij_provider.JVM]):
+        return None
 
-    return [intellij_provider.create(
-        ctx = ctx,
-        provider = intellij_provider.JvmInfo,
+    return intellij_module.result(
         value = _get_jvm_info(ctx),
         outputs = {
-            intellij_provider.BUILD_OUTPUT: intellij_common.depset(_get_resources(ctx)),
+            intellij_output_groups.BUILD: intellij_common.depset(_get_resources(ctx)),
         },
-    )]
+    )
 
-intellij_jvm_info_aspect = intellij_common.aspect(
-    implementation = _aspect_impl,
-    provides = [intellij_provider.JvmInfo],
-    required_aspect_providers = [[it] for it in intellij_provider.JVM_MODULES],
+_aspect = intellij_module.aspect(
+    provider = intellij_provider.JvmInfo,
+    implementation = _implementation,
+    field = "jvm_target_info",
+)
+
+module = intellij_module.define(
+    file = "jvm_info",
+    aspect = _aspect,
+    rulesets = ["@rules_java", "@rules_kotlin", "@rules_scala"],
 )

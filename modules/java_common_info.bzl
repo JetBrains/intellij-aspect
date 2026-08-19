@@ -14,7 +14,8 @@
 
 load("//common:common.bzl", "intellij_common")
 load("//common:make_variables.bzl", "expand_make_variables")
-load(":provider.bzl", "intellij_provider")
+load("//common:provider.bzl", "intellij_provider")
+load(":module.bzl", "intellij_module")
 
 _LIST_FIELDS = [
     "javac_opts",
@@ -22,18 +23,19 @@ _LIST_FIELDS = [
     "generated_jars",
     "jdeps",
 ]
+
 _BOOL_FIELDS = [
     "jvm_target",
 ]
 
-def _aspect_impl(target, ctx):
-    if not any([intellij_provider.get(target, it) for it in intellij_provider.JVM_MODULES]):
-        return [intellij_provider.JavaCommonInfo(present = False)]
+def _implementation(target, ctx, attr):
+    if not any([intellij_module.lookup(attr, it) for it in intellij_provider.JVM]):
+        return None
 
     value = {}
 
-    for it in intellij_provider.JVM_MODULES:
-        contributor = intellij_provider.get(target, it)
+    for it in intellij_provider.JVM:
+        contributor = intellij_module.lookup(attr, it)
         if not contributor:
             continue
         contribution = getattr(contributor.internal_value, "java_common", struct())
@@ -42,14 +44,16 @@ def _aspect_impl(target, ctx):
         for k in _BOOL_FIELDS:
             value[k] = value.get(k, False) or getattr(contribution, k, False)
 
-    return [intellij_provider.create(
-        ctx = ctx,
-        provider = intellij_provider.JavaCommonInfo,
-        value = intellij_common.struct(**value),
-    )]
+    return intellij_module.result(intellij_common.struct(**value))
 
-intellij_java_common_info_aspect = intellij_common.aspect(
-    implementation = _aspect_impl,
-    provides = [intellij_provider.JavaCommonInfo],
-    required_aspect_providers = [[it] for it in intellij_provider.JVM_MODULES],
+_aspect = intellij_module.aspect(
+    provider = intellij_provider.JavaCommonInfo,
+    implementation = _implementation,
+    field = "java_common",
+)
+
+module = intellij_module.define(
+    file = "java_common_info",
+    aspect = _aspect,
+    rulesets = ["@rules_java", "@rules_kotlin", "@rules_scala"],
 )

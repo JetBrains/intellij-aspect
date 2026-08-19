@@ -26,8 +26,8 @@ def _aspect(provider, implementation, field = None, attrs = None):
     def aspect_impl(container, actx):
         attr = {name: getattr(actx.attr, name) for name in list(attrs or [])}
 
-        def capture(target, ctx):
-            return implementation(target, ctx, attr)
+        def capture(target, ctx, results):
+            return implementation(target, ctx, attr | {"_results": results})
 
         return [provider(field = field, func = capture)]
 
@@ -57,9 +57,19 @@ def _result(value, *, internal_value = None, outputs = None, dependencies = None
         dependencies = dependencies or {},
     )
 
+def _lookup(attr, provider):
+    """Looks up the current result of another module identified by its provider."""
+    results = attr["_results"]
+
+    if provider not in results:
+        return None
+
+    return results[provider]
+
 intellij_module = struct(
     container = _container,
     aspect = _aspect,
     define = _define,
     result = _result,
+    lookup = _lookup,
 )

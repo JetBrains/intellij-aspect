@@ -19,6 +19,13 @@ junit_test(
 )
 
 junit_test(
+    data = ["//:archive_ide"],
+    env = {
+        "ARCHIVE_IDE": "$(rlocationpaths //:archive_ide)",
+    },
     test = "ModuleEnumTest.kt",
-    deps = ["//sdk/lib:deploy"],
+    deps = [
+        "//sdk/lib:deploy",
+        "@rules_java//java/runfiles",
+    ],
 )

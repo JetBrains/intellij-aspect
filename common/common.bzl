@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load(":version.bzl", "bazel_version")
 load(":provider.bzl", "intellij_provider")
+load(":version.bzl", "bazel_version")
 
 # fallback configurations if short id is not available
 _FALLBACK_CONFIG = "00000f1"
@@ -100,6 +100,7 @@ def _attr_as_label_list(ctx, name, strict = False):
 
 def _attr_as_info_list(ctx, name, strict = False):
     """Returns the attr as a list of IntelliJInfo. Filters out everything except targets."""
+
     # note: it is safe to assume that every target carries the IntelliJInfo provider since we walk aspect_attr = ["*"]
     return [it[intellij_provider.IntelliJInfo] for it in _attr_as_list(ctx, name, strict) if type(it) == "Target"]
 
