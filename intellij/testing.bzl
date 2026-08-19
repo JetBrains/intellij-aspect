@@ -13,19 +13,19 @@
 # limitations under the License.
 
 load("//common:platform.bzl", "platform")
-load("//modules:cc_info.bzl", "intellij_cc_info_aspect")
-load("//modules:go_info.bzl", "intellij_go_info_aspect")
-load("//modules:java_common_info.bzl", "intellij_java_common_info_aspect")
-load("//modules:java_info.bzl", "intellij_java_info_aspect")
-load("//modules:jvm_info.bzl", "intellij_jvm_info_aspect")
-load("//modules:kotlin_info.bzl", "intellij_kotlin_info_aspect")
-load("//modules:proto_info.bzl", "intellij_proto_info_aspect")
-load("//modules:protobuf_info.bzl", "intellij_protobuf_info_aspect")
-load("//modules:py_info.bzl", "intellij_py_info_aspect")
-load("//modules:python_info.bzl", "intellij_python_info_aspect")
-load("//modules:scala_info.bzl", "intellij_scala_info_aspect")
-load("//modules:xcode_info.bzl", "intellij_xcode_info_aspect")
-load(":aspect.bzl", "intellij_info_aspect")
+# load("//modules:cc_info.bzl", "intellij_cc_info_aspect")
+# load("//modules:go_info.bzl", "intellij_go_info_aspect")
+# load("//modules:java_common_info.bzl", "intellij_java_common_info_aspect")
+# load("//modules:java_info.bzl", "intellij_java_info_aspect")
+# load("//modules:jvm_info.bzl", "intellij_jvm_info_aspect")
+# load("//modules:kotlin_info.bzl", "intellij_kotlin_info_aspect")
+# load("//modules:proto_info.bzl", "intellij_proto_info_aspect")
+# load("//modules:protobuf_info.bzl", "intellij_protobuf_info_aspect")
+# load("//modules:py_info.bzl", "intellij_py_info_aspect")
+# load("//modules:python_info.bzl", "intellij_python_info_aspect")
+# load("//modules:scala_info.bzl", "intellij_scala_info_aspect")
+# load("//modules:xcode_info.bzl", "intellij_xcode_info_aspect")
+# load(":aspect.bzl", "intellij_info_aspect")
 
 # Aspects are grouped per language so that a target only runs the aspects for
 # its own language. This matters because some aspects (e.g. go, scala) force
@@ -33,41 +33,18 @@ load(":aspect.bzl", "intellij_info_aspect")
 # only needs declare the toolchains for the languages they test.
 _LANGUAGE_ASPECTS = {
     "cc": [
-        intellij_xcode_info_aspect,
-        intellij_cc_info_aspect,
-        intellij_info_aspect,
     ],
     "go": [
-        intellij_go_info_aspect,
-        intellij_info_aspect,
     ],
     "java": [
-        intellij_java_info_aspect,
-        intellij_jvm_info_aspect,
-        intellij_java_common_info_aspect,
-        intellij_info_aspect,
     ],
     "kotlin": [
-        intellij_kotlin_info_aspect,
-        intellij_jvm_info_aspect,
-        intellij_java_common_info_aspect,
-        intellij_info_aspect,
     ],
     "proto": [
-        intellij_proto_info_aspect,
-        intellij_protobuf_info_aspect,
-        intellij_info_aspect,
     ],
     "python": [
-        intellij_py_info_aspect,
-        intellij_python_info_aspect,
-        intellij_info_aspect,
     ],
     "scala": [
-        intellij_scala_info_aspect,
-        intellij_jvm_info_aspect,
-        intellij_java_common_info_aspect,
-        intellij_info_aspect,
     ],
 }
 
