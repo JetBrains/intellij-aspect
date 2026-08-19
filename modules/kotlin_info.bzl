@@ -17,7 +17,9 @@ load("@rules_kotlin//kotlin/internal:opts.bzl", "JavacOptions", "KotlincOptions"
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//common:dependencies.bzl", "intellij_deps")
-load(":provider.bzl", "intellij_provider")
+load("//common:output_groups.bzl", "intellij_output_groups")
+load("//common:provider.bzl", "intellij_provider")
+load(":module.bzl", "intellij_module")
 
 IMPORT_RULE_KIND = ["kt_jvm_import"]
 COMPILE_DEPS = ["associates"]
@@ -146,8 +148,8 @@ def _get_associates(target, ctx):
     ]
     for dep in direct_dep_targets:
         if str(dep.label) in associates_labels:
-            for provider in intellij_provider.JVM_MODULES:
-                provider_value = intellij_provider.get(dep, provider)
+            for provider in intellij_provider.JVM:
+                provider_value = intellij_module.lookup_target(dep, provider)
                 if provider_value:
                     exports = getattr(provider_value.internal_value, "exports", [])
                     associates_keys += intellij_common.target_keys_from(exports)
@@ -199,20 +201,18 @@ def _get_outputs(target, ctx, plugins):
         if hasattr(out, "source_jar") and out.source_jar != None:
             resolve_files += [out.source_jar]
     if intellij_common.label_is_external(target.label) or (ctx.rule.kind in IMPORT_RULE_KIND):
-        return {intellij_provider.SYNC_OUTPUT: intellij_common.depset(resolve_files, transitive = resolve_transitives + (
+        return {intellij_output_groups.SYNC: intellij_common.depset(resolve_files, transitive = resolve_transitives + (
             [target[KtJvmInfo].transitive_source_jars] if hasattr(target[KtJvmInfo], "transitive_source_jars") else []
         ) + sync_transitives)}
     else:
         return {
-            intellij_provider.SYNC_OUTPUT: intellij_common.depset(transitive = sync_transitives),
-            intellij_provider.BUILD_OUTPUT: intellij_common.depset(resolve_files, transitive = resolve_transitives),
+            intellij_output_groups.SYNC: intellij_common.depset(transitive = sync_transitives),
+            intellij_output_groups.BUILD: intellij_common.depset(resolve_files, transitive = resolve_transitives),
         }
 
-def _aspect_impl(target, ctx):
+def _implementation(target, ctx, attr):
     if not KtJvmInfo in target:
-        return [
-            intellij_provider.KotlinInfo(present = False),
-        ]
+        return None
 
     dep_targets_list = [
         intellij_common.attr_as_label_list(ctx, attr)
@@ -225,56 +225,47 @@ def _aspect_impl(target, ctx):
     ]
     plugins = _get_kotlin_plugins(ctx, dep_targets)
 
-    return [
-        intellij_provider.create(
-            ctx = ctx,
-            provider = intellij_provider.KotlinInfo,
-            outputs = _get_outputs(target, ctx, plugins),
-            value = intellij_common.struct(
-                language_version = getattr(target[KtJvmInfo], "language_version", None),
-                api_version = getattr(target[KtJvmInfo], "language_version", None),  # API version currently not exposed
-                associated_targets = _get_associates(target, ctx),
-                kotlinc_opts = _get_kotlinc_options(ctx),
-                stdlibs = _get_kotlin_stdlibs(ctx),
-                kotlinc_plugin_infos = [
-                    info
-                    for info in [_extract_kt_compiler_plugin_info(plugin) for plugin in plugins]
-                    if info != None
-                ],
-                exported_compiler_plugin_targets = intellij_common.target_keys_from(plugins),
-                module_name = getattr(target[KtJvmInfo], "module_name", None),
-            ),
-            dependencies = {
-                intellij_deps.COMPILE_TIME: intellij_deps.collect(
-                    ctx,
-                    attributes = COMPILE_DEPS,
-                ),
-                intellij_deps.EXPORTED_COMPILE_TIME: intellij_deps.collect(
-                    ctx,
-                    attributes = EXPORTED_COMPILE_TIME_DEPS,
-                ),
-                intellij_deps.RUNTIME: intellij_deps.collect(
-                    ctx,
-                    attributes = RUNTIME_DEPS,
-                ),
-            },
-            internal_value = intellij_common.struct(
-                java_common = intellij_common.struct(
-                    jars = _get_jvm_outputs(target),
-                    generated_jars = _get_generated_jars(target, ctx),
-                    javac_opts = _get_additional_javac_options(ctx),
-                    jvm_target = True,
-                ),
-                exports = intellij_common.attr_as_label_list(ctx, "exports"),
-            ),
+    return intellij_module.result(
+        outputs = _get_outputs(target, ctx, plugins),
+        value = intellij_common.struct(
+            language_version = getattr(target[KtJvmInfo], "language_version", None),
+            api_version = getattr(target[KtJvmInfo], "language_version", None),  # API version currently not exposed
+            associated_targets = _get_associates(target, ctx),
+            kotlinc_opts = _get_kotlinc_options(ctx),
+            stdlibs = _get_kotlin_stdlibs(ctx),
+            kotlinc_plugin_infos = [
+                info
+                for info in [_extract_kt_compiler_plugin_info(plugin) for plugin in plugins]
+                if info != None
+            ],
+            exported_compiler_plugin_targets = intellij_common.target_keys_from(plugins),
+            module_name = getattr(target[KtJvmInfo], "module_name", None),
         ),
-    ]
+        dependencies = {
+            intellij_deps.COMPILE_TIME: intellij_deps.collect(ctx, COMPILE_DEPS),
+            intellij_deps.EXPORTED_COMPILE_TIME: intellij_deps.collect(ctx, EXPORTED_COMPILE_TIME_DEPS),
+            intellij_deps.RUNTIME: intellij_deps.collect(ctx, RUNTIME_DEPS),
+        },
+        internal_value = intellij_common.struct(
+            java_common = intellij_common.struct(
+                jars = _get_jvm_outputs(target),
+                generated_jars = _get_generated_jars(target, ctx),
+                javac_opts = _get_additional_javac_options(ctx),
+                jvm_target = True,
+            ),
+            exports = intellij_common.attr_as_label_list(ctx, "exports"),
+        ),
+    )
 
-intellij_kotlin_info_aspect = intellij_common.aspect(
-    implementation = _aspect_impl,
-    provides = [intellij_provider.KotlinInfo],
-    toolchains = [
-        config_common.toolchain_type(TOOLCHAIN_TYPE, mandatory = False),
-    ],
-    required_aspect_providers = [[it] for it in intellij_provider.JVM_MODULES if it != intellij_provider.KotlinInfo],
+_aspect = intellij_module.aspect(
+    provider = intellij_provider.KotlinInfo,
+    implementation = _implementation,
+    field = "kotlin_target_info",
+)
+
+module = intellij_module.define(
+    file = "kotlin_info",
+    aspect = _aspect,
+    direct_toolchain_deps_do_not_use = [TOOLCHAIN_TYPE],
+    rulesets = ["@rules_kotlin"],
 )

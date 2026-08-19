@@ -50,7 +50,7 @@ def _get_jvm_info(ctx):
     )
 
 def _implementation(target, ctx, attr):
-    if not any([intellij_module.lookup(attr, it) for it in intellij_provider.JVM]):
+    if not any([intellij_module.lookup_self(attr, it) for it in intellij_provider.JVM]):
         return None
 
     return intellij_module.result(

@@ -101,8 +101,12 @@ def _attr_as_label_list(ctx, name, strict = False):
 def _attr_as_info_list(ctx, name, strict = False):
     """Returns the attr as a list of IntelliJInfo. Filters out everything except targets."""
 
-    # note: it is safe to assume that every target carries the IntelliJInfo provider since we walk aspect_attr = ["*"]
-    return [it[intellij_provider.IntelliJInfo] for it in _attr_as_list(ctx, name, strict) if type(it) == "Target"]
+    # note: it is not safe to assume that every target carries the IntelliJInfo provider since it might be a plain file
+    return [
+        it[intellij_provider.IntelliJInfo]
+        for it in _attr_as_list(ctx, name, strict)
+        if type(it) == "Target" and intellij_provider.IntelliJInfo in it
+    ]
 
 def _attr_as_string_list(ctx, name, strict = False):
     """Returns the attr as a list of strings. Filters out everything except strings."""
@@ -161,11 +165,11 @@ def _is_exec_configuration(ctx):
     return "-exec" in ctx.genfiles_dir.path
 
 def _target_keys_from(targets):
-    """Extracts keys from given list of targets. Omits the targets without TargetInfo provider."""
+    """Extracts keys from given list of targets."""
     return [
-        target[intellij_common.TargetInfo].partial_key
+        target[intellij_provider.IntelliJInfo].key
         for target in targets
-        if intellij_common.TargetInfo in target
+        if intellij_provider.IntelliJInfo in target
     ]
 
 intellij_common = struct(

@@ -62,6 +62,8 @@ class AssociatesTest {
     assertThat(targetC.srcsList.size).isEqualTo(1)
     assertThat(targetC.srcsList[0].isSource).isTrue()
     assertThat(targetC.srcsList[0].relativePath).isEqualTo("C.kt")
-    assertThatDeps(targetC.depsList).isEmpty()
+
+    // contains the java toolchain
+    assertThatDeps(targetC.depsList).isEqualTo(1)
   }
 }

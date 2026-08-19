@@ -72,12 +72,13 @@ def _build_target_key(builder, target, ctx):
     aspect_ids = {id: True for id in ctx.aspect_ids} | builder.aspect_ids
     return intellij_common.target_key(target, ctx, aspect_ids.keys())
 
-def _build(builder, target, ctx):
+def _build(builder, target, ctx, results):
     """Builds a new IntelliJInfo provider."""
     return intellij_provider.IntelliJInfo(
         key = _build_target_key(builder, target, ctx),
         outputs = _build_depset(builder.outputs),
         dependencies = _build_depset(builder.dependencies),
+        results = results,
     )
 
 intellij_info_builder = struct(

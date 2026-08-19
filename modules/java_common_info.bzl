@@ -29,13 +29,13 @@ _BOOL_FIELDS = [
 ]
 
 def _implementation(target, ctx, attr):
-    if not any([intellij_module.lookup(attr, it) for it in intellij_provider.JVM]):
+    if not any([intellij_module.lookup_self(attr, it) for it in intellij_provider.JVM]):
         return None
 
     value = {}
 
     for it in intellij_provider.JVM:
-        contributor = intellij_module.lookup(attr, it)
+        contributor = intellij_module.lookup_self(attr, it)
         if not contributor:
             continue
         contribution = getattr(contributor.internal_value, "java_common", struct())
