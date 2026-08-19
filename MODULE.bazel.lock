@@ -385,7 +385,7 @@
     "//private:extension.bzl%bazel_registry": {
       "general": {
         "bzlTransitiveDigest": "FEBJUsRhKeQp28+KLT716/LSorVETRHfA9zTgJKV0qM=",
-        "usagesDigest": "vNm5aKUYPoi9eYdyb9EDnKOTla+gVJ/jDvMlEHCO108=",
+        "usagesDigest": "Vicfxnd1Fafroykiop/RjfXOdWI0nNvltvX59bHlmC8=",
         "recordedInputs": [],
         "generatedRepoSpecs": {
           "bazelisk": {
@@ -398,8 +398,8 @@
           "bcr_archive": {
             "repoRuleId": "@@//private/repos:bcr_archive.bzl%bcr_archive",
             "attributes": {
-              "commit": "f08672b2f0a9a7ce478152bb3cc335f6c6f5d4bf",
-              "sha256": "f16c8a9e7075b06f6f9b0913302d42a8ef08322dc8178f789df273190a519773"
+              "commit": "3e205a23f5be1e1fd59461b616219c733b88a434",
+              "sha256": "d11fe8b4f6b4ab78b65ea8fa30c4c2f244e0c39cd01f1b9e3ccea2ef60d9533c"
             }
           },
           "bazel_env": {

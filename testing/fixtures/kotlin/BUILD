@@ -16,7 +16,7 @@ _MODULES = [
 })
 
 _MOUDLES_WITH_JAVA = _MODULES + [
-    "//testing/fixtures:rules_java_9_7_0",
+    "//testing/fixtures:rules_java_9_8_0",
 ]
 
 _MODULES_KSP = [
