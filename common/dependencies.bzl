@@ -38,9 +38,10 @@ def _collect_toolchains(ctx, toolchain_types):
     if not toolchains:
         return
 
+    # it is save to assume that every toolchain carries our provider, otherweise something went quite wrong
     return intellij_common.depset([
         toolchains[toolchain_type.label][intellij_provider.IntelliJInfo]
-        for toolchain_type in toolchain_types 
+        for toolchain_type in toolchain_types
         if toolchain_type.label in toolchains
     ])
 

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("//common:provider.bzl", "intellij_provider")
+
 def _module_container_impl(ctx):
     return []
 
@@ -37,7 +39,14 @@ def _aspect(provider, implementation, field = None, attrs = None):
         attrs = attrs or {},
     )
 
-def _define(file, aspect, rulesets = None, fragments = None, toolchains = None, aspect_providers = None):
+def _define(
+        file,
+        aspect,
+        rulesets = None,
+        fragments = None,
+        toolchains = None,
+        direct_toolchain_deps_do_not_use = None,
+        aspect_providers = None):
     """Creates a struct that descirbes the requirements for this module."""
     return struct(
         file = file,
@@ -45,6 +54,7 @@ def _define(file, aspect, rulesets = None, fragments = None, toolchains = None, 
         rulesets = rulesets or [],
         fragments = fragments or [],
         toolchains = toolchains or [],
+        direct_toolchain_deps_do_not_use = direct_toolchain_deps_do_not_use or [],
         aspect_providers = aspect_providers or [],
     )
 
@@ -57,9 +67,21 @@ def _result(value, *, internal_value = None, outputs = None, dependencies = None
         dependencies = dependencies or {},
     )
 
-def _lookup(attr, provider):
+def _lookup_self(attr, provider):
     """Looks up the current result of another module identified by its provider."""
     results = attr["_results"]
+
+    if provider not in results:
+        return None
+
+    return results[provider]
+
+def _lookup_target(target, provider):
+    """Looks up the result of a module for a specific target."""
+    if intellij_provider.IntelliJInfo not in target:
+        return None
+
+    results = target[intellij_provider.IntelliJInfo].results
 
     if provider not in results:
         return None
@@ -71,5 +93,6 @@ intellij_module = struct(
     aspect = _aspect,
     define = _define,
     result = _result,
-    lookup = _lookup,
+    lookup_self = _lookup_self,
+    lookup_target = _lookup_target,
 )

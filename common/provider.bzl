@@ -4,6 +4,7 @@ _IntelliJInfo = provider(
         "key": "TargetKey - The key to uniquly identify this target taking the configuration and all aspect ids into considadrtion.",
         "outputs": "dict[str, depset[File]|None] - Output groups emitted by this target (e.g., intellij-info).",
         "dependencies": "dict[int, depset[Target]|None] - Direct dependencies grouped by dependency type (see intellij_deps constants).",
+        "results": "dict[Provider, struct] - Results of modules executed on this target.",
     },
 )
 
@@ -24,6 +25,7 @@ _IntelliJJavaInfo = _create_module_provider()
 _IntelliJJavaToolchainInfo = _create_module_provider()
 _IntelliJJavaCommonInfo = _create_module_provider()
 _IntelliJJvmInfo = _create_module_provider()
+_IntelliJKotlinInfo = _create_module_provider()
 
 # all providers in the order they should be executed, i.e. dependencies need to be listed before dependeants
 _ORDERED = [
@@ -33,6 +35,7 @@ _ORDERED = [
     _IntelliJCcInfo,
     _IntelliJJavaToolchainInfo,
     _IntelliJJavaInfo,
+    _IntelliJKotlinInfo,
     _IntelliJJavaCommonInfo,
     _IntelliJJvmInfo,
 ]
@@ -42,6 +45,7 @@ _ORDERED = [
 # Also used by java_common to collect information contributed to by more than one provider.
 _JVM = [
     _IntelliJJavaInfo,
+    _IntelliJKotlinInfo,
 ]
 
 intellij_provider = struct(
@@ -54,6 +58,7 @@ intellij_provider = struct(
     JavaToolchainInfo = _IntelliJJavaToolchainInfo,
     JavaCommonInfo = _IntelliJJavaCommonInfo,
     JvmInfo = _IntelliJJvmInfo,
+    KotlinInfo = _IntelliJKotlinInfo,
     ORDERED = _ORDERED,
     JVM = _JVM,
 )

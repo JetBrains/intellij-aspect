@@ -45,6 +45,7 @@ def _merge_dependencies(builder, ctx):
     for toolchain_type in ctx.attr._toolchains:
         label = toolchain_type.label
 
+        # it is save to assume that every toolchain carries our provider
         if label in toolchains:
             intellij_info_builder.append(builder, toolchains[label][intellij_provider.IntelliJInfo])
 
@@ -138,7 +139,7 @@ def _implemenation(target, ctx):
     _merge_target_info(builder, target, ctx, results)
     _merge_dependencies(builder, ctx)
 
-    intellij_info = intellij_info_builder.build(builder, target, ctx)
+    intellij_info = intellij_info_builder.build(builder, target, ctx, results)
 
     return [intellij_info, OutputGroupInfo(**intellij_info.outputs)]
 
@@ -154,6 +155,7 @@ def intellij_configure_aspect(modules, container):
     """Creates an aspect running the given module groups."""
     toolchains = _unique_flatten(modules, "toolchains")
     aspect_providers = _unique_flatten(modules, "aspect_providers")
+    direct_toolchain_deps = _unique_flatten(modules, "direct_toolchain_deps_do_not_use")
 
     return intellij_common.aspect(
         implementation = _implemenation,
@@ -162,6 +164,8 @@ def intellij_configure_aspect(modules, container):
         attr_aspects = ["*"],
         toolchains_aspects = [str(it) for it in toolchains],
         required_aspect_providers = [[it] for it in aspect_providers],
+        # TODO: remove this once all modules have been fixed
+        toolchains = [config_common.toolchain_type(it, mandatory = False) for it in direct_toolchain_deps],
         attrs = {
             "_container": attr.label(
                 default = container,
