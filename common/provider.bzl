@@ -26,6 +26,7 @@ _IntelliJJavaToolchainInfo = _create_module_provider()
 _IntelliJJavaCommonInfo = _create_module_provider()
 _IntelliJJvmInfo = _create_module_provider()
 _IntelliJKotlinInfo = _create_module_provider()
+_IntelliJGoInfo = _create_module_provider()
 
 # all providers in the order they should be executed, i.e. dependencies need to be listed before dependeants
 _ORDERED = [
@@ -38,6 +39,7 @@ _ORDERED = [
     _IntelliJKotlinInfo,
     _IntelliJJavaCommonInfo,
     _IntelliJJvmInfo,
+    _IntelliJGoInfo,
 ]
 
 # Modules implying that jvm_info should run on the respective targets to obtain
@@ -59,6 +61,7 @@ intellij_provider = struct(
     JavaCommonInfo = _IntelliJJavaCommonInfo,
     JvmInfo = _IntelliJJvmInfo,
     KotlinInfo = _IntelliJKotlinInfo,
+    GoInfo = _IntelliJGoInfo,
     ORDERED = _ORDERED,
     JVM = _JVM,
 )

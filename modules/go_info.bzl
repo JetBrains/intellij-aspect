@@ -17,7 +17,9 @@ load("@rules_go//go/private:common.bzl", "GO_TOOLCHAIN_LABEL")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//common:dependencies.bzl", "intellij_deps")
-load(":provider.bzl", "intellij_provider")
+load("//common:output_groups.bzl", "intellij_output_groups")
+load("//common:provider.bzl", "intellij_provider")
+load(":module.bzl", "intellij_module")
 
 # As go targets do not reliably have a provider, we need to detect go targets by rule_kind as well
 _GO_RULE_KINDS = [
@@ -82,18 +84,16 @@ def _embed(ctx):
         return []
     return intellij_common.target_keys_from(ctx.rule.attr.embed)
 
-def _aspect_impl(target, ctx):
+def _implementation(target, ctx, attr):
     # Ideally, we would like to check for the presence of a provider to be sure, the target is defined by
     # the expected rule set; however, the currently-used provider was only introduced in 2024 and older versions
     # of rules_go are still in use. Therefore, check against a list of rule kinds.
     if ctx.rule.kind not in _GO_RULE_KINDS and \
        (OutputGroupInfo not in target or not hasattr(target[OutputGroupInfo], "go_generated_srcs")):  # support at least a subset of custom rules not hardcoded in _GO_RULE_KINDS
-        return [intellij_provider.GoInfo(present = False)]
+        return None
 
     sources = _sources(target, ctx)
-    return [intellij_provider.create(
-        ctx = ctx,
-        provider = intellij_provider.GoInfo,
+    return intellij_module.result(
         value = intellij_common.struct(
             import_path = _import_path(ctx),
             sdk_home_path = _go_sdk(ctx),
@@ -101,20 +101,24 @@ def _aspect_impl(target, ctx):
             embed = _embed(ctx),
         ),
         dependencies = {
-            intellij_deps.COMPILE_TIME: intellij_deps.collect(
-                ctx,
-                attributes = COMPILE_TIME_DEPS,
-            ),
+            intellij_deps.COMPILE_TIME: intellij_deps.collect(ctx, COMPILE_TIME_DEPS),
         },
         outputs = {
-            intellij_provider.SYNC_OUTPUT: intellij_common.depset(sources),
+            intellij_output_groups.SYNC: intellij_common.depset(sources),
         },
-    )]
+    )
 
-intellij_go_info_aspect = intellij_common.aspect(
-    implementation = _aspect_impl,
-    provides = [intellij_provider.GoInfo],
-    toolchains = [
-        config_common.toolchain_type(str(GO_TOOLCHAIN_LABEL), mandatory = False),
-    ],
+_aspect = intellij_module.aspect(
+    provider = intellij_provider.GoInfo,
+    implementation = _implementation,
+    field = "go_target_info",
+)
+
+module = intellij_module.define(
+    file = "go_info",
+    aspect = _aspect,
+    toolchains = [GO_TOOLCHAIN_LABEL],
+    # TODO: this seems to not be used by go
+    direct_toolchain_deps_do_not_use = [GO_TOOLCHAIN_LABEL],
+    rulesets = ["@rules_go"],
 )
