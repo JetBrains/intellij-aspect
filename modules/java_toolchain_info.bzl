@@ -16,14 +16,14 @@ load("@rules_java//java:defs.bzl", "java_common")
 load("@rules_java//java/common:java_semantics.bzl", JAVA_SEMANTICS = "semantics")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
-load("//common:ide_info.bzl", "ide_info")
-load(":provider.bzl", "intellij_provider")
+load("//common:provider.bzl", "intellij_provider")
+load(":module.bzl", "intellij_module")
 
-JAVA_TOOLCHAIN_TYPE = JAVA_SEMANTICS.JAVA_RUNTIME_TOOLCHAIN_TYPE
+JAVA_TOOLCHAIN_TYPE = JAVA_SEMANTICS.JAVA_TOOLCHAIN_TYPE
 
-def _aspect_impl(target, ctx):
+def _implementation(target, ctx, attrs):
     if not java_common.JavaToolchainInfo in target:
-        return [intellij_provider.JavaToolchainInfo(present = False)]
+        return None
 
     toolchain = target[java_common.JavaToolchainInfo]
     runtime = toolchain.java_runtime
@@ -35,15 +35,19 @@ def _aspect_impl(target, ctx):
         boot_classpath_java_home = artifact_location.from_execpath(boot_classpath_java_home) if boot_classpath_java_home else None,
         is_exec_config = intellij_common.is_exec_configuration(ctx),
     )
-    return [intellij_provider.create_toolchain(
-        provider = intellij_provider.JavaToolchainInfo,
-        info_file = ide_info.write_toolchain(target, ctx, "java_toolchain_info", info),
-        owner = target,
-    )]
 
-intellij_java_toolchain_info_aspect = intellij_common.aspect(
-    implementation = _aspect_impl,
+    return intellij_module.result(info)
+
+_aspect = intellij_module.aspect(
+    provider = intellij_provider.JavaToolchainInfo,
+    implementation = _implementation,
+    field = "java_toolchain_info",
+)
+
+module = intellij_module.define(
+    file = "java_toolchain_info",
+    aspect = _aspect,
+    toolchains = [JAVA_TOOLCHAIN_TYPE],
     fragments = ["java"],
-    provides = [intellij_provider.JavaToolchainInfo],
-    toolchains_aspects = [str(JAVA_TOOLCHAIN_TYPE)],
+    rulesets = ["@rules_java"],
 )

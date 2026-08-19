@@ -3,14 +3,8 @@ load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files")
 load("@rules_pkg//pkg:pkg.bzl", "pkg_tar", "pkg_zip")
-load("//private/rules:local_registry.bzl", "local_registry")
-
 load("//modules:module.bzl", "intellij_module")
-
-intellij_module.container(
-    name = "module_container",
-    visibility = ["//visibility:public"],
-)
+load("//private/rules:local_registry.bzl", "local_registry")
 
 BCR_NAME = "intellij_aspect"
 
@@ -92,5 +86,11 @@ jar_jar(
     inline_rules = ["rule com.google.protobuf.** com.intellij.aspect.internal.protoinfra.@1"],
     input_jar = "//:sdk_plain_deploy.jar",
     output_jar = "sdk_deploy.jar",
+    visibility = ["//visibility:public"],
+)
+
+# the container required to configure the aspect locally
+intellij_module.container(
+    name = "module_container",
     visibility = ["//visibility:public"],
 )

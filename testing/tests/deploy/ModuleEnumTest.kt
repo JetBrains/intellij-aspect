@@ -16,11 +16,13 @@
 package com.intellij.aspect.testing.tests.deploy
 
 import com.google.common.truth.Truth.assertWithMessage
+import com.google.devtools.build.runfiles.Runfiles
 import com.intellij.aspect.lib.Modules
 import com.intellij.aspect.lib.Rules
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import java.util.zip.ZipFile
 
 @RunWith(JUnit4::class)
 class ModuleEnumTest {
@@ -33,6 +35,22 @@ class ModuleEnumTest {
       assertWithMessage("module %s declares unsupported rulesets: %s", module.name, module.rulesets)
         .that(supportedRulesets)
         .containsAtLeastElementsIn(module.rulesets)
+    }
+  }
+
+  @Test
+  fun testModuleFilesExist() {
+    val archive = requireNotNull(System.getenv("ARCHIVE_IDE"))
+    val archivePath = Runfiles.preload().unmapped().rlocation(archive)
+
+    val entries = ZipFile(archivePath).use { zip ->
+      zip.entries().asSequence().map { it.name }.toSet()
+    }
+
+    Modules.entries.forEach { module ->
+      assertWithMessage("module %s declares missing file: %s", module.name, module.file)
+        .that(entries)
+        .contains("modules/${module.file}.bzl")
     }
   }
 }

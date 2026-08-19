@@ -28,7 +28,7 @@ COMPILE_TIME_DEPS = ["deps"]
 # Rule kinds to include in outputs, even though no special information is available
 EXTRA_RULES = ["sh_binary", "sh_library", "genrule", "intellij_plugin_debug_target", "_plugin_deploy_zip", "intellij_plugin_zip"]
 
-def _merge_dependencies(builder, ctx, results):
+def _merge_dependencies(builder, ctx):
     """Adds information from all dependencies' intellij info providers."""
     for name in dir(ctx.rule.attr):
         for dep in intellij_common.attr_as_label_list(ctx, name):
@@ -67,15 +67,16 @@ def _run_modules(target, ctx):
             continue
 
         module = container[provider]
-        result = module.func(target, ctx)
+        result = module.func(target, ctx, results)
 
         if result:
-            results[module] = result
+            results[provider] = result
 
     return results
 
 def _merge_target_info(builder, target, ctx, results):
     """Adds information collected from the current target's module providers."""
+    container = ctx.attr._container
 
     if AnalysisTestResultInfo in target:
         # We are not allowed to create an action (including a file-write action) for a target
@@ -83,9 +84,9 @@ def _merge_target_info(builder, target, ctx, results):
         return
 
     info = {
-        module.field: result.value
-        for (module, result) in results.items()
-        if module.field
+        container[provider].field: result.value
+        for (provider, result) in results.items()
+        if container[provider].field
     }
 
     # do not generate a intellij-info.txt if there is no language module attached
@@ -135,7 +136,7 @@ def _implemenation(target, ctx):
     results = _run_modules(target, ctx)
 
     _merge_target_info(builder, target, ctx, results)
-    _merge_dependencies(builder, ctx, results)
+    _merge_dependencies(builder, ctx)
 
     intellij_info = intellij_info_builder.build(builder, target, ctx)
 
@@ -159,7 +160,7 @@ def intellij_configure_aspect(modules, container):
         fragments = _unique_flatten(modules, "fragments"),
         provides = [intellij_provider.IntelliJInfo],
         attr_aspects = ["*"],
-        toolchains_aspects = [str(it) for it in toolchains or []],
+        toolchains_aspects = [str(it) for it in toolchains],
         required_aspect_providers = [[it] for it in aspect_providers],
         attrs = {
             "_container": attr.label(
@@ -167,7 +168,7 @@ def intellij_configure_aspect(modules, container):
                 aspects = [it.aspect for it in modules],
             ),
             "_toolchains": attr.label_list(
-                default = toolchains or [],
+                default = toolchains,
             ),
         },
     )
