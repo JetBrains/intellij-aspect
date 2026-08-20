@@ -92,6 +92,8 @@ class AspectFixture : ExternalResource() {
 
     return true
   }
+
+  fun isBCRDeployment() : Boolean  = output.config.aspectDeployment ==  FixtureProto.AspectDeployment.BCR
 }
 
 @Throws(IOException::class)
