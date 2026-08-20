@@ -67,6 +67,9 @@ class AssociatesTest {
     assertThat(targetC.srcsList.size).isEqualTo(1)
     assertThat(targetC.srcsList[0].isSource).isTrue()
     assertThat(targetC.srcsList[0].relativePath).isEqualTo("C.kt")
-    assertThatDeps(targetC.depsList).isEmpty()
+
+    assertThatDeps(targetC.depsList).withType(DependencyType.COMPILE_TIME).isEmpty()
+    assertThatDeps(targetC.depsList).withType(DependencyType.EXPORTED_COMPILE_TIME).isEmpty()
+    assertThatDeps(targetC.depsList).withType(DependencyType.RUNTIME).isEmpty()
   }
 }
