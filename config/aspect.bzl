@@ -10,6 +10,7 @@ load("//modules:kotlin_info.bzl", kotlin_info = "module")
 load("//modules:py_info.bzl", py_info = "module")
 load("//modules:python_info.bzl", python_info = "module")
 load("//modules:run_info.bzl", run_info = "module")
+load("//modules:scala_info.bzl", scala_info = "module")
 load("//modules:test_info.bzl", test_info = "module")
 
 MODULES = [
@@ -22,6 +23,7 @@ MODULES = [
     java_common_info,
     jvm_info,
     kotlin_info,
+    scala_info,
     go_info,
     py_info,
     python_info,
