@@ -47,9 +47,11 @@ class SimpleTest {
     assertThat(target.jvmTargetInfo.mainClass).isEqualTo("org.example.MainKt")
 
     // Common information
-    assertThat(target.javaCommon.jarsList.flatMap { it.binaryJarsList }.size).isEqualTo(1)
-    assertThat(target.javaCommon.jarsList.flatMap { it.sourceJarsList }.size).isEqualTo(1)
-    assertThat(target.javaCommon.jarsList.flatMap { it.interfaceJarsList }.size).isEqualTo(1)
+    if (!aspect.isBCRDeployment()) {
+      assertThat(target.javaCommon.jarsList.flatMap { it.binaryJarsList }.size).isEqualTo(1)
+      assertThat(target.javaCommon.jarsList.flatMap { it.sourceJarsList }.size).isEqualTo(1)
+      assertThat(target.javaCommon.jarsList.flatMap { it.interfaceJarsList }.size).isEqualTo(1)
+    }
 
     // Kotlin-specific information is present
     assertThat(target.kotlinTargetInfo.stdlibsList).isNotEmpty()
@@ -69,20 +71,27 @@ class SimpleTest {
     assertThat(target.srcsList[0].relativePath).isEqualTo("lib/Util.kt")
 
     // Common information
-    assertThat(target.javaCommon.jarsList.flatMap { it.binaryJarsList }.size).isEqualTo(1)
-    assertThat(target.javaCommon.jarsList.flatMap { it.binaryJarsList }[0].relativePath).isEqualTo("lib/util.jar")
-    assertThat(target.javaCommon.jarsList.flatMap { it.sourceJarsList }.size).isEqualTo(1)
-    assertThat(
-      target.javaCommon.jarsList.flatMap {
-        it.sourceJarsList
-      }[0].relativePath,
-    ).isEqualTo("lib/util-sources.jar")
-    assertThat(target.javaCommon.jarsList.flatMap { it.interfaceJarsList }.size).isEqualTo(1)
-    assertThat(
-      target.javaCommon.jarsList.flatMap {
-        it.interfaceJarsList
-      }[0].relativePath,
-    ).isEqualTo("lib/util.abi.jar")
+    if (aspect.isBCRDeployment()) {
+      // In BCR deployment, we always run all modules; so additional information can come from the JavaInfo provider
+      assertThat(target.javaCommon.jarsList.flatMap { it.binaryJarsList }.map { it.relativePath }.toSet()).containsExactly("lib/util.jar")
+      assertThat(target.javaCommon.jarsList.flatMap { it.sourceJarsList }.map { it.relativePath }.toSet()).containsExactly("lib/util-sources.jar")
+      assertThat(target.javaCommon.jarsList.flatMap { it.interfaceJarsList }.map { it.relativePath }.toSet()).containsExactly("lib/util.abi.jar")
+    } else {
+      assertThat(target.javaCommon.jarsList.flatMap { it.binaryJarsList }.size).isEqualTo(1)
+      assertThat(target.javaCommon.jarsList.flatMap { it.binaryJarsList }[0].relativePath).isEqualTo("lib/util.jar")
+      assertThat(target.javaCommon.jarsList.flatMap { it.sourceJarsList }.size).isEqualTo(1)
+      assertThat(
+        target.javaCommon.jarsList.flatMap {
+          it.sourceJarsList
+        }[0].relativePath,
+      ).isEqualTo("lib/util-sources.jar")
+      assertThat(target.javaCommon.jarsList.flatMap { it.interfaceJarsList }.size).isEqualTo(1)
+      assertThat(
+        target.javaCommon.jarsList.flatMap {
+          it.interfaceJarsList
+        }[0].relativePath,
+      ).isEqualTo("lib/util.abi.jar")
+    }
 
     // Kotlin-specific information is present
     assertThat(target.kotlinTargetInfo.stdlibsList).isNotEmpty()
