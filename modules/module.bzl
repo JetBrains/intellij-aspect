@@ -77,11 +77,11 @@ def _lookup_self(attr, provider):
     return results[provider]
 
 def _lookup_target(target, provider):
-    """Looks up the result of a module for a specific target."""
+    """Looks up the internal result of a module for a specific target."""
     if intellij_provider.IntelliJInfo not in target:
         return None
 
-    results = target[intellij_provider.IntelliJInfo].results
+    results = target[intellij_provider.IntelliJInfo].internal_results
 
     if provider not in results:
         return None

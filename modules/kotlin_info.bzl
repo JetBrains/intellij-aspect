@@ -149,9 +149,9 @@ def _get_associates(target, ctx):
     for dep in direct_dep_targets:
         if str(dep.label) in associates_labels:
             for provider in intellij_provider.JVM:
-                provider_value = intellij_module.lookup_target(dep, provider)
-                if provider_value:
-                    exports = getattr(provider_value.internal_value, "exports", [])
+                internal_result = intellij_module.lookup_target(dep, provider)
+                if internal_result:
+                    exports = getattr(internal_result, "exports", [])
                     associates_keys += intellij_common.target_keys_from(exports)
     return associates_keys
 

@@ -4,7 +4,7 @@ _IntelliJInfo = provider(
         "key": "TargetKey - The key to uniquly identify this target taking the configuration and all aspect ids into considadrtion.",
         "outputs": "dict[str, depset[File]|None] - Output groups emitted by this target (e.g., intellij-info).",
         "dependencies": "dict[int, depset[Target]|None] - Direct dependencies grouped by dependency type (see intellij_deps constants).",
-        "results": "dict[Provider, struct] - Results of modules executed on this target.",
+        "internal_results": "dict[Provider, struct] - Internal results of modules executed on this target (for performance reasons not all results can be retained).",
     },
 )
 
