@@ -40,8 +40,13 @@ class AssociatesTest {
     assertThat(target.kind).isEqualTo("kt_jvm_library")
 
     // Associates reported correctly
-    assertThat(target.kotlinTargetInfo.associatedTargetsList)
-      .containsExactly(aspect.findTarget("//:B").key, aspect.findTarget("//:C").key)
+    if (aspect.isBCRDeployment()) {
+      assertThat(target.kotlinTargetInfo.associatedTargetsList.toSet())
+        .containsExactly(aspect.findTarget("//:B").key, aspect.findTarget("//:C").key)
+    } else {
+      assertThat(target.kotlinTargetInfo.associatedTargetsList)
+        .containsExactly(aspect.findTarget("//:B").key, aspect.findTarget("//:C").key)
+    }
 
     // Dependencies reported correctly.
     assertThatDeps(target.depsList).withType(DependencyType.COMPILE_TIME).labels().containsExactly("//:B")
