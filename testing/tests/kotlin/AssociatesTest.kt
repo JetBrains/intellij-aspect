@@ -68,7 +68,8 @@ class AssociatesTest {
     assertThat(targetC.srcsList[0].isSource).isTrue()
     assertThat(targetC.srcsList[0].relativePath).isEqualTo("C.kt")
 
-    // contains the java toolchain
-    assertThatDeps(targetC.depsList).isEqualTo(1)
+    assertThatDeps(targetC.depsList).withType(DependencyType.COMPILE_TIME).isEmpty()
+    assertThatDeps(targetC.depsList).withType(DependencyType.EXPORTED_COMPILE_TIME).isEmpty()
+    assertThatDeps(targetC.depsList).withType(DependencyType.RUNTIME).isEmpty()
   }
 }
