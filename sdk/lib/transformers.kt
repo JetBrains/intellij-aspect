@@ -95,7 +95,7 @@ object TransformPythonToolchainType : TransformFieldLoad(
 
 object TransformJavaSemantics : TransformFieldLoad(
   fieldName = "JAVA_SEMANTICS",
-  replacement = "struct(JAVA_RUNTIME_TOOLCHAIN_TYPE = ${label("@bazel_tools//tools/java:toolchain_type")})"
+  replacement = "struct(JAVA_TOOLCHAIN_TYPE = ${label("@bazel_tools//tools/jdk:toolchain_type")})",
 )
 
 class TransformScalaToolchainType(scalaRepositoryName: String) : TransformFieldLoad(

@@ -13,17 +13,30 @@
 # limitations under the License.
 
 load("//common:common.bzl", "intellij_common")
-load(":provider.bzl", "intellij_provider")
+load("//common:provider.bzl", "intellij_provider")
+load(":module.bzl", "intellij_module")
 
-def _aspect_impl(target, ctx):
-    for it in intellij_provider.PROTO_MODULES:
-        contributor = intellij_provider.get(target, it)
+_PROTO_MODULES = [
+    intellij_provider.LegacyRulesProtoInfo,
+    intellij_provider.ProtobufInfo,
+]
+
+def _implementation(target, ctx, attr):
+    for it in _PROTO_MODULES:
+        contributor = intellij_module.lookup_self(attr, it)
         if contributor:
-            return [intellij_provider.create(ctx = ctx, provider = intellij_provider.ProtoInfo, value = contributor.value)]
-    return [intellij_provider.ProtoInfo(present = False)]
+            return intellij_module.result(contributor.value)
 
-intellij_proto_info_aspect = intellij_common.aspect(
-    implementation = _aspect_impl,
-    provides = [intellij_provider.ProtoInfo],
-    required_aspect_providers = [[it] for it in intellij_provider.PROTO_MODULES],
+    return None
+
+_aspect = intellij_module.aspect(
+    provider = intellij_provider.ProtoInfo,
+    implementation = _implementation,
+    field = "protobuf_target_info",
+)
+
+module = intellij_module.define(
+    file = "proto_info",
+    aspect = _aspect,
+    rulesets = ["@protobuf", "@rules_proto"],
 )

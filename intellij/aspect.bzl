@@ -144,12 +144,13 @@ def _implemenation(target, ctx):
     return [intellij_info, OutputGroupInfo(**intellij_info.outputs)]
 
 def _unique_flatten(modules, field):
-    """Creats a list of all unique values based on the string represnetation of that field for all modules."""
-    return {
-        str(value): value
-        for module in modules
-        for value in getattr(module, field)
-    }.values()
+    unique = []
+    for module in modules:
+        for value in getattr(module, field):
+            if value not in unique:
+                unique.append(value)
+
+    return unique
 
 def intellij_configure_aspect(modules, container):
     """Creates an aspect running the given module groups."""

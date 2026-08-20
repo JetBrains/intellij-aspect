@@ -16,8 +16,9 @@ load("@protobuf//bazel/common:proto_common.bzl", "proto_common")
 load("@protobuf//bazel/common:proto_info.bzl", "ProtoInfo")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
+load("//common:provider.bzl", "intellij_provider")
 load("//common:third_party/proto_common.bzl", "fallback_get_import_path")
-load(":provider.bzl", "intellij_provider")
+load(":module.bzl", "intellij_module")
 
 def _get_import_path(proto_file):
     if hasattr(proto_common, "get_import_path"):
@@ -34,20 +35,23 @@ def _source_mappings(target):
         mappings.append(proto)
     return mappings
 
-def _aspect_impl(target, ctx):
+def _implementation(target, ctx, attr):
     if not ProtoInfo in target:
-        return [intellij_provider.ProtobufInfo(present = False)]
-    return [
-        intellij_provider.create(
-            ctx = ctx,
-            provider = intellij_provider.ProtobufInfo,
-            value = intellij_common.struct(
-                source_mappings = _source_mappings(target),
-            ),
-        ),
-    ]
+        return None
 
-intellij_protobuf_info_aspect = intellij_common.aspect(
-    implementation = _aspect_impl,
-    provides = [intellij_provider.ProtobufInfo],
+    return intellij_module.result(
+        intellij_common.struct(
+            source_mappings = _source_mappings(target),
+        ),
+    )
+
+_aspect = intellij_module.aspect(
+    provider = intellij_provider.ProtobufInfo,
+    implementation = _implementation,
+)
+
+module = intellij_module.define(
+    file = "protobuf_info",
+    aspect = _aspect,
+    rulesets = ["@protobuf"],
 )

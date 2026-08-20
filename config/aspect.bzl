@@ -7,6 +7,8 @@ load("//modules:java_info.bzl", java_info = "module")
 load("//modules:java_toolchain_info.bzl", java_toolchain_info = "module")
 load("//modules:jvm_info.bzl", jvm_info = "module")
 load("//modules:kotlin_info.bzl", kotlin_info = "module")
+load("//modules:proto_info.bzl", proto_info = "module")
+load("//modules:protobuf_info.bzl", protobuf_info = "module")
 load("//modules:py_info.bzl", py_info = "module")
 load("//modules:python_info.bzl", python_info = "module")
 load("//modules:run_info.bzl", run_info = "module")
@@ -27,6 +29,8 @@ MODULES = [
     go_info,
     py_info,
     python_info,
+    protobuf_info,
+    proto_info,
 ]
 
 intellij_aspect = intellij_configure_aspect(
