@@ -19,7 +19,9 @@ load("@rules_python//python:defs.bzl", "PyInfo")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//common:make_variables.bzl", "expand_make_variables")
-load(":provider.bzl", "intellij_provider")
+load("//common:output_groups.bzl", "intellij_output_groups")
+load("//common:provider.bzl", "intellij_provider")
+load(":module.bzl", "intellij_module")
 
 # PythonVersion enum; must match PyIdeInfo.PythonVersion
 PY2 = 1
@@ -51,20 +53,18 @@ def _get_py_launcher(ctx):
     else:
         return None
 
-def _aspect_impl(target, ctx):
+def _implementation(target, ctx, attr):
     if PyInfo not in target:
-        return [intellij_provider.PyInfo(present = False)]
+        return None
 
     to_build = target[PyInfo].transitive_sources
 
     # TODO: port python get_code_generator_rule_names
 
-    return [intellij_provider.create(
-        ctx = ctx,
-        provider = intellij_provider.PyInfo,
+    return intellij_module.result(
         outputs = {
-            intellij_provider.BUILD_OUTPUT: to_build,
-            intellij_provider.SYNC_OUTPUT: to_build,
+            intellij_output_groups.BUILD: to_build,
+            intellij_output_groups.SYNC: to_build,
         },
         value = intellij_common.struct(
             launcher = _get_py_launcher(ctx),
@@ -73,10 +73,18 @@ def _aspect_impl(target, ctx):
             args = expand_make_variables(ctx, False, intellij_common.attr_as_list(ctx, "args")),
             imports = intellij_common.attr_as_list(ctx, "imports"),
         ),
-    )]
+    )
 
-intellij_py_info_aspect = intellij_common.aspect(
-    implementation = _aspect_impl,
+_aspect = intellij_module.aspect(
+    provider = intellij_provider.PyInfo,
+    implementation = _implementation,
+    field = "py_ide_info",
+)
+
+module = intellij_module.define(
+    file = "py_info",
+    aspect = _aspect,
+    aspect_providers = [PyInfo],
     fragments = ["py"],
-    provides = [intellij_provider.PyInfo],
+    rulesets = ["@rules_python"],
 )
