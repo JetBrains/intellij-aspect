@@ -16,13 +16,15 @@ load("@rules_cc//cc:defs.bzl", "CcToolchainConfigInfo", "cc_common")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_TYPE")
 load("//common:common.bzl", "intellij_common")
 load("//common:ide_info.bzl", "ide_info")
-load(":provider.bzl", "intellij_provider")
+load("//common:output_groups.bzl", "intellij_output_groups")
+load("//common:provider.bzl", "intellij_provider")
+load(":module.bzl", "intellij_module")
 
-def _find_provider(ctx):
+def _find_result(ctx):
     """
-    Tries to find the previously populated XCodeToolchainInfo provider either
-    in the rule's attributes. There is no need to check toolchains since there
-    is no need to propagate along these edges.
+    Tries to find the previously populated created result in the rule's
+    attributes. There is no need to check toolchains since there is no need to
+    propagate along these edges.
     """
 
     # check if there is any single target attribute that has the XcodeToolchainInfo
@@ -33,11 +35,11 @@ def _find_provider(ctx):
         if not target:
             continue
 
-        provider = intellij_provider.get(target, intellij_provider.XcodeToolchainInfo)
-        if not provider:
+        result = intellij_module.lookup_target(target, intellij_provider.XcodeInfo)
+        if not result:
             continue
 
-        return provider
+        return result
 
     return None
 
@@ -49,8 +51,8 @@ def _has_xcode_properties(target):
     """Returns True if target has XcodeProperties provider (Bazel 8)."""
     return apple_common.XcodeProperties != None and apple_common.XcodeProperties in target
 
-def _create_provider(target, ctx):
-    """Populates the provider with data from the Xcode configuration.
+def _create_result(target, ctx):
+    """Creates the result with data from the Xcode configuration.
 
     Supports both XcodeVersionConfig (Bazel 9+) and XcodeProperties (Bazel 8).
     Prefers XcodeVersionConfig when both are available.
@@ -59,52 +61,54 @@ def _create_provider(target, ctx):
     # prefer XcodeVersionConfig (Bazel 9+) over XcodeProperties (Bazel 8)
     if _has_xcode_version_config(target):
         provider = target[apple_common.XcodeVersionConfig]
-        info = intellij_common.struct(
+        return intellij_common.struct(
             xcode_version = str(provider.xcode_version()),
             macos_sdk_version = str(provider.sdk_version_for_platform(apple_common.platform.macos)),
         )
-    elif _has_xcode_properties(target):
+
+    if _has_xcode_properties(target):
         provider = target[apple_common.XcodeProperties]
-        info = intellij_common.struct(
+        return intellij_common.struct(
             xcode_version = provider.xcode_version,
             macos_sdk_version = provider.default_macos_sdk_version,
         )
-    else:
-        return None
 
-    return intellij_provider.create_toolchain(
-        provider = intellij_provider.XcodeToolchainInfo,
-        info_file = ide_info.write_toolchain(target, ctx, "xcode_ide_info", info),
-        owner = target,
-    )
+    return None
 
-def _aspect_impl(target, ctx):
+def _implementation(target, ctx, attr):
     """Collects Xcode configuration data and propagates it through the toolchain.
 
     This aspect collects data from either XcodeVersionConfig (Bazel 9+) or
     XcodeProperties (Bazel 8) providers and propagates the data up to the
-    top-most toolchain target for access from the cc_info aspect.
+    top-most toolchain target.
 
     Assumes that the target defining the Xcode configuration is a direct
     dependency of the toolchain configuration.
     """
 
     # try to create the provider if any of the xcode providers is present
-    provider = _create_provider(target, ctx)
-    if provider:
-        return [provider]
+    result = _create_result(target, ctx)
+    if result:
+        return intellij_module.result(result, internal_value = result)
 
     # propaget the the created provider if this is a toolchain target
     if cc_common.CcToolchainInfo in target or CcToolchainConfigInfo in target:
-        provider = _find_provider(ctx)
-        if provider:
-            return [provider]
+        result = _find_result(ctx)
+        if result:
+            return intellij_module.result(result, internal_value = result)
 
     # otherwise default to the empty provider
-    return [intellij_provider.XcodeToolchainInfo(present = False)]
+    return None
 
-intellij_xcode_info_aspect = intellij_common.aspect(
-    implementation = _aspect_impl,
-    provides = [intellij_provider.XcodeToolchainInfo],
-    toolchains_aspects = [str(CC_TOOLCHAIN_TYPE)],
+_aspect = intellij_module.aspect(
+    provider = intellij_provider.XcodeInfo,
+    implementation = _implementation,
+    field = "xcode_ide_info",
+)
+
+module = intellij_module.define(
+    file = "xcode_info",
+    aspect = _aspect,
+    toolchains = [CC_TOOLCHAIN_TYPE],
+    rulesets = ["@rules_cc"],
 )

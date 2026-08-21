@@ -21,6 +21,7 @@ _IntelliJRunInfo = _create_module_provider()
 _IntelliJTestInfo = _create_module_provider()
 _IntelliJCcInfo = _create_module_provider()
 _IntelliJCcToolchainInfo = _create_module_provider()
+_IntelliJXcodeInfo = _create_module_provider()
 _IntelliJJavaInfo = _create_module_provider()
 _IntelliJJavaToolchainInfo = _create_module_provider()
 _IntelliJJavaCommonInfo = _create_module_provider()
@@ -38,6 +39,7 @@ _IntelliJProtoInfo = _create_module_provider()  # used to consolidated protobuf 
 _ORDERED = [
     _IntelliJRunInfo,
     _IntelliJTestInfo,
+    _IntelliJXcodeInfo,
     _IntelliJCcToolchainInfo,
     _IntelliJCcInfo,
     _IntelliJJavaToolchainInfo,
@@ -69,6 +71,7 @@ intellij_provider = struct(
     TestInfo = _IntelliJTestInfo,
     CcInfo = _IntelliJCcInfo,
     CcToolchainInfo = _IntelliJCcToolchainInfo,
+    XcodeInfo = _IntelliJXcodeInfo,
     JavaInfo = _IntelliJJavaInfo,
     JavaToolchainInfo = _IntelliJJavaToolchainInfo,
     JavaCommonInfo = _IntelliJJavaCommonInfo,
