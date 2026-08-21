@@ -34,7 +34,7 @@ test_runner(
 
 intellij_aspect_test(
     name = "aspect_test",
-    java = [
+    deps = [
         "@maven//:com_google_guava_guava",
         "@maven//:com_google_truth_truth",
     ],
