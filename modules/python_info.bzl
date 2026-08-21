@@ -17,7 +17,8 @@ load("@rules_python//python/private:toolchain_types.bzl", PYTHON_TOOLCHAIN_TYPE 
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//common:output_groups.bzl", "intellij_output_groups")
-load(":provider.bzl", "intellij_provider")
+load("//common:provider.bzl", "intellij_provider")
+load(":module.bzl", "intellij_module")
 
 TOOLCHAIN_TYPE = str(PYTHON_TOOLCHAIN_TYPE)
 
@@ -43,9 +44,9 @@ def _source_files(ctx):
         if not f.is_directory
     ]
 
-def _aspect_impl(target, ctx):
+def _implementation(target, ctx, attr):
     if PyInfo not in target:
-        return [intellij_provider.PythonInfo(present = False)]
+        return None
 
     runtime = _get_runtime(ctx)
 
@@ -99,9 +100,7 @@ def _aspect_impl(target, ctx):
         if runfiles and runfiles.files:
             generated_sources.extend([f for f in runfiles.files.to_list()])
 
-    return [intellij_provider.create(
-        ctx = ctx,
-        provider = intellij_provider.PythonInfo,
+    return intellij_module.result(
         value = intellij_common.struct(
             version = getattr(runtime, "python_version", None),
             main = artifact_location.from_file(getattr(ctx.rule.file, "main", None)),
@@ -115,13 +114,18 @@ def _aspect_impl(target, ctx):
             intellij_output_groups.SYNC: intellij_common.depset(generated_sources),
             intellij_output_groups.BUILD: intellij_common.depset(generated_sources),
         },
-    )]
+    )
 
-intellij_python_info_aspect = intellij_common.aspect(
-    implementation = _aspect_impl,
+_aspect = intellij_module.aspect(
+    provider = intellij_provider.PythonInfo,
+    implementation = _implementation,
+    field = "python_target_info",
+)
+
+module = intellij_module.define(
+    file = "python_info",
+    aspect = _aspect,
     fragments = ["py"],
-    provides = [intellij_provider.PythonInfo],
-    toolchains = [
-        config_common.toolchain_type(TOOLCHAIN_TYPE, mandatory = False),
-    ],
+    direct_toolchain_deps_do_not_use = [TOOLCHAIN_TYPE],
+    rulesets = ["PYTHON"],
 )
