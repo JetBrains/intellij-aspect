@@ -12,18 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load(":provider.bzl", "intellij_provider")
 load(":version.bzl", "bazel_version")
 
+# fallback configurations if short id is not available
 _FALLBACK_CONFIG = "00000f1"
 _FALLBACK_EXEC_CONFIG = "00000f2"
-
-_IntelliJTargetInfo = provider(
-    doc = "Internal target identity used by IntelliJ aspects.",
-    fields = {
-        "owner": "Target - Underlying Bazel target that owns this info.",
-        "partial_key": "struct - Label/configuration identity without the full set of aspect ids. Used to reference dependencies; not the complete target key (see the main aspect for that).",
-    },
-)
 
 def _struct(**kwargs):
     """A replacement for standard `struct` function that omits the fields with None value."""
@@ -104,6 +98,16 @@ def _attr_as_label_list(ctx, name, strict = False):
     """Returns the attr as a list of targets. Filters out everything except targets."""
     return [it for it in _attr_as_list(ctx, name, strict) if type(it) == "Target"]
 
+def _attr_as_info_list(ctx, name, strict = False):
+    """Returns the attr as a list of IntelliJInfo. Filters out everything except targets."""
+
+    # note: it is not safe to assume that every target carries the IntelliJInfo provider since it might be a plain file
+    return [
+        it[intellij_provider.IntelliJInfo]
+        for it in _attr_as_list(ctx, name, strict)
+        if type(it) == "Target" and intellij_provider.IntelliJInfo in it
+    ]
+
 def _attr_as_string_list(ctx, name, strict = False):
     """Returns the attr as a list of strings. Filters out everything except strings."""
     return [it for it in _attr_as_list(ctx, name, strict) if type(it) == "string"]
@@ -149,49 +153,26 @@ def _target_key(target, ctx, aspect_ids):
         configuration = _target_config(ctx),
     )
 
-def _intellij_info_aspect_impl(target, ctx):
-    """Implementation for the target info aspect. Creates the partial key for the target."""
-    return [intellij_common.TargetInfo(
-        owner = target,
-        partial_key = _target_key(target, ctx, ctx.aspect_ids),
-    )]
-
-# This is the first aspect run and any other aspect depends on it. Provides a key
-# to uniquely reference targets between aspects.
-_intellij_target_info_aspect = aspect(
-    implementation = _intellij_info_aspect_impl,
-    attr_aspects = ["*"],
-    provides = [_IntelliJTargetInfo],
-)
-
 def _aspect(**kwargs):
     """A replacement for the standard `aspect` function that modifies some of the arguments."""
-    requires = kwargs.pop("requires", [])
-    requires.append(_intellij_target_info_aspect)
-
     if bazel_version.le(8):
         kwargs.pop("toolchains_aspects", None)
 
-    return aspect(
-        attr_aspects = ["*"],
-        requires = requires,
-        **kwargs
-    )
+    return aspect(**kwargs)
 
 def _is_exec_configuration(ctx):
     """Simple heuristic to detect if a context is building for the exec configuration."""
     return "-exec" in ctx.genfiles_dir.path
 
 def _target_keys_from(targets):
-    """Extracts keys from given list of targets. Omits the targets without TargetInfo provider."""
+    """Extracts keys from given list of targets."""
     return [
-        target[intellij_common.TargetInfo].partial_key
+        target[intellij_provider.IntelliJInfo].key
         for target in targets
-        if intellij_common.TargetInfo in target
+        if intellij_provider.IntelliJInfo in target
     ]
 
 intellij_common = struct(
-    TargetInfo = _IntelliJTargetInfo,
     struct = _struct,
     struct_update = _struct_update,
     depset = _depset_or_none,
@@ -202,6 +183,7 @@ intellij_common = struct(
     attr_as_target = _attr_as_target,
     attr_as_list = _attr_as_list,
     attr_as_label_list = _attr_as_label_list,
+    attr_as_info_list = _attr_as_info_list,
     attr_as_string_list = _attr_as_string_list,
     attr_as_dict = _attr_as_dict,
     attr_as_string_dict = _attr_as_string_dict,

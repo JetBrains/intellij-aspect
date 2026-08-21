@@ -16,7 +16,8 @@ load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//common:dependencies.bzl", "intellij_deps")
 load("//common:output_groups.bzl", "intellij_output_groups")
-load(":provider.bzl", "intellij_provider")
+load("//common:provider.bzl", "intellij_provider")
+load(":module.bzl", "intellij_module")
 
 SCALA_TOOLCHAIN_TYPE = "@rules_scala//scala:toolchain_type"
 
@@ -128,9 +129,9 @@ def _get_outputs(target, ctx, java_outputs, extra_sync):
             intellij_output_groups.BUILD: intellij_common.depset(resolve_files, transitive = resolve_transitives),
         }
 
-def _aspect_impl(target, ctx):
+def _implementation(target, ctx, attr):
     if not ctx.rule.kind.startswith("scala_") and not ctx.rule.kind.startswith("thrift_"):
-        return [intellij_provider.ScalaInfo(present = False)]
+        return None
 
     compiler_classpath_info = None
     extra_sync = []
@@ -153,15 +154,10 @@ def _aspect_impl(target, ctx):
         elif hasattr(target.scala, "outputs") and provider.outputs:
             java_outputs = provider.outputs.jars
 
-    return [intellij_provider.create(
-        ctx = ctx,
-        provider = intellij_provider.ScalaInfo,
+    return intellij_module.result(
         outputs = _get_outputs(target, ctx, java_outputs, extra_sync),
         dependencies = {
-            intellij_deps.TOOLCHAIN: intellij_deps.collect(
-                ctx,
-                attributes = TOOLCHAIN_DEPS,
-            ),
+            intellij_deps.TOOLCHAIN: intellij_deps.collect(ctx, TOOLCHAIN_DEPS),
         },
         value = intellij_common.struct(
             scalac_opts = common_scalac_opts + getattr(ctx.rule.attr, "scalacopts", []),
@@ -174,12 +170,17 @@ def _aspect_impl(target, ctx):
                 generated_jars = _get_generated_jars(java_outputs),
             ),
         ),
-    )]
+    )
 
-intellij_scala_info_aspect = intellij_common.aspect(
-    implementation = _aspect_impl,
-    provides = [intellij_provider.ScalaInfo],
-    toolchains = [
-        config_common.toolchain_type(SCALA_TOOLCHAIN_TYPE, mandatory = False),
-    ],
+_aspect = intellij_module.aspect(
+    provider = intellij_provider.ScalaInfo,
+    implementation = _implementation,
+    field = "scala_target_info",
+)
+
+module = intellij_module.define(
+    file = "scala_info",
+    aspect = _aspect,
+    direct_toolchain_deps_do_not_use = [SCALA_TOOLCHAIN_TYPE],
+    rulesets = ["SCALA"],
 )

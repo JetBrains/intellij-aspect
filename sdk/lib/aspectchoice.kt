@@ -33,66 +33,19 @@ enum class OutputGroups(val groupName: String) {
   BUILD("intellij-build"),
 }
 
-/**
- * Aspects in correct (topological) order together with the languages for which they should be present.
- */
-enum class Aspects(val pkg: String, val file: String, val aspect: String, private val rules: Set<Rules>) {
-  RULES_PROTO(
-    "modules", "rules_proto_info.bzl", "intellij_rules_proto_info_aspect",
-    setOf(Rules.LEGACY_RULES_PROTO),
-  ),
-  PROTOBUF(
-    "modules", "protobuf_info.bzl", "intellij_protobuf_info_aspect",
-    setOf(Rules.PROTO),
-  ),
-  PROTO(
-    "modules", "proto_info.bzl", "intellij_proto_info_aspect",
-    setOf(Rules.PROTO, Rules.LEGACY_RULES_PROTO),
-  ),
-  XCODE(
-    "modules", "xcode_info.bzl", "intellij_xcode_info_aspect",
-    setOf(Rules.CC),
-  ),
-  CC(
-    "modules", "cc_info.bzl", "intellij_cc_info_aspect",
-    setOf(Rules.CC),
-  ),
-  PY(
-    "modules", "py_info.bzl", "intellij_py_info_aspect",
-    setOf(Rules.PYTHON),
-  ),
-  PYTHON(
-    "modules", "python_info.bzl", "intellij_python_info_aspect",
-    setOf(Rules.PYTHON),
-  ),
-  JAVA(
-    "modules", "java_info.bzl", "intellij_java_info_aspect",
-    setOf(Rules.JAVA),
-  ),
-  KOTLIN(
-    "modules", "kotlin_info.bzl", "intellij_kotlin_info_aspect",
-    setOf(Rules.KOTLIN),
-  ),
-  SCALA(
-    "modules", "scala_info.bzl", "intellij_scala_info_aspect",
-    setOf(Rules.SCALA),
-  ),
-  JVM(
-    "modules", "jvm_info.bzl", "intellij_jvm_info_aspect",
-    setOf(Rules.JAVA, Rules.KOTLIN, Rules.SCALA),
-  ),
-  JAVA_COMMON(
-    "modules", "java_common_info.bzl", "intellij_java_common_info_aspect",
-    setOf(Rules.JAVA, Rules.KOTLIN, Rules.SCALA),
-  ),
-  GO(
-    "modules", "go_info.bzl", "intellij_go_info_aspect",
-    setOf(Rules.GO),
-  ),
-  INTELLIJ(
-    "intellij", "aspect.bzl", "intellij_info_aspect",
-    Rules.entries.toSet(),
-  ),
+fun modulesForRules(rules: Iterable<Rules>): List<Modules> {
+  val rulesets = rules.toSet()
+  return Modules.entries.filter { module -> module.rulesets.isEmpty() || module.rulesets.any { it in rulesets } }
+}
+
+// If the repository names of the rules for certain languages are known, provide the appropriate
+// repo-mapping to be used in the aspect configuration.
+fun repoMappingForRules(mapping: Map<Rules, String>): Map<String, String> {
+  return mapping.mapKeys { (language, _) -> language.rulesetName }
+}
+
+enum class Aspects(val pkg: String, val file: String, val aspect: String) {
+  INTELLIJ("config", "aspect.bzl", "intellij_aspect"),
   ;
 
   override fun toString(): String {
@@ -100,19 +53,12 @@ enum class Aspects(val pkg: String, val file: String, val aspect: String, privat
   }
 
   companion object {
-
     /**
      * For the specified rulesets, returns the list of aspects to be run in the correct order.
      */
     @JvmStatic
     fun forRules(languages: Set<Rules>): List<Aspects> {
-      return entries.filter { aspect -> languages.any { it in aspect.rules } || aspect == INTELLIJ }
+      return listOf(INTELLIJ)
     }
   }
-}
-
-// If the repository names of the rules for certain languages are known, provide the appropriate
-// repo-mapping to be used in the aspect configuration.
-fun repoMappingForRules(mapping: Map<Rules, String>): Map<String, String> {
-  return mapping.mapKeys { (language, _) -> language.rulesetName }
 }
