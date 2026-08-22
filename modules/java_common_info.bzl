@@ -55,5 +55,5 @@ _aspect = intellij_module.aspect(
 module = intellij_module.define(
     file = "java_common_info",
     aspect = _aspect,
-    rulesets = ["@rules_java", "@rules_kotlin", "@rules_scala"],
+    rulesets = ["JAVA", "KOTLIN", "SCALA"],
 )

@@ -47,7 +47,7 @@ def _define(
         toolchains = None,
         direct_toolchain_deps_do_not_use = None,
         aspect_providers = None):
-    """Creates a struct that descirbes the requirements for this module."""
+    """Creates a struct that describes the requirements for this module."""
     return struct(
         file = file,
         aspect = aspect,

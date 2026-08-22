@@ -49,5 +49,5 @@ module = intellij_module.define(
     aspect = _aspect,
     toolchains = [JAVA_TOOLCHAIN_TYPE],
     fragments = ["java"],
-    rulesets = ["@rules_java"],
+    rulesets = ["JAVA"],
 )

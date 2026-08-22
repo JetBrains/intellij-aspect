@@ -86,5 +86,5 @@ module = intellij_module.define(
     aspect = _aspect,
     aspect_providers = [PyInfo],
     fragments = ["py"],
-    rulesets = ["@rules_python"],
+    rulesets = ["PYTHON"],
 )

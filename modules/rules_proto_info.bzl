@@ -52,5 +52,5 @@ _aspect = intellij_module.aspect(
 module = intellij_module.define(
     file = "rules_proto_info",
     aspect = _aspect,
-    rulesets = ["@rules_proto"],
+    rulesets = ["LEGACY_RULES_PROTO"],
 )

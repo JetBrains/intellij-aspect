@@ -127,5 +127,5 @@ module = intellij_module.define(
     aspect = _aspect,
     toolchains = [CC_TOOLCHAIN_TYPE],
     fragments = ["cpp"],
-    rulesets = ["@rules_cc"],
+    rulesets = ["CC"],
 )

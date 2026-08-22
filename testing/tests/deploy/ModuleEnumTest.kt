@@ -29,7 +29,7 @@ class ModuleEnumTest {
 
   @Test
   fun testModuleRulesets() {
-    val supportedRulesets = Rules.entries.map { it.rulesetName }.toSet()
+    val supportedRulesets = Rules.entries.map { it.name }.toSet()
 
     Modules.entries.forEach { module ->
       assertWithMessage("module %s declares unsupported rulesets: %s", module.name, module.rulesets)

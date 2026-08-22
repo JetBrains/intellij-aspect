@@ -127,5 +127,5 @@ module = intellij_module.define(
     aspect = _aspect,
     fragments = ["py"],
     direct_toolchain_deps_do_not_use = [TOOLCHAIN_TYPE],
-    rulesets = ["@rules_python"],
+    rulesets = ["PYTHON"],
 )

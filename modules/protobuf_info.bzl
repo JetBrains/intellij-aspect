@@ -53,5 +53,5 @@ _aspect = intellij_module.aspect(
 module = intellij_module.define(
     file = "protobuf_info",
     aspect = _aspect,
-    rulesets = ["@protobuf"],
+    rulesets = ["PROTO"],
 )

@@ -110,5 +110,5 @@ module = intellij_module.define(
     file = "xcode_info",
     aspect = _aspect,
     toolchains = [CC_TOOLCHAIN_TYPE],
-    rulesets = ["@rules_cc"],
+    rulesets = ["CC"],
 )

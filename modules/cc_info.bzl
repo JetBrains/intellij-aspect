@@ -126,5 +126,5 @@ module = intellij_module.define(
     aspect = _aspect,
     toolchains = [CC_TOOLCHAIN_TYPE],
     aspect_providers = [CcInfo],
-    rulesets = ["@rules_cc"],
+    rulesets = ["CC"],
 )

@@ -230,5 +230,5 @@ module = intellij_module.define(
     aspect = _aspect,
     toolchains = [JAVA_TOOLCHAIN_TYPE],
     aspect_providers = [JavaInfo],
-    rulesets = ["@rules_java"],
+    rulesets = ["JAVA"],
 )

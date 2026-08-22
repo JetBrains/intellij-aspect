@@ -120,5 +120,5 @@ module = intellij_module.define(
     toolchains = [GO_TOOLCHAIN_LABEL],
     # TODO: this seems to not be used by go
     direct_toolchain_deps_do_not_use = [GO_TOOLCHAIN_LABEL],
-    rulesets = ["@rules_go"],
+    rulesets = ["GO"],
 )

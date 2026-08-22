@@ -267,5 +267,5 @@ module = intellij_module.define(
     file = "kotlin_info",
     aspect = _aspect,
     direct_toolchain_deps_do_not_use = [TOOLCHAIN_TYPE],
-    rulesets = ["@rules_kotlin"],
+    rulesets = ["KOTLIN"],
 )

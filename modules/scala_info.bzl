@@ -182,6 +182,6 @@ module = intellij_module.define(
     file = "scala_info",
     aspect = _aspect,
     direct_toolchain_deps_do_not_use = [SCALA_TOOLCHAIN_TYPE],
-    rulesets = ["@rules_scala"],
+    rulesets = ["SCALA"],
 )
 
