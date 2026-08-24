@@ -1,0 +1,4 @@
+<plugin>
+  <name>fixture-plugin</name>
+  <classname>com.example.foo.CompilerPlugin</classname>
+</plugin>
