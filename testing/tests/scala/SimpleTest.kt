@@ -44,10 +44,10 @@ class SimpleTest {
       aspect.findTarget("//src/main/com/example/foo:example-lib").scalaTargetInfo.scalacOptsList
 
     assertThat(
-        scalacOptions.any {
-          it.matches(Regex("^-Xplugin:.*src/main/com/example/foo/compiler-plugin_deploy\\.jar$"))
-        }
-      )
+      scalacOptions.any {
+        it.matches(Regex("^-Xplugin:.*src/main/com/example/foo/compiler-plugin_deploy\\.jar$"))
+      },
+    )
       .isTrue()
   }
 
