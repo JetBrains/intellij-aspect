@@ -52,3 +52,21 @@ test_module_dep = rule(
     },
     provides = [TestModuleDep],
 )
+
+BCRFlagProvider = provider(
+    doc = "Extra flags to add on BCR deployment",
+    fields = {"flags": "list[str] - extra flags to add to .bazelrc when using BCR deployment"},
+)
+
+def _bcr_flags_impl(ctx):
+    return [BCRFlagProvider(flags = ctx.attr.flags)]
+
+bcr_flags = rule(
+    implementation = _bcr_flags_impl,
+    attrs = {
+        "flags": attr.string_list(
+            default = [],
+            doc = "Flags to additionally add on BCR deployment",
+        ),
+    },
+)

@@ -15,6 +15,7 @@
 load("@bazel_env//:environment.bzl", _bazel_env = "environment")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load(":config.bzl", "TestMatrix", "config_hash", "config_name", "merge_matrixes", "serialize_test_config")
+load("module_dep.bzl", "BCRFlagProvider")
 
 def _test_fixture_impl(ctx):
     output_protos = []
@@ -47,7 +48,7 @@ def _test_fixture_impl(ctx):
             config = serialize_test_config(config),
             targets = ctx.attr.targets,
             output_groups = ctx.attr.output_groups,
-            extra_flags = ctx.attr.extra_flags,
+            extra_flags = ctx.attr.extra_flags + (ctx.attr._bcr_extra_flags[BCRFlagProvider].flags if config.aspect_deployment == "bcr" else []),
         ))
 
         response_file = ctx.actions.declare_file("%s-%s_work_arguments.textproto" % (ctx.label.name, unique_hash))
@@ -143,6 +144,9 @@ test_fixture = rule(
         ),
         "_worker_dir": attr.label(
             default = Label("//testing/rules:worker_dir"),
+        ),
+        "_bcr_extra_flags": attr.label(
+            default = Label("//testing/fixtures:bcr_extra_flags"),
         ),
     },
     implementation = _test_fixture_impl,

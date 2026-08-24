@@ -1,4 +1,4 @@
-load("//testing/rules:defs.bzl", "test_module_deps")
+load("//testing/rules:defs.bzl", "bcr_flags", "test_module_deps")
 
 package(
     default_testonly = 1,
@@ -122,4 +122,14 @@ test_module_deps(
     config = _TOOLCHAINS_LLVM_CONFIG,
     module_name = "toolchains_llvm",
     versions = ["1.7.0"],
+)
+
+bcr_flags(
+    name = "bcr_extra_flags",
+    flags = [
+        "--java_runtime_version=remotejdk_21",
+        "--java_language_version=21",
+        "--tool_java_runtime_version=remotejdk_21",
+        "--tool_java_language_version=21",
+    ],
 )
