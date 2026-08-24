@@ -1,10 +1,13 @@
 # IntelliJ Aspect (Split Architecture)
 
-A modular, non-templated Bazel aspect for IntelliJ IDE integration, designed as a
+A modular, non-templated Bazel aspect framework for IntelliJ IDE integration, designed as a
 drop-in replacement for the current monolithic aspect. The key design change is splitting
-language/toolchain logic into independent **module aspects** that each produce a dedicated
-provider, while a thin **aggregator aspect** merges those providers and writes a single
-textproto per target for IDE import.
+language/toolchain logic into independent **modules** that each contribute a function that produces
+a dedicated struct that are then aggregated to a single textproto per target for IDE import.
+Each module provides its function through an aspect that contains the function in its returned
+provider (that is returned unconditionally). Those module aspects, however, do not walk the
+graph but are applied only to a single container target in order to collect the contributed
+functions.
 
 This architecture significantly reduces templating (a major source of friction in the old
 aspect). When deployed from the BCR no templating is needed at all; the materialized
@@ -65,22 +68,13 @@ The repository contains two Bazel modules:
 When building `archive_bcr`, `MODULE.bazel.bcr` is renamed to `MODULE.bazel` inside the
 archive, so consumers see a clean `intellij_aspect` module.
 
-## Module Aspects
+## Modules
 
-Each language or toolchain gets its own aspect in `modules/`. There are two kinds:
-
-**Target aspects** (e.g. `cc_info`, `java_info`, `py_info`) run on regular targets and
-collect language-specific information from providers like `CcInfo`, `JavaInfo`, or `PyInfo`.
-They advertise their output provider via `provides = [...]`, which lets the aggregator
-aspect discover them without hardcoded dependencies. Modules can be toggled from the command
-line.
-
-**Toolchain aspects** (e.g. `cc_toolchain_info`, `java_toolchain_info`, `xcode_info`)
-exist because starting with Bazel 8, toolchain dependencies use a specialized edge
-(`toolchains_aspects`) that the aggregator aspect cannot traverse directly. Toolchain
-aspects therefore write their own proto file instead of contributing to the aggregator.
-Target aspects declare their toolchain dependencies via `requires = [...]` (mandatory) or
-`required_aspect_providers` (optional, toggleable).
+Each language or toolchain gets its own aspect in `modules/` that
+contributes, through its provider, a function to be called by the
+main aspect that actually walks the target graph. The results of
+those function calls can contribute to the overall result for the
+respective target.
 
 ## Testing Infrastructure
 
