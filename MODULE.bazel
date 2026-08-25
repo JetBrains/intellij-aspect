@@ -22,7 +22,7 @@ scala_deps = use_extension("@rules_scala//scala/extensions:deps.bzl", "scala_dep
 scala_deps.scala()
 
 # dependencies to test projects for the aspect
-bazel_dep(name = "abseil-cpp", version = "20260526.0")
+bazel_dep(name = "abseil-cpp", version = "20260817.0")
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(
