@@ -3,5 +3,14 @@ load("@rules_scala//scala:scala.bzl", "scala_library")
 scala_library(
     name = "example-lib",
     srcs = ["Foo.scala"],
+    plugins = [":compiler-plugin_deploy.jar"],
     visibility = ["//visibility:public"],
+)
+
+scala_library(
+    name = "compiler-plugin",
+    srcs = ["CompilerPlugin.scala"],
+    resource_strip_prefix = package_name(),
+    resources = ["scalac-plugin.xml"],
+    deps = ["@rules_scala//scala/private/toolchain_deps:scala_compile_classpath"],
 )
