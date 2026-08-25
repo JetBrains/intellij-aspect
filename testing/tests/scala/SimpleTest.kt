@@ -39,6 +39,19 @@ class SimpleTest {
   }
 
   @Test
+  fun testIncludesCompilerPluginInScalacOptions() {
+    val scalacOptions =
+      aspect.findTarget("//src/main/com/example/foo:example-lib").scalaTargetInfo.scalacOptsList
+
+    assertThat(
+      scalacOptions.any {
+        it.matches(Regex("^-Xplugin:.*src/main/com/example/foo/compiler-plugin_deploy\\.jar$"))
+      },
+    )
+      .isTrue()
+  }
+
+  @Test
   fun testFindsTest() {
     val target = aspect.findTarget("//src/test/com/example/foo:test")
     assertThat(target.kind).isEqualTo("scala_test")

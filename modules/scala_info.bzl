@@ -129,6 +129,13 @@ def _get_outputs(target, ctx, java_outputs, extra_sync):
             intellij_output_groups.BUILD: intellij_common.depset(resolve_files, transitive = resolve_transitives),
         }
 
+def _compiler_plugin_options(rule_attr):
+    return [
+        "-Xplugin:%s" % plugin_file.path
+        for plugin_target in getattr(rule_attr, "plugins", [])
+        for plugin_file in plugin_target.files.to_list()
+    ]
+
 def _implementation(target, ctx, attr):
     if not ctx.rule.kind.startswith("scala_") and not ctx.rule.kind.startswith("thrift_"):
         return None
@@ -160,7 +167,7 @@ def _implementation(target, ctx, attr):
             intellij_deps.TOOLCHAIN: intellij_deps.collect(ctx, TOOLCHAIN_DEPS),
         },
         value = intellij_common.struct(
-            scalac_opts = common_scalac_opts + getattr(ctx.rule.attr, "scalacopts", []),
+            scalac_opts = common_scalac_opts + getattr(ctx.rule.attr, "scalacopts", []) + _compiler_plugin_options(ctx.rule.attr),
             compiler_classpath = compiler_classpath_info,
             scalatest_classpath_targets = extract_scalatest_classpath_targets(ctx.rule.attr),
         ),
