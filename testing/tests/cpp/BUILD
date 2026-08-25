@@ -38,7 +38,7 @@ test_runner(
 
 intellij_aspect_test(
     name = "aspect_test",
-    cc = [
+    deps = [
         "@abseil-cpp//absl/algorithm:algorithm",
         "@abseil-cpp//absl/algorithm:container",
         "@abseil-cpp//absl/container:flat_hash_map",

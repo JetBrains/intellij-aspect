@@ -17,11 +17,12 @@ load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 load(":bazel.bzl", _resolve_bazel_spec = "resolve")
 load(":config.bzl", _test_matrix = "test_matrix", _test_matrix_suite = "test_matrix_suite")
 load(":fixture.bzl", _test_fixture = "test_fixture")
-load(":module_dep.bzl", _test_module_dep = "test_module_dep")
+load(":module_dep.bzl", _bcr_flags = "bcr_flags", _test_module_dep = "test_module_dep")
 load(":project.bzl", _project_archive = "project_archive")
 
 test_matrix = _test_matrix
 test_matrix_suite = _test_matrix_suite
+bcr_flags = _bcr_flags
 
 def test_module_deps(module_name, versions, **kwargs):
     """Declares Bazel module dependencies for use in test fixtures.

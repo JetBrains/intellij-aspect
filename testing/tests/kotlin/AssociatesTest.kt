@@ -40,8 +40,13 @@ class AssociatesTest {
     assertThat(target.kind).isEqualTo("kt_jvm_library")
 
     // Associates reported correctly
-    assertThat(target.kotlinTargetInfo.associatedTargetsList)
-      .containsExactly(aspect.findTarget("//:B").key, aspect.findTarget("//:C").key)
+    if (aspect.isBCRDeployment()) {
+      assertThat(target.kotlinTargetInfo.associatedTargetsList.toSet())
+        .containsExactly(aspect.findTarget("//:B").key, aspect.findTarget("//:C").key)
+    } else {
+      assertThat(target.kotlinTargetInfo.associatedTargetsList)
+        .containsExactly(aspect.findTarget("//:B").key, aspect.findTarget("//:C").key)
+    }
 
     // Dependencies reported correctly.
     assertThatDeps(target.depsList).withType(DependencyType.COMPILE_TIME).labels().containsExactly("//:B")
@@ -62,6 +67,9 @@ class AssociatesTest {
     assertThat(targetC.srcsList.size).isEqualTo(1)
     assertThat(targetC.srcsList[0].isSource).isTrue()
     assertThat(targetC.srcsList[0].relativePath).isEqualTo("C.kt")
-    assertThatDeps(targetC.depsList).isEmpty()
+
+    assertThatDeps(targetC.depsList).withType(DependencyType.COMPILE_TIME).isEmpty()
+    assertThatDeps(targetC.depsList).withType(DependencyType.EXPORTED_COMPILE_TIME).isEmpty()
+    assertThatDeps(targetC.depsList).withType(DependencyType.RUNTIME).isEmpty()
   }
 }

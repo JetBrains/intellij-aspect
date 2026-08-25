@@ -23,10 +23,10 @@ test_runner(
 
 intellij_aspect_test(
     name = "aspect_test",
-    kotlin = [
+    deps = [
         "//sdk",
-        "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_core",
         "@maven//:com_google_guava_guava",
         "@maven//:com_google_truth_truth",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_core",
     ],
 )

@@ -63,6 +63,7 @@ class DeployTest {
         bazelVersion = "8.5.0",
         repoMapping = emptyMap(),
         useBuiltin = emptySet(),
+        rulesets = Rules.entries.toSet(),
       ),
     )
 
@@ -78,6 +79,7 @@ class DeployTest {
         bazelVersion = "8.5.0",
         repoMapping = emptyMap(),
         useBuiltin = Rules.entries.toSet(),
+        rulesets = Rules.entries.toSet(),
       ),
     )
 
@@ -95,6 +97,7 @@ class DeployTest {
         bazelVersion = "8.5.0",
         repoMapping = emptyMap(),
         useBuiltin = setOf(Rules.PYTHON),
+        rulesets = Rules.entries.toSet(),
       ),
     )
 
@@ -113,6 +116,7 @@ class DeployTest {
         bazelVersion = "8.5.0",
         repoMapping = mapOf(Rules.CC to "@my_rules_cc"),
         useBuiltin = emptySet(),
+        rulesets = setOf(Rules.CC),
       ),
     )
 
