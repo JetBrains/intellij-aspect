@@ -103,8 +103,17 @@ def _implementation(target, ctx, attr):
 
     return intellij_module.result(
         outputs = {
+            intellij_output_groups.SYNC:
+            # Flattening that dep set is acceptable overhead given that we serialize its members
+            # anyway in the compilation-context message. Should be dropped if we stop serializing there.
+            intellij_common.depset(
+                [
+                    it
+                    for it in resolve_files.to_list()
+                    if it.is_source
+                ],
+            ),
             intellij_output_groups.BUILD: resolve_files,
-            intellij_output_groups.SYNC: resolve_files,
         },
         value = intellij_common.struct(
             rule_context = _collect_rule_context(ctx),
