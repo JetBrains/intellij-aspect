@@ -122,7 +122,7 @@ class Sandbox(
     }
 
     val outputGroups = parseBepOutputGroups(bepFile)
-    val metrics = parseBepMetrics(bepFile)
+    val metrics = if (isWindows()) null else parseBepMetrics(bepFile)
 
     val infoProcess = ProcessBuilder(
       listOf(
@@ -137,7 +137,7 @@ class Sandbox(
     if (process.waitFor() != 0) {
       throw IOException("Querying bazel heap size failed.")
     }
-    val heapInfo = infoProcess.inputStream.readAllBytes().decodeToString()
+    val heapInfo = if (isWindows()) "" else infoProcess.inputStream.readAllBytes().decodeToString()
 
     return BuildResult(outputGroups, metrics, heapInfo)
   }

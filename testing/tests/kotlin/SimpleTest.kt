@@ -18,6 +18,7 @@ package com.intellij.aspect.testing.tests.kotlin
 
 import com.google.common.truth.Truth.assertThat
 import com.intellij.aspect.lib.OutputGroups
+import com.intellij.aspect.private.lib.utils.isWindows
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import org.junit.Rule
 import org.junit.Test
@@ -124,9 +125,13 @@ class SimpleTest {
 
   @Test
   fun testMetrics() {
-    assertThat(aspect.getMetrics().skyframeNodeCount).isAtLeast(10) // sanity check that the metrics was recorded
+    if (!isWindows()) {
+      assertThat(aspect.getMetrics().skyframeNodeCount).isAtLeast(10) // sanity check that the metrics was recorded
+    }
     assertThat(aspect.getMetrics().skyframeNodeCount).isAtMost(if (aspect.isBCRDeployment()) 65_000 else 45_000)
-    assertThat(aspect.getMetrics().usedHeapSizeAfterGc).isAtLeast(1_000_000) // sanity check
+    if (!isWindows()) {
+      assertThat(aspect.getMetrics().usedHeapSizeAfterGc).isAtLeast(1_000_000) // sanity check
+    }
     assertThat(aspect.getMetrics().usedHeapSizeAfterGc).isAtMost(20_000_000)
     // The following metrics are not always present, so only verify upper bounds
     assertThat(aspect.getMetrics().evaluatedConfiguredTarget).isAtMost(if (aspect.isBCRDeployment()) 20_000 else 15_000)

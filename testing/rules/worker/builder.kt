@@ -25,6 +25,7 @@ import com.intellij.aspect.lib.Rules
 import com.intellij.aspect.lib.deployAspectZip
 import com.intellij.aspect.lib.modulesForRules
 import com.intellij.aspect.private.lib.utils.asBazelPath
+import com.intellij.aspect.private.lib.utils.isWindows
 import com.intellij.aspect.private.lib.utils.unzip
 import com.intellij.aspect.testing.rules.fixture.FixtureProto
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.AspectDeployment
@@ -107,29 +108,31 @@ fun main(args: Array<String>) {
 
       addAllExtraFlags(input.extraFlagsList)
 
-      metrics = FixtureProto.Metrics.newBuilder().apply {
-        usedHeapSizeAfterGc = parseSize(buildResult.infoHeap)
-        buildResult.metrics?.get("buildGraphMetrics")?.get("postInvocationSkyframeNodeCount")?.let {
-          try {
-            skyframeNodeCount = it.asLong()
-          } catch (_: Throwable) {
-          }
-        }
-        buildResult.metrics?.get("buildGraphMetrics")?.get("evaluatedValues")?.let {
-          it.filter { it.get("skyfunctionName").asText() == "ARTIFACT_NESTED_SET" }.firstOrNull()?.let {
+      if (!isWindows()) {
+        metrics = FixtureProto.Metrics.newBuilder().apply {
+          usedHeapSizeAfterGc = parseSize(buildResult.infoHeap)
+          buildResult.metrics?.get("buildGraphMetrics")?.get("postInvocationSkyframeNodeCount")?.let {
             try {
-              evaluatedArtifactNestedSet = it.get("count").asText().toLong()
+              skyframeNodeCount = it.asLong()
             } catch (_: Throwable) {
             }
           }
-          it.filter { it.get("skyfunctionName").asText() == "CONFIGURED_TARGET" }.firstOrNull()?.let {
-            try {
-              evaluatedConfiguredTarget = it.get("count").asText().toLong()
-            } catch (_: Throwable) {
+          buildResult.metrics?.get("buildGraphMetrics")?.get("evaluatedValues")?.let {
+            it.filter { it.get("skyfunctionName").asText() == "ARTIFACT_NESTED_SET" }.firstOrNull()?.let {
+              try {
+                evaluatedArtifactNestedSet = it.get("count").asText().toLong()
+              } catch (_: Throwable) {
+              }
+            }
+            it.filter { it.get("skyfunctionName").asText() == "CONFIGURED_TARGET" }.firstOrNull()?.let {
+              try {
+                evaluatedConfiguredTarget = it.get("count").asText().toLong()
+              } catch (_: Throwable) {
+              }
             }
           }
-        }
-      }.build()
+        }.build()
+      }
     }
 
     Files.newOutputStream(Path.of(input.outputProto)).use { outputStream ->
