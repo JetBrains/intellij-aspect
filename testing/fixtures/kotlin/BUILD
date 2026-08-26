@@ -20,7 +20,7 @@ _MOUDLES_WITH_JAVA = _MODULES + [
 ]
 
 _MODULES_KSP = [
-    "//testing/fixtures:rules_kotlin_2_4_0",
+    "//testing/fixtures:rules_kotlin_2_4_10",
     "//testing/fixtures:toolchains_llvm_latest",
 ]
 
