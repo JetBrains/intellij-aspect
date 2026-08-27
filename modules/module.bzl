@@ -58,11 +58,12 @@ def _define(
         aspect_providers = aspect_providers or [],
     )
 
-def _result(value, *, internal_value = None, outputs = None, dependencies = None):
+def _result(value, *, internal_value = None, cross_target_internal_value = None, outputs = None, dependencies = None):
     """Creates the result struct of a module."""
     return struct(
         value = value,
         internal_value = internal_value or struct(),
+        cross_target_internal_value = cross_target_internal_value or struct(),
         outputs = outputs or {},
         dependencies = dependencies or {},
     )
