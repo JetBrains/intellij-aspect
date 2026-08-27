@@ -84,6 +84,8 @@ message PyIdeInfo {
 
 message PythonTargetInfo {
   ArtifactLocation interpreter = 1;
+  string interpreter_path = 8;
+
   string version = 2;
   repeated string imports = 3;
   repeated ArtifactLocation generated_sources = 5;
@@ -103,8 +105,13 @@ message DartIdeInfo {
 message JavaToolchainInfo {
   string source_version = 1;
   string target_version = 2;
-  ArtifactLocation java_home = 3;
-  ArtifactLocation boot_classpath_java_home = 4;
+
+  ArtifactLocation java_home = 3 [deprecated = true];
+  string java_home_path = 6;
+
+  ArtifactLocation boot_classpath_java_home = 4 [deprecated = true];
+  string boot_classpath_java_home_path = 7;
+
   bool is_exec_config = 5;
 }
 
@@ -215,7 +222,7 @@ message TargetKey {
 message Dependency {
   enum DependencyType {
     COMPILE_TIME = 0;
-    EXPORTED_COMPILE_TIME =3;
+    EXPORTED_COMPILE_TIME = 3;
     RUNTIME = 1;
     TOOLCHAIN = 2;
   }
