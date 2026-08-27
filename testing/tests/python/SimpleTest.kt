@@ -44,8 +44,8 @@ class SimpleTest {
     assertThat(target.hasPythonTargetInfo()).isTrue()
     assertThat(target.pythonTargetInfo.version).isEqualTo("PY3")
     assertThat(target.pythonTargetInfo.interpreter.rootPath).containsMatch("rules_python")
-    assertThat(target.pythonTargetInfo.interpreter.relativePath)
-      .endsWith(if (isWindows()) "python.exe" else "python3")
+    assertThat(target.pythonTargetInfo.interpreter.relativePath).containsMatch("python(3|\\.exe)$")
+    assertThat(target.pythonTargetInfo.interpreterPath).isEmpty()
   }
 
   @Test
@@ -60,6 +60,7 @@ class SimpleTest {
     assertThat(target.pythonTargetInfo.version).isEqualTo("PY3")
     assertThat(target.pythonTargetInfo.interpreter.rootPath).containsMatch("rules_python")
     assertThat(target.pythonTargetInfo.interpreter.relativePath).containsMatch("python(3|\\.exe)$")
+    assertThat(target.pythonTargetInfo.interpreterPath).isEmpty()
   }
 
   @Test
@@ -75,5 +76,6 @@ class SimpleTest {
     assertThat(target.pythonTargetInfo.version).isEqualTo("PY3")
     assertThat(target.pythonTargetInfo.interpreter.rootPath).containsMatch("rules_python")
     assertThat(target.pythonTargetInfo.interpreter.relativePath).containsMatch("python(3|\\.exe)$")
+    assertThat(target.pythonTargetInfo.interpreterPath).isEmpty()
   }
 }

@@ -1,0 +1,23 @@
+load("@rules_python//python:defs.bzl", "py_binary", "py_runtime", "py_runtime_pair")
+
+py_runtime(
+    name = "false_platform",
+    interpreter_path = "/usr/bin/false",
+    python_version = "PY3",
+)
+
+py_runtime_pair(
+    name = "false_platform_pair",
+    py3_runtime = ":false_platform",
+)
+
+toolchain(
+    name = "false_toolchain",
+    toolchain = ":false_platform_pair",
+    toolchain_type = "@rules_python//python:toolchain_type",
+)
+
+py_binary(
+    name = "main",
+    srcs = ["main.py"],
+)
