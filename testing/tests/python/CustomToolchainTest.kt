@@ -36,9 +36,9 @@ class CustomToolchainTest {
     assertThat(target.kind).isEqualTo("py_binary")
     assertThat(target.hasPythonTargetInfo()).isTrue()
     assertThat(target.pythonTargetInfo.version).isEqualTo("PY3")
-    assertThat(target.pythonTargetInfo.interpreterPath).isEqualTo("/usr/bin/false")
+    assertThat(target.pythonTargetInfo.interpreterPath).isEqualTo("/bin/false")
 
     // TODO: dropped this once the interpreter_path is used in the plugin
-    assertThat(target.pythonTargetInfo.interpreter.relativePath).isEqualTo("/usr/bin/false")
+    assertThat(target.pythonTargetInfo.interpreter.relativePath).isEqualTo("/bin/false")
   }
 }

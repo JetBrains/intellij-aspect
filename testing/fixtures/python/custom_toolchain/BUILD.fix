@@ -2,7 +2,7 @@ load("@rules_python//python:defs.bzl", "py_binary", "py_runtime", "py_runtime_pa
 
 py_runtime(
     name = "false_platform",
-    interpreter_path = "/usr/bin/false",
+    interpreter_path = "/bin/false",
     python_version = "PY3",
 )
 
