@@ -56,7 +56,7 @@ fun unzip(srcFile: Path, outDirectory: Path, stripPrefix: Int = 0) {
 
       val path = outDirectory.resolve(Path.of(entry.name).stripPrefix(stripPrefix))
       Files.createDirectories(path.parent)
-      Files.newOutputStream(path, StandardOpenOption.CREATE).use(src::transferTo)
+      Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING).use(src::transferTo)
 
       if (entry.isExecutable()) {
         path.toFile().setExecutable(true)
