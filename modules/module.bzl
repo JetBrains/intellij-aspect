@@ -82,7 +82,7 @@ def _lookup_target(target, provider):
     if intellij_provider.IntelliJInfo not in target:
         return None
 
-    results = target[intellij_provider.IntelliJInfo].internal_results
+    results = target[intellij_provider.IntelliJInfo].internal_results or {}
 
     if provider not in results:
         return None
