@@ -89,13 +89,13 @@ def _implementation(target, ctx, attr):
     # try to create the provider if any of the xcode providers is present
     result = _create_result(target, ctx)
     if result:
-        return intellij_module.result(result, internal_value = result)
+        return intellij_module.result(result, cross_target_internal_value = result)
 
     # propaget the the created provider if this is a toolchain target
     if cc_common.CcToolchainInfo in target or CcToolchainConfigInfo in target:
         result = _find_result(ctx)
         if result:
-            return intellij_module.result(result, internal_value = result)
+            return intellij_module.result(result, cross_target_internal_value = result)
 
     # otherwise default to the empty provider
     return None

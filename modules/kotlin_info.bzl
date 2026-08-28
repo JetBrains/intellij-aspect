@@ -248,6 +248,8 @@ def _implementation(target, ctx, attr):
                 javac_opts = _get_additional_javac_options(ctx),
                 jvm_target = True,
             ),
+        ),
+        cross_target_internal_value = intellij_common.struct(
             exports = intellij_common.attr_as_label_list(ctx, "exports"),
         ),
     )
