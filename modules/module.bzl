@@ -63,7 +63,7 @@ def _result(value, *, internal_value = None, cross_target_internal_value = None,
     return struct(
         value = value,
         internal_value = internal_value or struct(),
-        cross_target_internal_value = cross_target_internal_value or struct(),
+        cross_target_internal_value = cross_target_internal_value,
         outputs = outputs or {},
         dependencies = dependencies or {},
     )

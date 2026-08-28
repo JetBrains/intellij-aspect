@@ -76,7 +76,7 @@ def _build(builder, target, ctx, results):
     """Builds a new IntelliJInfo provider."""
 
     # for performance reasons only retian the internal values
-    internal_results = {key: result.cross_target_internal_value for (key, result) in results.items()}
+    internal_results = {key: result.cross_target_internal_value for (key, result) in results.items() if result.cross_target_internal_value}
 
     return intellij_provider.IntelliJInfo(
         key = _build_target_key(builder, target, ctx),
