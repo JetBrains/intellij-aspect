@@ -7,13 +7,13 @@ package(
 
 _MODULES = [
     "//testing/fixtures:rules_go_0_61_1",
-    "//testing/fixtures:toolchains_llvm_latest",
+    "//testing/fixtures/registry:cc_false_toolchain",
 ]
 
 # Old version of rules_go, not compatible with newer versions of bazel, but still in use
 _MODULES_OLD = [
     "//testing/fixtures:rules_go_0_49_0",
-    "//testing/fixtures:toolchains_llvm_latest",
+    "//testing/fixtures/registry:cc_false_toolchain",
 ]
 
 test_fixture(
