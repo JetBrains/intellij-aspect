@@ -105,8 +105,9 @@ def _implementation(target, ctx, attr):
             version = getattr(runtime, "python_version", None),
             main = artifact_location.from_file(getattr(ctx.rule.file, "main", None)),
             main_module = getattr(ctx.rule.attr, "main_module", None),
-            interpreter = (artifact_location.from_file(getattr(runtime, "interpreter", None)) or
-                           artifact_location.from_execpath(getattr(runtime, "interpreter_path", None))),
+            interpreter = artifact_location.from_file(getattr(runtime, "interpreter", None)) or
+                          artifact_location.from_execpath_do_not_use(getattr(runtime, "interpreter_path", None)),  # TODO: this alternative has to be dropped once the interpreter_path is used in the plugin
+            interpreter_path = getattr(runtime, "interpreter_path", None),
             imports = imports,
             generated_sources = [artifact_location.from_file(f) for f in generated_sources],
         ),

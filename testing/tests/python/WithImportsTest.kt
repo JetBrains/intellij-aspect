@@ -41,6 +41,7 @@ class WithImportsTest {
     assertThat(target.pythonTargetInfo.version).isEqualTo("PY3")
     assertThat(target.pythonTargetInfo.interpreter.rootPath).containsMatch("rules_python")
     assertThat(target.pythonTargetInfo.interpreter.relativePath).containsMatch("python(3|\\.exe)$")
+    assertThat(target.pythonTargetInfo.interpreterPath).isEmpty()
   }
 
   @Test

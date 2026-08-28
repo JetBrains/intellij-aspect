@@ -64,6 +64,7 @@ def _from_attr(ctx, name):
     return _from_list(intellij_common.attr_as_label_list(ctx, name))
 
 def _from_execpath(exec_path):
+    """DEPRICATED return plain path instead, converts an execution-root-relative path to an artifact location."""
     if exec_path == None:
         return None
     relative_path = _strip_external_workspace_prefix(exec_path)
@@ -93,7 +94,7 @@ def _strip_external_workspace_prefix(path):
 artifact_location = struct(
     create = _create,
     from_depset = _from_depset,
-    from_execpath = _from_execpath,
+    from_execpath_do_not_use = _from_execpath,
     from_file = _from_file,
     from_list = _from_list,
     from_attr = _from_attr,

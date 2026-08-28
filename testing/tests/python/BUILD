@@ -24,3 +24,8 @@ test_runner(
     fixture = "//testing/fixtures/python:withImports",
     test = "WithImportsTest.kt",
 )
+
+test_runner(
+    fixture = "//testing/fixtures/python:custom_toolchain",
+    test = "CustomToolchainTest.kt",
+)

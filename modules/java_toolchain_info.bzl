@@ -28,11 +28,14 @@ def _implementation(target, ctx, attrs):
     toolchain = target[java_common.JavaToolchainInfo]
     runtime = toolchain.java_runtime
     boot_classpath_java_home = getattr(getattr(toolchain, "_bootclasspath_info", None), "_system_path", None)
+
     info = intellij_common.struct(
         source_version = toolchain.source_version,
         target_version = toolchain.target_version,
-        java_home = artifact_location.from_execpath(runtime.java_home),
-        boot_classpath_java_home = artifact_location.from_execpath(boot_classpath_java_home) if boot_classpath_java_home else None,
+        java_home = artifact_location.from_execpath_do_not_use(runtime.java_home),
+        java_home_path = runtime.java_home,
+        boot_classpath_java_home = artifact_location.from_execpath_do_not_use(boot_classpath_java_home) if boot_classpath_java_home else None,
+        boot_classpath_java_home_path = boot_classpath_java_home,
         is_exec_config = intellij_common.is_exec_configuration(ctx),
     )
 

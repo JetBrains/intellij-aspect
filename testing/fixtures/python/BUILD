@@ -36,3 +36,12 @@ test_fixture(
     rule_sets = ["python"],
     targets = ["//:main"],
 )
+
+test_fixture(
+    name = "custom_toolchain",
+    srcs = glob(["custom_toolchain/**"]),
+    extra_flags = ["--extra_toolchains=//:false_toolchain"],
+    modules = _MODULES,
+    rule_sets = ["python"],
+    targets = ["//:main"],
+)
