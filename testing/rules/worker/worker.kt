@@ -170,11 +170,12 @@ data class SharedResources(
 
 @Throws(IOException::class)
 private fun createResources(cwd: Path, options: WorkerOptions): SharedResources {
-  require(options.registryFile.isNotBlank())
+  require(options.registryFilesList.isNotEmpty())
   require(options.bazelisk.isNotBlank())
 
+  // this assumes that all registries use the "modules" directory; otherwise they could not be merged this way
   val registryDirectory = Files.createDirectories(cwd.resolve("registry"))
-  unzip(Path.of(options.registryFile), registryDirectory, stripPrefix = 1)
+  for (file in options.registryFilesList) unzip(Path.of(file), registryDirectory, stripPrefix = 1)
 
   val repoCacheDirectory = options.repoCache.takeIf { it.isNotBlank() }
     ?.let(::resolvePath)

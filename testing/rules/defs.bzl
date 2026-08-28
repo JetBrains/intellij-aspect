@@ -19,10 +19,13 @@ load(":config.bzl", _test_matrix = "test_matrix", _test_matrix_suite = "test_mat
 load(":fixture.bzl", _test_fixture = "test_fixture")
 load(":module_dep.bzl", _bcr_flags = "bcr_flags", _test_module_dep = "test_module_dep")
 load(":project.bzl", _project_archive = "project_archive")
+load(":registry.bzl", _registry = "registry", _registry_module = "registry_module")
 
 test_matrix = _test_matrix
 test_matrix_suite = _test_matrix_suite
 bcr_flags = _bcr_flags
+registry_module = _registry_module
+registry = _registry
 
 def test_module_deps(module_name, versions, **kwargs):
     """Declares Bazel module dependencies for use in test fixtures.
