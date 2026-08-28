@@ -445,22 +445,28 @@
     },
     "@@aspect_tools_telemetry+//:extension.bzl%telemetry": {
       "general": {
-        "bzlTransitiveDigest": "cl5A2O84vDL6Tt+Qga8FCj1DUDGqn+e7ly5rZ+4xvcc=",
-        "usagesDigest": "YrfZ4bJpm8TElVj7Cl9MuPxrvXtxG3i75iLf1pGcdG8=",
+        "bzlTransitiveDigest": "XVKR7Fz0TpsBTBIjxfUrpsRKdh9a5XZHQEJmfRGJOD8=",
+        "usagesDigest": "4eYfYGZkkZZem5Ss/tvRTn4oYAhl3RAUYpmiLLQszC0=",
         "recordedInputs": [
           "REPO_MAPPING:aspect_tools_telemetry+,bazel_lib bazel_lib+",
-          "REPO_MAPPING:aspect_tools_telemetry+,bazel_skylib bazel_skylib+"
+          "REPO_MAPPING:aspect_tools_telemetry+,bazel_skylib bazel_skylib+",
+          "ENV:ASPECT_TOOLS_TELEMETRY_TEST \\0"
         ],
         "generatedRepoSpecs": {
           "aspect_tools_telemetry_report": {
             "repoRuleId": "@@aspect_tools_telemetry+//:extension.bzl%tel_repository",
             "attributes": {
               "deps": {
-                "aspect_rules_lint": "2.7.2",
-                "aspect_tools_telemetry": "0.3.3"
-              }
+                "aspect_rules_lint": "2.8.0",
+                "aspect_tools_telemetry": "0.5.0"
+              },
+              "last_notice": 0
             }
           }
+        },
+        "moduleExtensionMetadata": {
+          "useAllRepos": "NO",
+          "reproducible": false
         }
       }
     },
@@ -515,7 +521,7 @@
     "@@rules_multitool+//multitool:extension.bzl%multitool": {
       "general": {
         "bzlTransitiveDigest": "s+rg9YTYK9CxhExLmokBLy6sbL6I8ELJ7FgNiXGKZu4=",
-        "usagesDigest": "OxXTEbe+pxnGKai6ApFrmdjQOvsZ1xgjkDb718C0Kl0=",
+        "usagesDigest": "eWpXzaD9ht18VnQw3S20m3gV480QjWem9SRAxNGDi6w=",
         "recordedInputs": [
           "REPO_MAPPING:bazel_features+,bazel_features_globals bazel_features++version_extension+bazel_features_globals",
           "REPO_MAPPING:bazel_features+,bazel_features_version bazel_features++version_extension+bazel_features_version",
@@ -814,6 +820,9 @@
     }
   },
   "facts": {
+    "@@aspect_tools_telemetry+//:extension.bzl%telemetry": {
+      "notice_version": "2"
+    },
     "@@rules_go+//go:extensions.bzl%go_sdk": {
       "1.22.4": {
         "aix_ppc64": [

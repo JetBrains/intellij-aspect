@@ -99,12 +99,16 @@ def _implementation(target, ctx, attr):
     if not _aspect_guard(target, ctx):
         return None
 
-    resolve_files = target[CcInfo].compilation_context.headers
+    all_headers = target[CcInfo].compilation_context.headers
+
+    # Flattening that dep set is acceptable overhead given that we serialize its members
+    # anyway in the compilation-context message. Should be dropped if we stop serializing there.
+    source_headers = [it for it in all_headers.to_list() if it.is_source]
 
     return intellij_module.result(
         outputs = {
-            intellij_output_groups.BUILD: resolve_files,
-            intellij_output_groups.SYNC: resolve_files,
+            intellij_output_groups.SYNC: intellij_common.depset(source_headers),
+            intellij_output_groups.BUILD: all_headers,
         },
         value = intellij_common.struct(
             rule_context = _collect_rule_context(ctx),
