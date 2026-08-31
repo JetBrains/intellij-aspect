@@ -25,7 +25,9 @@ import com.intellij.aspect.lib.Rules
 import com.intellij.aspect.lib.deployAspectZip
 import com.intellij.aspect.lib.modulesForRules
 import com.intellij.aspect.private.lib.utils.asBazelPath
+import com.intellij.aspect.private.lib.utils.isWindows
 import com.intellij.aspect.private.lib.utils.unzip
+import com.intellij.aspect.testing.rules.fixture.FixtureProto
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.AspectDeployment
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.BazelModule
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.OutputGroup
@@ -86,7 +88,7 @@ fun main(args: Array<String>) {
 
     val aspects = Aspects.forRules(rulesets).map { ASPECT_PREFIX.getValue(deployment) + it.toString() }
 
-    val files = bazelBuild(
+    val buildResult = bazelBuild(
       version,
       targets = input.targetsList,
       aspects = aspects,
@@ -95,6 +97,7 @@ fun main(args: Array<String>) {
       execLog = Path.of(input.outputExecLog),
       flags = input.extraFlagsList,
     )
+    val files = buildResult.outputGroups
     require(files.isNotEmpty()) { "no files were generated" }
 
     val builder = TestFixture.newBuilder().apply {
@@ -104,11 +107,52 @@ fun main(args: Array<String>) {
       files.entries.map(::createOutputGroup).forEach(::addOutputs)
 
       addAllExtraFlags(input.extraFlagsList)
+
+      if (!isWindows()) {
+        metrics = FixtureProto.Metrics.newBuilder().apply {
+          usedHeapSizeAfterGc = parseSize(buildResult.infoHeap)
+          buildResult.metrics?.get("buildGraphMetrics")?.get("postInvocationSkyframeNodeCount")?.let {
+            try {
+              skyframeNodeCount = it.asLong()
+            } catch (_: Throwable) {
+            }
+          }
+          buildResult.metrics?.get("buildGraphMetrics")?.get("evaluatedValues")?.let {
+            it.filter { it.get("skyfunctionName").asText() == "ARTIFACT_NESTED_SET" }.firstOrNull()?.let {
+              try {
+                evaluatedArtifactNestedSet = it.get("count").asText().toLong()
+              } catch (_: Throwable) {
+              }
+            }
+            it.filter { it.get("skyfunctionName").asText() == "CONFIGURED_TARGET" }.firstOrNull()?.let {
+              try {
+                evaluatedConfiguredTarget = it.get("count").asText().toLong()
+              } catch (_: Throwable) {
+              }
+            }
+          }
+        }.build()
+      }
     }
 
     Files.newOutputStream(Path.of(input.outputProto)).use { outputStream ->
       builder.build().writeTo(outputStream)
     }
+  }
+}
+
+@Throws(NumberFormatException::class)
+private fun parseSize(sizeString: String): Long {
+  // Heap size is "helpfully" reported with SI suffixes and rounded, so we have reverse that encoding (to the extend
+  // possible).
+  // https://github.com/bazelbuild/bazel/blob/deaa7a9352d6a4ebd0e8e644b82a26332f36329f/src/main/java/com/google/devtools/build/lib/util/StringUtilities.java#L96
+  val sizeSI = sizeString.substringBefore("B")
+  return when {
+    sizeSI == "" -> 0
+    sizeSI.endsWith("K") -> sizeSI.substringBefore("K").toLong() * 1000
+    sizeSI.endsWith("M") -> sizeSI.substringBefore("M").toLong() * 1000_000
+    sizeSI.endsWith("G") -> sizeSI.substringBefore("G").toLong() * 1000_000_000
+    else -> sizeString.toLong()
   }
 }
 
