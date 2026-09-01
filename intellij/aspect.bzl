@@ -141,7 +141,14 @@ def _implemenation(target, ctx):
 
     intellij_info = intellij_info_builder.build(builder, target, ctx, results)
 
-    return [intellij_info, OutputGroupInfo(**intellij_info.outputs)]
+    # Keep the visible group for compatibility while offering an exact hidden alias
+    # for clients that do not need build outputs reported as top-level artifacts.
+    outputs = dict(intellij_info.outputs)
+    build_outputs = outputs.get(intellij_output_groups.BUILD)
+    if build_outputs:
+        outputs[intellij_output_groups.HIDDEN_BUILD] = build_outputs
+
+    return [intellij_info, OutputGroupInfo(**outputs)]
 
 def _unique_flatten(modules, field):
     unique = []
