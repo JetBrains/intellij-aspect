@@ -16,4 +16,5 @@ intellij_output_groups = struct(
     INFO = "intellij-info",
     SYNC = "intellij-sync",
     BUILD = "intellij-build",
+    HIDDEN_BUILD = "_intellij-build",
 )
