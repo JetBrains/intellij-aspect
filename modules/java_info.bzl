@@ -104,16 +104,6 @@ def _get_generated_jars(target):
         if (output != None) and (output.generated_class_jar != None)
     ]
 
-def _runtime_jars(target):
-    compilation_info = getattr(target[JavaInfo], "compilation_info", None)
-    if compilation_info:
-        return compilation_info.runtime_classpath
-    return getattr(target[JavaInfo], "transitive_runtime_jars", None)
-
-def _compile_jars(target):
-    compilation_info = getattr(target[JavaInfo], "compilation_info", None)
-    return compilation_info.compilation_classpath if compilation_info else None
-
 def _get_outputs(target, ctx, jdeps):
     generated_outputs = [
         output
@@ -124,7 +114,9 @@ def _get_outputs(target, ctx, jdeps):
         [output.generated_class_jar for output in generated_outputs] +
         [output.generated_source_jar for output in generated_outputs]
     )
-    resolve_transitives = [jarset for jarset in [_runtime_jars(target), _compile_jars(target)] if jarset]
+    # The transitive runtime and compile classpaths are not added here: every dependency carrying
+    # JavaInfo is visited by the aspect itself and contributes its own jars.
+    resolve_transitives = []
     for out in target[JavaInfo].java_outputs:
         if getattr(out, "compile_jar", None):
             resolve_files += [out.compile_jar]
@@ -142,7 +134,7 @@ def _get_outputs(target, ctx, jdeps):
             [f for f in resolve_files if f.is_source],
         ),
         intellij_output_groups.BUILD: intellij_common.depset(
-            resolve_files + jdeps,
+            [f for f in resolve_files if not f.is_source] + jdeps,
             transitive = resolve_transitives,
         ),
     }

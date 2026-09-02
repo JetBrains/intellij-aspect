@@ -202,7 +202,7 @@ def _get_outputs(target, ctx, plugins):
         intellij_output_groups.SYNC: intellij_common.depset(
             [f for f in resolve_files if f.is_source],
         ),
-        intellij_output_groups.BUILD: intellij_common.depset(resolve_files, transitive = transitives),
+        intellij_output_groups.BUILD: intellij_common.depset([f for f in resolve_files if not f.is_source], transitive = transitives),
     }
 
 def _implementation(target, ctx, attr):
