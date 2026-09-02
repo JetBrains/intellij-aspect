@@ -45,6 +45,7 @@ def _go_sdk(ctx):
     return artifact_location.from_file(go.sdk.go)
 
 def _sources(target, ctx):
+    sources_depsets = None
     if ctx.rule.kind in [
         "go_binary",
         "go_library",
@@ -55,13 +56,17 @@ def _sources(target, ctx):
         "go_appengine_test",
     ]:
         sources = [f for src in getattr(ctx.rule.attr, "srcs", []) for f in src.files.to_list()]
+        sources_depsets = [src.files for src in getattr(ctx.rule.attr, "srcs", [])]
     elif ctx.rule.kind == "go_wrap_cc":
         sources = [f for f in target.files.to_list() if f.basename.endswith(".go")]
+        sources_depsets = [target.files]
     elif OutputGroupInfo in target and hasattr(target[OutputGroupInfo], "go_generated_srcs"):
         sources = [f for f in target[OutputGroupInfo].go_generated_srcs.to_list() if f.basename.endswith(".go")]
+        sources_depsets = [target[OutputGroupInfo].go_generated_srcs]
     else:
         sources = []
-    return sources
+        sources_depsets = []
+    return sources, sources_depsets
 
 def _import_path(ctx):
     import_path = getattr(ctx.rule.attr, "importpath", None)
@@ -92,7 +97,7 @@ def _implementation(target, ctx, attr):
        (OutputGroupInfo not in target or not hasattr(target[OutputGroupInfo], "go_generated_srcs")):  # support at least a subset of custom rules not hardcoded in _GO_RULE_KINDS
         return None
 
-    sources = _sources(target, ctx)
+    sources, sources_depsets = _sources(target, ctx)
     return intellij_module.result(
         value = intellij_common.struct(
             import_path = _import_path(ctx),
@@ -104,8 +109,7 @@ def _implementation(target, ctx, attr):
             intellij_deps.COMPILE_TIME: intellij_deps.collect(ctx, COMPILE_TIME_DEPS),
         },
         outputs = {
-            intellij_output_groups.SYNC: intellij_common.depset([f for f in sources if f.is_source]),
-            intellij_output_groups.BUILD: intellij_common.depset(sources),
+            intellij_output_groups.BUILD: intellij_common.depset(transitive = sources_depsets),
         },
     )
 
