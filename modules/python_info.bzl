@@ -51,7 +51,7 @@ def _implementation(target, ctx, attr):
     runtime = _get_runtime(ctx)
 
     imports = list(getattr(ctx.rule.attr, "imports", []))
-    generated_sources = []
+    generated_sources_depset = None
     if 0 == len(_source_files(ctx)):
         def provider_import_to_attr_import(provider_import):
             """\
@@ -98,7 +98,7 @@ def _implementation(target, ctx, attr):
             imports.extend(provider_imports_to_attr_imports())
         runfiles = target[DefaultInfo].default_runfiles
         if runfiles and runfiles.files:
-            generated_sources.extend([f for f in runfiles.files.to_list()])
+            generated_sources_depset = runfiles.files
 
     return intellij_module.result(
         value = intellij_common.struct(
@@ -109,10 +109,10 @@ def _implementation(target, ctx, attr):
                           artifact_location.from_execpath_do_not_use(getattr(runtime, "interpreter_path", None)),  # TODO: this alternative has to be dropped once the interpreter_path is used in the plugin
             interpreter_path = getattr(runtime, "interpreter_path", None),
             imports = imports,
-            generated_sources = [artifact_location.from_file(f) for f in generated_sources],
+            generated_sources = [artifact_location.from_file(f) for f in (generated_sources_depset.to_list() if generated_sources_depset else [])],
         ),
         outputs = {
-            intellij_output_groups.BUILD: intellij_common.depset(generated_sources),
+            intellij_output_groups.BUILD: generated_sources_depset,
         },
     )
 
