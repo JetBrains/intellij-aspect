@@ -76,6 +76,8 @@ class AspectFixture : ExternalResource() {
     return targets.maxByOrNull { it.key.aspectIdsList.size }!!
   }
 
+  fun hasOutputGroup(group: OutputGroups): Boolean = output.outputsList.any { it.name == group.groupName }
+
   fun findOutputGroup(
     group: OutputGroups,
   ): List<String> {

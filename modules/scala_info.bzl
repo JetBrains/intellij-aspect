@@ -106,7 +106,7 @@ def _get_generated_jars(java_outputs):
         if (output != None) and (output.generated_class_jar != None)
     ]
 
-def _get_outputs(target, ctx, java_outputs, extra_sync):
+def _get_outputs(target, ctx, java_outputs):
     resolve_files = []
     resolve_transitives = []
     for out in java_outputs:
@@ -122,7 +122,6 @@ def _get_outputs(target, ctx, java_outputs, extra_sync):
             else:
                 resolve_files += out.source_jars
     return {
-        intellij_output_groups.SYNC: intellij_common.depset([f for f in extra_sync if f.is_source]),
         intellij_output_groups.BUILD: intellij_common.depset(resolve_files, transitive = resolve_transitives),
     }
 
@@ -138,7 +137,6 @@ def _implementation(target, ctx, attr):
         return None
 
     compiler_classpath_info = None
-    extra_sync = []
     if hasattr(ctx.rule.attr, "_scala_toolchain"):
         common_scalac_opts = ctx.toolchains[SCALA_TOOLCHAIN_TYPE].scalacopts
         if hasattr(ctx.rule.attr, "_scalac"):
@@ -146,8 +144,6 @@ def _implementation(target, ctx, attr):
             compiler_classpath = find_scalac_classpath(scalac.default_runfiles.files.to_list())
             if compiler_classpath:
                 compiler_classpath_info = [artifact_location.from_file(f) for f in compiler_classpath]
-                if intellij_common.label_is_external(scalac.label):
-                    extra_sync = compiler_classpath
     else:
         common_scalac_opts = []
 
@@ -159,7 +155,7 @@ def _implementation(target, ctx, attr):
             java_outputs = provider.outputs.jars
 
     return intellij_module.result(
-        outputs = _get_outputs(target, ctx, java_outputs, extra_sync),
+        outputs = _get_outputs(target, ctx, java_outputs),
         dependencies = {
             intellij_deps.TOOLCHAIN: intellij_deps.collect(ctx, TOOLCHAIN_DEPS),
         },

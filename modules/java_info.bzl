@@ -138,9 +138,6 @@ def _get_outputs(target, ctx, jdeps):
             else:
                 resolve_files += out.source_jars
     return {
-        intellij_output_groups.SYNC: intellij_common.depset(
-            [f for f in resolve_files if f.is_source],
-        ),
         intellij_output_groups.BUILD: intellij_common.depset(
             resolve_files + jdeps,
             transitive = resolve_transitives,
