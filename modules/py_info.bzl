@@ -57,7 +57,15 @@ def _implementation(target, ctx, attr):
     if PyInfo not in target:
         return None
 
-    to_build = target[PyInfo].transitive_sources
+    # Only this target's own generated files. Files of dependencies are contributed by the
+    # aspect application on those dependencies; plain source files never need to be built and
+    # the executable (py_binary/py_test launcher) is not needed for sync.
+    executable = getattr(target[DefaultInfo].files_to_run, "executable", None)
+    to_build = intellij_common.depset([
+        f
+        for f in target.files.to_list()
+        if not f.is_source and f != executable
+    ])
 
     # TODO: port python get_code_generator_rule_names
 
