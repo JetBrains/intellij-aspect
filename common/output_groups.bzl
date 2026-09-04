@@ -16,4 +16,9 @@ intellij_output_groups = struct(
     INFO = "intellij-info",
     SYNC = "intellij-sync",
     BUILD = "intellij-build",
+    # The intellij-info.txt files written for the target itself; for targets without an info file
+    # of their own (e.g. aliases or filegroups) the nearest info files of their dependencies.
+    DIRECT_INFO = "intellij-info-direct",
+    # Hidden alias of INFO: built, but not reported as top-level artifacts in the build event stream.
+    HIDDEN_INFO = "_intellij-info",
 )
