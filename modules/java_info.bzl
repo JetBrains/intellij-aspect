@@ -114,6 +114,7 @@ def _get_outputs(target, ctx, jdeps):
         [output.generated_class_jar for output in generated_outputs] +
         [output.generated_source_jar for output in generated_outputs]
     )
+
     # The transitive runtime and compile classpaths are not added here: every dependency carrying
     # JavaInfo is visited by the aspect itself and contributes its own jars.
     resolve_transitives = []
