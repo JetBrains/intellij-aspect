@@ -101,13 +101,8 @@ def _implementation(target, ctx, attr):
 
     all_headers = target[CcInfo].compilation_context.headers
 
-    # Flattening that dep set is acceptable overhead given that we serialize its members
-    # anyway in the compilation-context message. Should be dropped if we stop serializing there.
-    source_headers = [it for it in all_headers.to_list() if it.is_source]
-
     return intellij_module.result(
         outputs = {
-            intellij_output_groups.SYNC: intellij_common.depset(source_headers),
             intellij_output_groups.BUILD: all_headers,
         },
         value = intellij_common.struct(

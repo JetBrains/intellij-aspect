@@ -14,6 +14,10 @@
 
 intellij_output_groups = struct(
     INFO = "intellij-info",
+    # Files that have to be built for a sync without a full build. Plain source files (including
+    # prebuilt jars and headers in external repositories) never need building and are listed in
+    # the intellij-info.txt files instead, so they are deliberately not part of this group: every
+    # artifact in a requested output group is retained per top-level target by Bazel.
     SYNC = "intellij-sync",
     BUILD = "intellij-build",
 )

@@ -104,7 +104,6 @@ def _implementation(target, ctx, attr):
             intellij_deps.COMPILE_TIME: intellij_deps.collect(ctx, COMPILE_TIME_DEPS),
         },
         outputs = {
-            intellij_output_groups.SYNC: intellij_common.depset([f for f in sources if f.is_source]),
             intellij_output_groups.BUILD: intellij_common.depset(sources),
         },
     )
