@@ -2,7 +2,6 @@ load("@protobuf//bazel:java_proto_library.bzl", "java_proto_library")
 load("@protobuf//bazel:proto_library.bzl", "proto_library")
 load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
-load(":measure.bzl", "measure_report")
 
 proto_library(
     name = "report_proto",
@@ -40,12 +39,4 @@ java_binary(
     main_class = "com.intellij.aspect.tools.measure.MainKt",
     visibility = ["//visibility:public"],
     runtime_deps = [":measure_lib"],
-)
-
-measure_report(
-    name = "report",
-    languages = ["cc"],
-    project = "@abseil_cpp//:project.zip",
-    # multi-minute benchmark, must never be part of a wildcard build
-    tags = ["manual"],
 )
