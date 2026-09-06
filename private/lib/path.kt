@@ -23,9 +23,7 @@ import java.nio.file.Path
 import java.nio.file.SimpleFileVisitor
 import java.nio.file.attribute.BasicFileAttributes
 
-/**
- * Resolves a path string, expanding a leading `~` to the user's home directory.
- */
+/** Resolves a path string, expanding a leading `~` to the user's home directory. */
 fun resolvePath(path: String): Path {
   if (path.startsWith("~/")) {
     return Path.of(System.getProperty("user.home")).resolve(path.removePrefix("~/"))
@@ -36,9 +34,26 @@ fun resolvePath(path: String): Path {
   return Path.of(path)
 }
 
-/**
- * Deletes a directory recursively, correctly handling symbolic links and junctions.
- */
+/** Resolves the temp directory that should be used in the current context. */
+fun resolveTempDirectory(): Path {
+  val options = sequence<String?> {
+    yield(System.getenv("TEST_TMPDIR"))
+    yield(System.getenv("TMPDIR"))
+    yield(System.getProperty("java.io.tmpdir"))
+
+    yield(".") // fallback to the current execution root
+  }
+
+  return options.filterNotNull().filter { it.isNotBlank() }.map(Path::of).first()
+}
+
+/** Creates a new temp directory with the given prefix. */
+@Throws(IOException::class)
+fun createTempDirectory(prefix: String): Path {
+  return Files.createTempDirectory(resolveTempDirectory(), prefix)
+}
+
+/** Deletes a directory recursively, correctly handling symbolic links and junctions. */
 @Throws(IOException::class)
 fun deleteRecursive(directory: Path) {
   Files.walkFileTree(
@@ -50,10 +65,19 @@ fun deleteRecursive(directory: Path) {
           return FileVisitResult.SKIP_SUBTREE
         }
 
+        // fetched repositories may be write protected, e.g. hermetic toolchains
+        if (!Files.isWritable(dir)) {
+          dir.toFile().setWritable(true)
+        }
+
         return FileVisitResult.CONTINUE
       }
 
       override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
+        if (!Files.isWritable(file)) {
+          file.toFile().setWritable(true)
+        }
+
         Files.deleteIfExists(file)
         return FileVisitResult.CONTINUE
       }

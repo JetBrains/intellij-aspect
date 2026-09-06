@@ -31,6 +31,21 @@ kt_jvm_library(
 )
 
 kt_jvm_library(
+    name = "sandbox",
+    srcs = ["sandbox.kt"],
+    deps = [
+        ":bep",
+        ":logger",
+        ":path",
+        ":platform",
+        ":tee",
+        ":zip",
+        "//sdk/lib:deploy",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_core",
+    ],
+)
+
+kt_jvm_library(
     name = "path",
     srcs = ["path.kt"],
 )
