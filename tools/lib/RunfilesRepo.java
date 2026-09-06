@@ -25,12 +25,19 @@ public class RunfilesRepo {
 
   private static Runfiles runfiles;
 
-  public static synchronized Path rlocation(String path) throws IOException {
+  public static synchronized Path location(String path) throws IOException {
     if (runfiles == null) {
       runfiles = Runfiles.preload().withSourceRepository(AutoBazelRepository_RunfilesRepo.NAME);
     }
 
-    final var location = runfiles.rlocation("_main/" + path);
+    String location;
+
+    if (path.startsWith("../")) {
+      location = runfiles.rlocation(path.substring(3));
+    } else {
+      location = runfiles.rlocation("_main/" + path);
+    }
+
     if (location == null) {
       throw new IOException("Cannot find runfile: " + path);
     }
