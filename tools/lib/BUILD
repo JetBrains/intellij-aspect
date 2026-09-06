@@ -9,12 +9,11 @@ java_library(
 )
 
 kt_jvm_library(
-    name = "exec",
-    srcs = ["exec.kt"],
+    name = "cli",
+    srcs = ["cli.kt"],
     visibility = ["//tools:__subpackages__"],
     deps = [
-        "//private/lib:bep",
         "//sdk/lib:deploy",
-        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_cli_jvm",
     ],
 )
