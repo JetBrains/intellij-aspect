@@ -15,7 +15,7 @@ repeats comparable and their average meaningful. The output base is deleted when
 
 For every repeat the tool:
 
-1. runs `bazel build <target> --nobuild --memory_profile=<tmp> --memory_profile_stable_heap_parameters=4,4`,
+1. runs `bazel build <target> --memory_profile=<tmp> --memory_profile_stable_heap_parameters=4,4`,
 2. parses the retained heap of the *Load and analyze dependencies* phase from the memory profile
    (`analysis_heap_used`, `analysis_heap_committed`, in MB), and
 3. reads `bazel info gc-count gc-time max-heap-size peak-heap-size used-heap-size used-heap-size-after-gc`.
@@ -25,14 +25,10 @@ heap is recorded, so `analysis_heap_used` reflects the retained live set after a
 stable, comparable number rather than a noisy point-in-time snapshot. This is the headline metric
 for the aspect's memory overhead.
 
-Because the server is restarted for every repeat, `peak-heap-size` and the GC counters cover that
-one build rather than a whole server lifetime. `max-heap-size` is the JVM's own `-Xmx`, so it is a
-constant and its comparison is always zero.
-
-The default `--nobuild` stops after analysis, so the numbers reflect only the phase where the aspect
-does its work. Pass `--build` to execute the actions too, which is recorded in the report's `build`
-field. Note that bazel then fuses analysis and execution into a single
-*Load, analyze dependencies and build artifacts* phase, so the heap numbers of a `--build` run cover
+Pass `--nobuild` to stop after analysis, so the numbers reflect only the phase where the aspect does
+its work, which is recorded in the report's `nobuild` field. By default the actions are executed too.
+Note that bazel then fuses analysis and execution into a single
+*Load, analyze dependencies and build artifacts* phase, so the heap numbers of a full build cover
 execution as well and are not comparable with the analysis-only ones.
 
 ## The report
@@ -61,8 +57,6 @@ metrics {
 }
 ```
 
-The numbers above are shortened for readability, the report writes full precision.
-
 `values` are the raw per-repeat readings in run order, `avg` is their arithmetic mean and `std`
 their sample standard deviation (n-1). `cmp` is the percentage the aspect average adds over the
 baseline average.
@@ -81,27 +75,45 @@ bazel run //tools/measure -- <project> -l java,kotlin -r 3
 measured with a fully isolated server (own output roots, no rc files, minimal environment), so
 the project's own server and caches are never touched.
 
-## Output
+## Bazel rule
 
-Stdout carries the report and nothing else, so it can be piped into another tool. Everything else -
-the phase and every command the tool runs - goes to stderr:
+`heap_analysis` from `//testing/rules:defs.bzl` runs the tool as a build action against a project
+downloaded by the `bazel_registry.project` module extension tag and produces the report as a
+textproto file. The project archive is extracted once by a separate, cacheable action; only the
+measurement itself re-runs every time.
 
-```
-warmup
-$ .../bazelisk --nosystem_rc --nohome_rc --output_base=... build --lockfile_mode=update --nobuild //...
-baseline 1/3
-$ .../bazelisk ... shutdown
-$ .../bazelisk ... build --lockfile_mode=update --nobuild --memory_profile=... //...
-$ .../bazelisk ... info gc-count gc-time max-heap-size ...
-baseline 2/3
-...
-aspect 1/3
-...
+```python
+bazel_registry.project(
+    name = "intellij_community",
+    commit = "idea/2026.2.2",
+    sha256 = "...",
+    url = "https://github.com/JetBrains/intellij-community",
+)
 ```
 
-The report goes to a file instead with `--report <file>`.
+```python
+load("//testing/rules:defs.bzl", "heap_analysis")
 
-The output of the nested bazel is always recorded, but only shown when a measurement fails, so a
-failure can be diagnosed without the log of a successful benchmark drowning everything else. Pass
-`-v/--verbose` to stream it while it runs, together with a stack trace on failure, or `-q/--quiet`
-to suppress the diagnostics entirely and print the recorded log only if the measurement fails.
+heap_analysis(
+    name = "intellij",
+    bazel_version = "9.2.0",
+    languages = [
+        "java",
+        "kotlin",
+    ],
+    project = "@intellij_community//:project.zip",
+)
+```
+
+`bazel_version` and `languages` are mandatory, everything else has a default: `target` is `//...`,
+`repeats` is 3 and `nobuild` is off, so the measurement covers analysis and execution. Set
+`nobuild = True` for an analysis-only report.
+
+```
+bazel build //testing/tests/perf:intellij
+cat bazel-bin/testing/tests/perf/intellij.textproto
+```
+
+The action is never cached and always re-measures. Benchmark targets should be tagged `manual`, so
+a wildcard build never picks up a multi-minute benchmark, and `exclusive`, so no two of them
+compete for the machine and skew each other's numbers.
