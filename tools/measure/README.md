@@ -105,3 +105,41 @@ The output of the nested bazel is always recorded, but only shown when a measure
 failure can be diagnosed without the log of a successful benchmark drowning everything else. Pass
 `-v/--verbose` to stream it while it runs, together with a stack trace on failure, or `-q/--quiet`
 to suppress the diagnostics entirely and print the recorded log only if the measurement fails.
+
+## Bazel rule
+
+`measure_report` runs the tool as a build action against a project downloaded by the
+`bazel_registry.project` module extension tag and produces the report as a textproto file. The
+project archive is extracted once by a separate, cacheable action; only the measurement itself
+re-runs every time:
+
+```python
+bazel_registry.project(
+    name = "abseil_cpp",
+    commit = "20260817.0",
+    sha256 = "...",
+    url = "https://github.com/abseil/abseil-cpp",
+)
+```
+
+```python
+measure_report(
+    name = "report",
+    languages = ["cc"],
+    project = "@abseil_cpp//:project.zip",
+    tags = ["manual"],
+)
+```
+
+```
+bazel build //tools/measure:report
+cat bazel-bin/tools/measure/report.textproto
+```
+
+The action runs the tool with `--quiet`, so a successful measurement prints nothing - bazel replays
+an action's output even on success, and a benchmark's log is long. A failed measurement prints the
+tail of the nested bazel log, which bazel then surfaces with the action failure.
+
+
+The action is never cached and always re-measures. Benchmark targets should be tagged `manual`
+and built alone for stable numbers.
