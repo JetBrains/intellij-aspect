@@ -1,10 +1,14 @@
-load("@rules_kotlin//kotlin:core.bzl", "define_kt_toolchain")
+load("@rules_kotlin//kotlin:core.bzl", "define_kt_toolchain", "kt_kotlinc_options")
 
-# Overrides rules_kotlin's default toolchain, which pins language/api version to
-# "2.1" while bundling a Kotlin 2.2.x compiler that warns 2.1 is deprecated.
+kt_kotlinc_options(
+    name = "kotlinc_options",
+    x_context_parameters = True,
+)
+
 define_kt_toolchain(
-    name = "kotlin_toolchain",
+    name = "toolchain",
     api_version = "2.2",
     jvm_target = "21",
+    kotlinc_options = ":kotlinc_options",
     language_version = "2.2",
 )
