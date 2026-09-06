@@ -21,16 +21,14 @@ kt_jvm_library(
     testonly = 1,
     srcs = [
         "builder.kt",
-        "sandbox.kt",
         "worker.kt",
     ],
     visibility = ["//testing/rules:__subpackages__"],
     deps = [
         ":worker_java_proto",
-        "//private/lib:bep",
         "//private/lib:path",
-        "//private/lib:platform",
         "//private/lib:proto",
+        "//private/lib:sandbox",
         "//private/lib:tee",
         "//private/lib:zip",
         "//sdk/lib:deploy",

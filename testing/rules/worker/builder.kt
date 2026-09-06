@@ -19,12 +19,12 @@ import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
 import com.google.protobuf.TextFormat
 import com.intellij.aspect.lib.AspectConfig
 import com.intellij.aspect.lib.Aspects
-import com.intellij.aspect.lib.Modules
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.lib.Rules
 import com.intellij.aspect.lib.deployAspectZip
-import com.intellij.aspect.lib.modulesForRules
+import com.intellij.aspect.private.lib.utils.Sandbox
 import com.intellij.aspect.private.lib.utils.asBazelPath
+import com.intellij.aspect.private.lib.utils.build
 import com.intellij.aspect.private.lib.utils.unzip
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.AspectDeployment
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.BazelModule
@@ -59,8 +59,7 @@ fun main(args: Array<String>) {
   require(args.contains("--persistent_worker"))
 
   worker(args) { input ->
-    val version = input.config.bazelVersion
-    deployProject(input.projectArchive)
+    unzip(Path.of(input.projectArchive), projectDirectory)
 
     val rulesets = input.config.ruleSetsList.map(RULES::getValue).toSet()
 
@@ -86,8 +85,7 @@ fun main(args: Array<String>) {
 
     val aspects = Aspects.forRules(rulesets).map { ASPECT_PREFIX.getValue(deployment) + it.toString() }
 
-    val files = bazelBuild(
-      version,
+    val files = build(
       targets = input.targetsList,
       aspects = aspects,
       outputGroups = listOf(OutputGroups.INFO.groupName) + input.outputGroupsList,
@@ -131,7 +129,7 @@ private fun Sandbox.createOutputGroup(entry: Map.Entry<String, Set<Path>>): Outp
 
 @Throws(IOException::class)
 private fun Sandbox.deployBcrAspect(archive: String): Path {
-  val directory = tempDirectory("aspect")
+  val directory = createDirectory("aspect")
   unzip(Path.of(archive), directory)
 
   return directory
