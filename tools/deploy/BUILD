@@ -7,7 +7,7 @@ kt_jvm_library(
     visibility = ["//visibility:private"],
     deps = [
         "//sdk/lib:deploy",
-        "//tools/lib:exec",
+        "//tools/lib:cli",
         "//tools/lib:runfiles_repo",
         "@maven//:org_jetbrains_kotlinx_kotlinx_cli_jvm",
     ],
@@ -15,10 +15,7 @@ kt_jvm_library(
 
 java_binary(
     name = "deploy",
-    data = [
-        "//:archive_bcr",
-        "//:archive_ide",
-    ],
+    data = ["//:archive_bcr"],
     main_class = "com.intellij.aspect.tools.deploy.MainKt",
     runtime_deps = [":deploy_lib"],
 )
