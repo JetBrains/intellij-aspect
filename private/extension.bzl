@@ -15,6 +15,7 @@
 load("//private/repos:bazelisk.bzl", "bazelisk")
 load("//private/repos:bcr_archive.bzl", "bcr_archive")
 load("//private/repos:environment.bzl", "environment")
+load("//private/repos:github_archive.bzl", "github_archive")
 
 _bazelisk = tag_class(attrs = {
     "version": attr.string(mandatory = True),
@@ -22,6 +23,13 @@ _bazelisk = tag_class(attrs = {
 })
 
 _bcr = tag_class(attrs = {
+    "commit": attr.string(mandatory = True),
+    "sha256": attr.string(mandatory = True),
+})
+
+_project = tag_class(attrs = {
+    "name": attr.string(mandatory = True),
+    "url": attr.string(mandatory = True),
     "commit": attr.string(mandatory = True),
     "sha256": attr.string(mandatory = True),
 })
@@ -64,10 +72,20 @@ def _bazel_registry_impl(mctx):
         vars = ["BAZEL_SH"],
     )
 
+    for mod in mctx.modules:
+        for tag in mod.tags.project:
+            github_archive(
+                name = tag.name,
+                url = tag.url,
+                commit = tag.commit,
+                sha256 = tag.sha256,
+            )
+
 bazel_registry = module_extension(
     implementation = _bazel_registry_impl,
     tag_classes = {
         "bazelisk": _bazelisk,
         "bcr": _bcr,
+        "project": _project,
     },
 )
