@@ -140,6 +140,41 @@ The action runs the tool with `--quiet`, so a successful measurement prints noth
 an action's output even on success, and a benchmark's log is long. A failed measurement prints the
 tail of the nested bazel log, which bazel then surfaces with the action failure.
 
+Some projects are not a single checkout. `overlays` extracts further archives into a directory of
+the project, so a layout that upstream assembles with extra clones - such as intellij-community,
+whose `getPlugins.sh` clones the android plugin into `android` - can be pinned as a set of
+archives instead:
+
+```python
+bazel_registry.project(
+    name = "intellij_community",
+    commit = "idea/2026.2.2",
+    sha256 = "...",
+    url = "https://github.com/JetBrains/intellij-community",
+)
+```
+
+```python
+measure_report(
+    name = "intellij_report_nobuild",
+    languages = ["java", "kotlin"],
+    overlays = {"android": "@intellij_android//:project.zip"},
+    project = "@intellij_community//:project.zip",
+    tags = ["manual"],
+)
+
+measure_report(
+    name = "intellij_report_build",
+    build = True,
+    languages = ["java", "kotlin"],
+    overlays = {"android": "@intellij_android//:project.zip"},
+    project = "@intellij_community//:project.zip",
+    tags = ["manual"],
+)
+```
+
+Overlays are extracted by the same cacheable action as the project, with the same `strip_prefix`,
+so the result is one project tree laid out the way a checkout would be.
 
 The action is never cached and always re-measures. Benchmark targets should be tagged `manual`
 and built alone for stable numbers.

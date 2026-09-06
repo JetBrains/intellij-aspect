@@ -49,3 +49,15 @@ measure_report(
     # multi-minute benchmark, must never be part of a wildcard build
     tags = ["manual"],
 )
+
+measure_report(
+    name = "intellij_report_build",
+    languages = [
+        "java",
+        "kotlin",
+    ],
+    overlays = {"android": "@intellij_android//:project.zip"},
+    project = "@intellij_community//:project.zip",
+    # multi-minute benchmark, must never be part of a wildcard build
+    tags = ["manual"],
+)
