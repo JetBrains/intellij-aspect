@@ -52,4 +52,3 @@ object RuleMapArgType : ArgType<Map<Rules, String>>(hasParameter = true) {
     }
   }
 }
-
