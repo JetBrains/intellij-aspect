@@ -236,7 +236,6 @@ suspend fun Sandbox.shutdown() {
   exec("shutdown")
 }
 
-
 /** Builds a file registry URI for bazel, workaround for Bazel 9 crash on Windows when host is null in file:// URIs */
 private fun registryUri(registry: Path): String {
   val uri = registry.toUri()
