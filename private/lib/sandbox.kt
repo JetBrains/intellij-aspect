@@ -21,7 +21,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.io.OutputStream
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
@@ -125,17 +124,23 @@ class Sandbox internal constructor(
   private suspend fun run(cmd: List<String>, name: String? = null): String {
     val builder = ProcessBuilder(cmd)
     builder.directory(projectDirectory.toFile())
-    builder.environment().clear()
+
+    // preserve the host environment, including TEMP/TMP required by Bazel's JNI loader on Windows
     builder.environment().putAll(environment())
 
     logger.log("$ " + cmd.joinToString(" "))
 
-    val output = ByteArrayOutputStream()
+    val stdout = ByteArrayOutputStream()
+
     val exitCode = withContext(Dispatchers.IO) {
       val process = builder.start()
 
-      launch { process.errorStream.transferTo(logger.stream(name)) }
-      launch { process.inputStream.transferTo(tee(output, logger.stream(name))) }
+      launch {
+        logger.stream(name).use(process.errorStream::transferTo)
+      }
+      launch {
+        tee(stdout, logger.stream(name)).use(process.inputStream::transferTo)
+      }
 
       process.waitFor()
     }
@@ -144,7 +149,7 @@ class Sandbox internal constructor(
       throw IOException("${cmd.joinToString(" ")} failed with code $exitCode")
     }
 
-    return output.toString(Charsets.UTF_8)
+    return stdout.toString(Charsets.UTF_8)
   }
 
   private fun environment(): Map<String, String> {

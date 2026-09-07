@@ -26,6 +26,7 @@ kt_jvm_library(
     visibility = ["//testing/rules:__subpackages__"],
     deps = [
         ":worker_java_proto",
+        "//private/lib:logger",
         "//private/lib:path",
         "//private/lib:proto",
         "//private/lib:sandbox",

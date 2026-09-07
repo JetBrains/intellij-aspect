@@ -25,12 +25,9 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.security.MessageDigest
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -70,14 +67,14 @@ fun worker(
 
         server.logger.log("build started: ${input.projectArchive}}")
 
-        val stderr = ByteArrayOutputStream()
+        val log = ByteArrayOutputStream()
 
         try {
           sandbox(
             bazelisk = shared.bazeliskBinary,
             version = server.version,
             root = sandboxRoot,
-            logger = server.logger,
+            logger = server.logger.child(out = log),
           ) {
             outputRoot(server.outputRootDirectory)
             outputBase(server.outputBaseDirectory)
@@ -97,7 +94,7 @@ fun worker(
           }
         } catch (e: Throwable) {
           val builder = StringBuilder()
-          builder.appendLine(stderr.toString())
+          builder.appendLine(log.toString())
           builder.appendLine()
           builder.appendLine(e.stackTraceToString())
 
