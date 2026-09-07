@@ -1,0 +1,46 @@
+name: Benchmark
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  deployments: write
+
+concurrency:
+  group: benchmark
+  cancel-in-progress: false
+
+jobs:
+  heap-overhead:
+    runs-on: Large-Linux-x64-16-64-for-intellij-aspect-public
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Setup Bazel
+      uses: bazel-contrib/setup-bazel@0.18.0
+      with:
+        bazelisk-cache: true
+        disk-cache: ${{ github.workflow }}-linux
+        repository-cache: true
+        cache-save: false
+
+    - name: Run heap analysis
+      run: bazel build //testing/tests/perf:intellij
+
+    - name: Convert reports
+      run: bazel run //tools/measure:benchmark -- bazel-bin/testing/tests/perf/intellij.textproto > "${{ runner.temp }}/report.json"
+
+    - name: Store benchmark results
+      uses: benchmark-action/github-action-benchmark@v1
+      with:
+        name: Heap Analysis
+        tool: customSmallerIsBetter
+        output-file-path: ${{ runner.temp }}/report.json
+        auto-push: false
+
+    - name: Push benchmark results
+      run: git push origin gh-pages:gh-pages

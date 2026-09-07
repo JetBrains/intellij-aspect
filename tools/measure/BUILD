@@ -17,7 +17,11 @@ java_proto_library(
 
 kt_jvm_library(
     name = "measure_lib",
-    srcs = glob(["*.kt"]),
+    srcs = [
+        "analysis.kt",
+        "main.kt",
+        "metrics.kt",
+    ],
     visibility = ["//visibility:private"],
     deps = [
         ":report_java_proto",
@@ -39,4 +43,22 @@ java_binary(
     main_class = "com.intellij.aspect.tools.measure.MainKt",
     visibility = ["//visibility:public"],
     runtime_deps = [":measure_lib"],
+)
+
+kt_jvm_library(
+    name = "benchmark_lib",
+    srcs = ["benchmark.kt"],
+    visibility = ["//visibility:private"],
+    deps = [
+        ":report_java_proto",
+        "@maven//:com_google_code_gson_gson",
+        "@protobuf//:protobuf_java",
+    ],
+)
+
+java_binary(
+    name = "benchmark",
+    main_class = "com.intellij.aspect.tools.measure.BenchmarkKt",
+    visibility = ["//visibility:public"],
+    runtime_deps = [":benchmark_lib"],
 )
