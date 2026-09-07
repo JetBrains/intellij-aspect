@@ -112,9 +112,9 @@ class SimpleTest {
 
   @Test
   fun testOutputs() {
-    val syncFiles = aspect.findOutputGroup(OutputGroups.SYNC)
-    assertThat(syncFiles.filter { it.endsWith("/kotlin-stdlib.jar") }).isNotEmpty()
-    assertThat(syncFiles.filter { it.endsWith("/main.jar") }).isEmpty()
+    // source files (including prebuilt jars such as the Kotlin stdlib) are never part of the sync
+    // group, so nothing has to be built for a plain sync and the group is absent
+    assertThat(aspect.hasOutputGroup(OutputGroups.SYNC)).isFalse()
 
     val buildFiles = aspect.findOutputGroup(OutputGroups.BUILD)
     assertThat(buildFiles.filter { it.endsWith("/main.jar") }).isNotEmpty()

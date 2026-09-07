@@ -141,9 +141,9 @@ class SimpleTest {
 
   @Test
   fun testOutputGroups() {
-    val syncFiles = aspect.findOutputGroup(OutputGroups.SYNC)
-    assertThat(syncFiles).isNotEmpty() // contains at least the test runner
-    assertThat(syncFiles.filter { it.endsWith("main.jar") }).isEmpty()
+    // source files (including prebuilt jars such as the test runner) are never part of the sync
+    // group, so nothing has to be built for a plain sync and the group is absent
+    assertThat(aspect.hasOutputGroup(OutputGroups.SYNC)).isFalse()
 
     val buildFiles = aspect.findOutputGroup(OutputGroups.BUILD)
     assertThat(buildFiles.filter { it.endsWith("main.jar") }).isNotEmpty()
