@@ -100,7 +100,7 @@ heap_analysis = rule(
         ),
         "target": attr.string(default = "//..."),
         "languages": attr.string_list(mandatory = True),
-        "repeats": attr.int(default = 3),
+        "repeats": attr.int(default = 2),
         "bazel_version": attr.string(mandatory = True),
         "nobuild": attr.bool(default = False),
         "_measure": attr.label(

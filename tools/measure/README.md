@@ -85,7 +85,7 @@ measurement itself re-runs every time.
 ```python
 bazel_registry.project(
     name = "intellij_community",
-    commit = "idea/2026.2.2",
+    tag = "idea/2026.2.2",
     sha256 = "...",
     url = "https://github.com/JetBrains/intellij-community",
 )

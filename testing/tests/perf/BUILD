@@ -16,3 +16,26 @@ heap_analysis(
     project = "@intellij_community//:project.zip",
     tags = TAGS,
 )
+
+heap_analysis(
+    name = "communication",
+    bazel_version = "8.7.0",
+    languages = [
+        "cc",
+        "python",
+    ],
+    project = "@score_communication//:project.zip",
+    tags = TAGS,
+)
+
+heap_analysis(
+    name = "bazel",
+    bazel_version = "9.2.0",
+    languages = [
+        "cc",
+        "python",
+        "java",
+    ],
+    project = "@bazelbuild_bazel//:project.zip",
+    tags = TAGS,
+)

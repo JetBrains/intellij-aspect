@@ -55,23 +55,37 @@ bazel_registry.bcr(
 )
 bazel_registry.project(
     name = "intellij_android",
-    commit = "idea/2026.2.2",
     sha256 = "6a028768f90220d580935ccb16f21ec6885b801f1f8e005a139cbededb437748",
+    tag = "idea/2026.2.2",
     url = "https://github.com/JetBrains/android",
 )
 bazel_registry.project(
     name = "intellij_community",
-    commit = "idea/2026.2.2",
     sha256 = "0e77ac04fafb1e5ce3772cd8b8eb40b98494c63ebeed5d5f8ba7861e06011ce5",
+    tag = "idea/2026.2.2",
     url = "https://github.com/JetBrains/intellij-community",
+)
+bazel_registry.project(
+    name = "score_communication",
+    commit = "313f1178628189d267c8cd0d75971bdac04c20ee",
+    sha256 = "2dc81a3b8e80dca97b8ee0aac7b6443e7674dfdddb62c48a66dba25dade6f26e",
+    url = "https://github.com/eclipse-score/communication",
+)
+bazel_registry.project(
+    name = "bazelbuild_bazel",
+    commit = "77d1415c3e74fd9d57f3f13d124f9fb58a1c96b5",
+    sha256 = "79d9954f115a6cff397f19079a221ee598fc3e8e5a65e270210566a0d872e4b2",
+    url = "https://github.com/bazelbuild/bazel",
 )
 use_repo(
     bazel_registry,
     "bazel_env",
+    "bazelbuild_bazel",
     "bazelisk",
     "bcr_archive",
     "intellij_android",
     "intellij_community",
+    "score_communication",
 )
 
 config = use_extension("//config:extension.bzl", "config")

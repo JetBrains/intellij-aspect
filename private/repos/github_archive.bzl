@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-_ARCHIVE_URL = "{url}/archive/{commit}.zip"
+_COMMIT_ARCHIVE_URL = "{url}/archive/{commit}.zip"
+_TAG_ARCHIVE_URL = "{url}/archive/refs/tags/{tag}.zip"
 
 _BUILD_FILE = """
 package(default_visibility = ["//visibility:public"])
@@ -26,7 +27,14 @@ filegroup(
 """
 
 def _github_archive_impl(rctx):
-    url = _ARCHIVE_URL.format(url = rctx.attr.url.rstrip("/"), commit = rctx.attr.commit)
+    if bool(rctx.attr.commit) == bool(rctx.attr.tag):
+        fail("github_archive must specify exactly one of commit or tag")
+
+    base_url = rctx.attr.url.rstrip("/")
+    if rctx.attr.commit:
+        url = _COMMIT_ARCHIVE_URL.format(url = base_url, commit = rctx.attr.commit)
+    else:
+        url = _TAG_ARCHIVE_URL.format(url = base_url, tag = rctx.attr.tag)
 
     # download zip WITHOUT extracting - consumers work on a private extracted copy
     rctx.download(
@@ -45,13 +53,15 @@ github_archive = repository_rule(
             doc = "URL of the GitHub project, e.g. https://github.com/abseil/abseil-cpp",
         ),
         "commit": attr.string(
-            mandatory = True,
-            doc = "Git commit SHA or tag of the project to download",
+            doc = "Git commit SHA of the project to download; mutually exclusive with tag",
+        ),
+        "tag": attr.string(
+            doc = "Git tag of the project to download; mutually exclusive with commit",
         ),
         "sha256": attr.string(
             mandatory = True,
             doc = "SHA256 checksum of the downloaded zip file",
         ),
     },
-    doc = "Downloads a GitHub project source archive as a zip file.",
+    doc = "Downloads a GitHub project source archive at a commit or tag as a zip file.",
 )
