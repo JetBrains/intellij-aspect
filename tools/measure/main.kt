@@ -25,8 +25,10 @@ import com.intellij.aspect.lib.deployAspectZip
 import com.intellij.aspect.private.lib.utils.Logger
 import com.intellij.aspect.private.lib.utils.Sandbox
 import com.intellij.aspect.private.lib.utils.createTempDirectory
+import com.intellij.aspect.private.lib.utils.resolvePath
 import com.intellij.aspect.private.lib.utils.sandbox
 import com.intellij.aspect.private.lib.utils.shutdown
+import com.intellij.aspect.private.lib.utils.unzip
 import com.intellij.aspect.tools.RunfilesRepo
 import com.intellij.aspect.tools.lib.LanguagesArgType
 import com.intellij.aspect.tools.lib.PathArgType
@@ -37,6 +39,7 @@ import kotlinx.cli.ArgType
 import kotlinx.cli.default
 import kotlinx.cli.required
 import kotlinx.coroutines.runBlocking
+import java.io.IOError
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -44,6 +47,9 @@ import kotlin.system.exitProcess
 
 // path to the bazelisk executable in the generated repository
 private const val BAZELISK_EXECUTABLE = "../bazelisk/bazelisk"
+
+// the same pinned BCR snapshot used by the test fixtures
+private const val BCR_ARCHIVE = "../bcr_archive/bcr.zip"
 
 // 4,4 = do 4 full GCs, waiting 4s between them, before recording each phase's heap
 private const val STABLE_HEAP_FLAG = "--memory_profile_stable_heap_parameters=4,4"
@@ -60,7 +66,7 @@ private val OUTPUT_GROUPS = "--output_groups=" + OutputGroups.entries.joinToStri
 // project files that are not copied to the sandbox
 private val EXCLUDED_ENTRIES = setOf(".bazeliskrc", ".bazeliskversion", "MODULE.bazel.lock")
 
-fun main(args: Array<String>) {
+fun main(args: Array<String>): Unit = runBlocking {
   val parser = ArgParser("measure")
 
   val project by parser.argument(
@@ -114,7 +120,13 @@ fun main(args: Array<String>) {
     description = "Deploy the aspect for builtin rules.",
   ).default(false)
 
-  val noBuild by parser.option(
+  val repoCache by parser.option(
+    ArgType.String,
+    fullName = "repo_cache",
+    description = "Persistent repository download cache directory (supports ~/).",
+  )
+
+  val nobuild by parser.option(
     ArgType.Boolean,
     fullName = "nobuild",
     description = "Execute the only the analysis phase.",
@@ -136,39 +148,13 @@ fun main(args: Array<String>) {
     rulesets = languages,
   )
 
-  val logger = Logger(quiet = quiet)
+  val logger = if (quiet) Logger.quiet() else Logger()
 
-  val report = try {
-    runBlocking { measure(project.toAbsolutePath(), aspect, target, noBuild, repeat, logger) }
-  } catch (e: Exception) {
-    logger.log("Error: ${e.message}")
-    exitProcess(2)
-  }
+  val report = catchingSandbox(aspect, logger) {
+    repoCache?.let { repoCache(resolvePath(it).toAbsolutePath()) }
 
-  val rendered = TextFormat.printer().printToString(report)
-  reportFile?.let { Files.writeString(it, rendered) } ?: print(rendered)
-}
-
-/**
- * Measures a baseline and an aspect-enabled build of [project] in an isolated sandbox, so the
- * project's own server and caches are never touched.
- */
-@Throws(IOException::class)
-private suspend fun measure(
-  project: Path,
-  aspect: AspectConfig,
-  target: String,
-  nobuild: Boolean,
-  repeat: Int,
-  logger: Logger,
-): Report {
-  return sandbox(
-    bazelisk = RunfilesRepo.location(BAZELISK_EXECUTABLE),
-    version = aspect.bazelVersion,
-    root = createTempDirectory("measure"),
-    logger = logger,
-  ) {
     linkProject(project, projectDirectory)
+    deployBCRRegistry()
     deployAspectZip(projectDirectory, Path.of(ASPECT_DESTINATION), aspect)
 
     val report = context(Measurement(this, target, nobuild, logger)) {
@@ -189,6 +175,28 @@ private suspend fun measure(
     shutdown()
     report
   }
+
+  val rendered = TextFormat.printer().printToString(report)
+  reportFile?.let { Files.writeString(it, rendered) } ?: print(rendered)
+}
+
+private suspend fun <T> catchingSandbox(
+  aspect: AspectConfig,
+  logger: Logger,
+  body: suspend Sandbox.() -> T,
+): T {
+  try {
+    return sandbox(
+      bazelisk = RunfilesRepo.location(BAZELISK_EXECUTABLE),
+      version = aspect.bazelVersion,
+      root = createTempDirectory("measure"),
+      logger = logger,
+      body = body,
+    )
+  } catch (e: Throwable) {
+    logger.error(e)
+    exitProcess(2)
+  }
 }
 
 /**
@@ -199,13 +207,20 @@ private suspend fun measure(
  */
 @Throws(IOException::class)
 private fun linkProject(project: Path, destination: Path) {
-  Files.newDirectoryStream(project).use { entries ->
+  Files.newDirectoryStream(project.toAbsolutePath()).use { entries ->
     for (entry in entries) {
       val name = entry.fileName.toString()
       if (name in EXCLUDED_ENTRIES || name.startsWith("bazel-")) continue
       Files.createSymbolicLink(destination.resolve(entry.fileName), entry)
     }
   }
+}
+
+@Throws(IOError::class)
+private fun Sandbox.deployBCRRegistry() {
+  val registryDirectory = createDirectory("registry")
+  unzip(RunfilesRepo.location(BCR_ARCHIVE), registryDirectory, stripPrefix = 1)
+  registry(registryDirectory)
 }
 
 /**

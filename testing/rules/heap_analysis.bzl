@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
+
 def _project_archives(ctx):
     """Returns the archives to extract as destination to archive map, the project first."""
     archives = {"": ctx.file.project}
@@ -65,6 +67,10 @@ def _heap_analysis_impl(ctx):
     args.add("--bazel_version", ctx.attr.bazel_version)
     args.add("--quiet")
 
+    repo_cache = ctx.attr._repo_cache[BuildSettingInfo].value
+    if repo_cache:
+        args.add("--repo_cache", repo_cache)
+
     if ctx.attr.nobuild:
         args.add("--nobuild")
 
@@ -79,6 +85,7 @@ def _heap_analysis_impl(ctx):
             "requires-network": "1",
             "no-cache": "1",
             "no-remote": "1",
+            "no-sandbox": "1",
         },
     )
 
@@ -103,6 +110,9 @@ heap_analysis = rule(
         "repeats": attr.int(default = 2),
         "bazel_version": attr.string(mandatory = True),
         "nobuild": attr.bool(default = False),
+        "_repo_cache": attr.label(
+            default = Label("//testing/rules:repo_cache"),
+        ),
         "_measure": attr.label(
             cfg = "exec",
             executable = True,

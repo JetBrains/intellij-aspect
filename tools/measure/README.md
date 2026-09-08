@@ -6,8 +6,9 @@ recording heap and GC statistics so the aspect's overhead can be read directly f
 
 ## What it measures
 
-The tool measures against a fresh output base in a temporary directory, so it never touches a
-server or cache of the project itself. It first pre-warms that output base with
+The tool measures against a fresh output base in a temporary directory, keeping the project's
+own server and build outputs separate. Repository downloads can use a shared persistent cache.
+It first pre-warms that output base with
 `bazel build --nobuild <target>`, so the measured builds do not pay the fetch cost. All runs then share that
 output base, but the server is shut down before every build, so each repeat measures a cold
 analysis instead of an incremental re-analysis of the repeat before it - which is what makes the
@@ -71,9 +72,21 @@ baseline - is zero, and therefore omitted from the textproto. The baseline run i
 bazel run //tools/measure -- <project> -l java,kotlin -r 3
 ```
 
-`<project>` is a Bazel workspace directory. Its contents are linked into a temporary sandbox and
-measured with a fully isolated server (own output roots, no rc files, minimal environment), so
-the project's own server and caches are never touched.
+`<project>` is a Bazel workspace directory. Its contents are linked into a temporary workspace and
+measured with a separate server (own output roots, no system or home rc files, minimal environment).
+The project's `.bazelrc` is read. Build actions run on the host with `--spawn_strategy=local`.
+
+To reuse repository downloads between invocations, pass a cache directory explicitly:
+
+```sh
+bazel run //tools/measure -- <project> -l java,kotlin -r 3 --repo_cache ~/.cache/intellij-aspect-repo
+```
+
+The tool uses the pinned local BCR snapshot from `@bcr_archive`, also used by the test fixtures.
+Registry metadata is extracted before warmup and resolved locally; module source archives and
+toolchains still need network access on cache misses. Update `bazel_registry.bcr` in `MODULE.bazel`
+if a project needs module versions newer than the snapshot. The repository cache stores downloads,
+not build outputs, so sharing it preserves the cold analysis measurements.
 
 ## Bazel rule
 
@@ -114,6 +127,24 @@ bazel build //testing/tests/perf:intellij
 cat bazel-bin/testing/tests/perf/intellij.textproto
 ```
 
-The action is never cached and always re-measures. Benchmark targets should be tagged `manual`, so
+The measurement action runs locally without Bazel sandboxing, is never cached, and always
+re-measures. Project extraction remains a separate cacheable action.
+
+Configure the repository cache with the existing test-infrastructure flag, either on the command
+line or in the git-ignored `user.bazelrc`:
+
+```text
+build --//testing/rules:repo_cache=~/.cache/intellij-aspect-repo
+```
+
+The directory is created if needed; `~` is expanded and relative paths are resolved against the
+measurement process's working directory. Prefer an absolute path or `~/` in `user.bazelrc`.
+An unset flag leaves Bazel's default cache under the temporary output root, so downloads are not
+preserved between benchmark invocations.
+
+CI passes `bazel info repository_cache` to the same flag, sharing the repository cache restored
+and saved by `setup-bazel` with the nested benchmark builds.
+
+Benchmark targets should be tagged `manual`, so
 a wildcard build never picks up a multi-minute benchmark, and `exclusive`, so no two of them
 compete for the machine and skew each other's numbers.

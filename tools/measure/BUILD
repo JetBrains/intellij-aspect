@@ -22,8 +22,10 @@ kt_jvm_library(
     deps = [
         ":report_java_proto",
         "//private/lib:logger",
+        "//private/lib:path",
         "//private/lib:sandbox",
         "//private/lib:tee",
+        "//private/lib:zip",
         "//sdk/lib:deploy",
         "//tools/lib:cli",
         "//tools/lib:runfiles_repo",
@@ -35,7 +37,10 @@ kt_jvm_library(
 
 java_binary(
     name = "measure",
-    data = ["@bazelisk//:executable"],
+    data = [
+        "@bazelisk//:executable",
+        "@bcr_archive//:bcr.zip",
+    ],
     main_class = "com.intellij.aspect.tools.measure.MainKt",
     visibility = ["//visibility:public"],
     runtime_deps = [":measure_lib"],
