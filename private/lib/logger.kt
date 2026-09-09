@@ -55,7 +55,11 @@ class Logger(
   }
 
   /** Creates a child logger with a new name. */
-  fun child(name: String): Logger = Logger(name = name, sink = out, quiet = quiet)
+  fun child(name: String? = null, out: OutputStream? = null): Logger = Logger(
+    name = name ?: this.name,
+    sink = out?.let { tee(it, this.out) } ?: this.out,
+    quiet = quiet,
+  )
 }
 
 private class LineOutputStream(private val sink: (String) -> Unit) : OutputStream() {
