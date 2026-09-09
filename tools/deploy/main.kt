@@ -20,7 +20,8 @@ import com.intellij.aspect.lib.AspectConfig
 import com.intellij.aspect.lib.Rules
 import com.intellij.aspect.lib.deployAspectZip
 import com.intellij.aspect.tools.RunfilesRepo
-import com.intellij.aspect.tools.lib.executeCommand
+import com.intellij.aspect.tools.lib.LanguagesArgType
+import com.intellij.aspect.tools.lib.RuleMapArgType
 import kotlinx.cli.ArgParser
 import kotlinx.cli.ArgType
 import kotlinx.cli.default
@@ -30,7 +31,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.system.exitProcess
 
-private const val ARCHIVE_IDE = "archive_ide.zip"
 private const val LOCAL_DEPLOY = "archive_bcr.tar.gz"
 
 fun main(args: Array<String>) {
@@ -67,40 +67,41 @@ fun main(args: Array<String>) {
   )
 
   val languages by parser.option(
-    ArgType.String,
+    LanguagesArgType,
     shortName = "l",
     fullName = "languages",
     description = "Comma separated list of languages to deploy",
   ).required()
 
   val ruleRemap by parser.option(
-    ArgType.String,
+    RuleMapArgType,
     fullName = "rule_remap",
     description = "Comma separated ruleset repo remappings, e.g. scala=@my_scala,cc=@my_rules_cc",
-  ).default("")
+  ).default(emptyMap())
 
   parser.parse(args)
 
   val targetPath = Path.of(path).toAbsolutePath()
   val relativePath = relativeDestination?.let(Path::of)
 
-  val rulesets = languages.split(",").mapNotNull { language ->
-    Rules.entries.firstOrNull { it.name.equals(language, ignoreCase = true) }
-  }.toSet()
-
-  System.err.println("Selected languages: ${rulesets.joinToString(", ")}")
-
-  val repoMapping = parseRuleRemap(ruleRemap)
-
-  if (repoMapping.isNotEmpty()) {
-    System.err.println("Rule remappings: ${repoMapping.entries.joinToString(", ") { "${it.key}=${it.value}" }}")
-  }
-
   try {
+    System.err.println("Selected languages: ${languages.joinToString(", ")}")
+
+    if (ruleRemap.isNotEmpty()) {
+      System.err.println("Rule remappings: ${ruleRemap.entries.joinToString(", ") { "${it.key}=${it.value}" }}")
+    }
+
+    val aspect = AspectConfig(
+      bazelVersion = bazelVersion,
+      repoMapping = ruleRemap,
+      useBuiltin = if (method == "builtin") Rules.entries.toSet() else emptySet(),
+      rulesets = languages,
+    )
+
     when (method) {
       "bcr" -> deployBcr(targetPath)
-      "materialized" -> deployIde(targetPath, relativePath, rulesets, repoMapping, bazelVersion, useBuiltin = false)
-      "builtin" -> deployIde(targetPath, relativePath, rulesets, repoMapping, bazelVersion, useBuiltin = true)
+      "materialized" -> deployAspectZip(targetPath, relativePath ?: Path.of("aspect", "default"), aspect)
+      "builtin" -> deployAspectZip(targetPath, relativePath ?: Path.of("aspect", "builtin"), aspect)
     }
 
     System.err.println("Deployed aspect ($method) to $targetPath")
@@ -118,61 +119,15 @@ fun main(args: Array<String>) {
 private fun deployBcr(targetPath: Path) {
   Files.createDirectories(targetPath)
 
-  executeCommand(
+  val cmd = listOf(
     "tar",
-    "xf", RunfilesRepo.rlocation(LOCAL_DEPLOY).toString(),
+    "xf", RunfilesRepo.location(LOCAL_DEPLOY).toString(),
     "-C", targetPath.toString(),
     "--strip-components", "1",
   )
-}
 
-/**
- * Parses a comma separated list of `ruleset=@repo` remappings into a [Rules] keyed map.
- *
- * Ruleset keys are matched against the [Rules] enum case-insensitively. Exits the process with a
- * clear message on a malformed entry or an unknown ruleset key.
- */
-private fun parseRuleRemap(remap: String): Map<Rules, String> {
-  return remap.split(",").filter { it.isNotBlank() }.associate { entry ->
-    val separator = entry.indexOf('=')
-    if (separator < 0) {
-      System.err.println("Error: invalid rule remapping '${entry.trim()}', expected ruleset=@repo")
-      exitProcess(2)
-    }
-
-    val key = entry.substring(0, separator).trim()
-    val value = entry.substring(separator + 1).trim()
-
-    val rule = Rules.entries.firstOrNull { it.name.equals(key, ignoreCase = true) }
-    if (rule == null) {
-      System.err.println("Error: unknown ruleset '$key' in rule remapping")
-      exitProcess(2)
-    }
-
-    rule to value
+  val process = ProcessBuilder(cmd).inheritIO().start()
+  if (process.waitFor() != 0) {
+    throw IOException("${cmd.joinToString(" ")} failed")
   }
-}
-
-@Throws(IOException::class)
-private fun deployIde(
-  targetPath: Path,
-  relativePath: Path?,
-  rulesets: Set<Rules>,
-  repoMapping: Map<Rules, String>,
-  bazelVersion: String,
-  useBuiltin: Boolean,
-) {
-  val config = AspectConfig(
-    bazelVersion = bazelVersion,
-    repoMapping = repoMapping,
-    useBuiltin = if (useBuiltin) Rules.entries.toSet() else emptySet(),
-    rulesets = rulesets,
-  )
-
-  deployAspectZip(
-    workspaceRoot = targetPath,
-    relativeDestination = relativePath ?: Path.of("aspect", if (useBuiltin) "builtin" else "default"),
-    archiveZip = RunfilesRepo.rlocation(ARCHIVE_IDE),
-    config = config,
-  )
 }
