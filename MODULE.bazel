@@ -53,7 +53,26 @@ bazel_registry.bcr(
     commit = "de6c049ad4ec6c4dc484930d95834066f0af985c",
     sha256 = "b8230294a465d3d59d82fb0be9b1d8bbb40e5639e5c880182b331d21c15fc779",
 )
-use_repo(bazel_registry, "bazel_env", "bazelisk", "bcr_archive")
+bazel_registry.project(
+    name = "intellij_android",
+    commit = "idea/2026.2.2",
+    sha256 = "6a028768f90220d580935ccb16f21ec6885b801f1f8e005a139cbededb437748",
+    url = "https://github.com/JetBrains/android",
+)
+bazel_registry.project(
+    name = "intellij_community",
+    commit = "idea/2026.2.2",
+    sha256 = "0e77ac04fafb1e5ce3772cd8b8eb40b98494c63ebeed5d5f8ba7861e06011ce5",
+    url = "https://github.com/JetBrains/intellij-community",
+)
+use_repo(
+    bazel_registry,
+    "bazel_env",
+    "bazelisk",
+    "bcr_archive",
+    "intellij_android",
+    "intellij_community",
+)
 
 config = use_extension("//config:extension.bzl", "config")
 use_repo(config, "intellij_config")
