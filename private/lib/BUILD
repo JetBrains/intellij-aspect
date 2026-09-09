@@ -25,6 +25,12 @@ kt_jvm_library(
 )
 
 kt_jvm_library(
+    name = "logger",
+    srcs = ["logger.kt"],
+    deps = [":tee"],
+)
+
+kt_jvm_library(
     name = "path",
     srcs = ["path.kt"],
 )
