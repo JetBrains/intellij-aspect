@@ -415,7 +415,7 @@
     "//private:extension.bzl%bazel_registry": {
       "general": {
         "bzlTransitiveDigest": "2QGu2NncsL8WjOhFUuq2DycK0FwfH8DrgWDVbeKsdgM=",
-        "usagesDigest": "iZLWNxhT+9ONdhxlEUQhpvvwGz3Ad2ao85DSgOLsPHA=",
+        "usagesDigest": "N2QrHSUVdqYa5MFN4nT3CPKN1E6fidzBcjUn3TSa9fk=",
         "recordedInputs": [],
         "generatedRepoSpecs": {
           "bazelisk": {
@@ -473,7 +473,7 @@
               "url": "https://github.com/bazelbuild/bazel",
               "commit": "77d1415c3e74fd9d57f3f13d124f9fb58a1c96b5",
               "tag": "",
-              "sha256": "09d65a25d6cd5fd65df1c2ddd0f94fc4f76005375c694c7e072b0545f13b6fdd"
+              "sha256": "79d9954f115a6cff397f19079a221ee598fc3e8e5a65e270210566a0d872e4b2"
             }
           }
         }
@@ -546,7 +546,7 @@
     "@@aspect_tools_telemetry+//:extension.bzl%telemetry": {
       "general": {
         "bzlTransitiveDigest": "XVKR7Fz0TpsBTBIjxfUrpsRKdh9a5XZHQEJmfRGJOD8=",
-        "usagesDigest": "4eYfYGZkkZZem5Ss/tvRTn4oYAhl3RAUYpmiLLQszC0=",
+        "usagesDigest": "6Q9OCLeYxKnHawj/ALppnjkvMb8bM51clTXIIWF2Wh4=",
         "recordedInputs": [
           "REPO_MAPPING:aspect_tools_telemetry+,bazel_lib bazel_lib+",
           "REPO_MAPPING:aspect_tools_telemetry+,bazel_skylib bazel_skylib+",
@@ -557,10 +557,10 @@
             "repoRuleId": "@@aspect_tools_telemetry+//:extension.bzl%tel_repository",
             "attributes": {
               "deps": {
-                "aspect_rules_lint": "2.8.0",
+                "aspect_rules_lint": "2.9.0",
                 "aspect_tools_telemetry": "0.5.0"
               },
-              "last_notice": 0
+              "last_notice": 2
             }
           }
         },
@@ -672,7 +672,7 @@
     "@@rules_multitool+//multitool:extension.bzl%multitool": {
       "general": {
         "bzlTransitiveDigest": "s+rg9YTYK9CxhExLmokBLy6sbL6I8ELJ7FgNiXGKZu4=",
-        "usagesDigest": "eWpXzaD9ht18VnQw3S20m3gV480QjWem9SRAxNGDi6w=",
+        "usagesDigest": "s0jYV5Mp+svbi4uj/MxNFj54Y3TGXlAcRelm3CSsgBw=",
         "recordedInputs": [
           "REPO_MAPPING:bazel_features+,bazel_features_globals bazel_features++version_extension+bazel_features_globals",
           "REPO_MAPPING:bazel_features+,bazel_features_version bazel_features++version_extension+bazel_features_version",
@@ -891,7 +891,7 @@
     "@@rules_python+//python/uv:uv.bzl%uv": {
       "general": {
         "bzlTransitiveDigest": "DafUArm1CsjJZcemT0FvUq9rUch+pq38+JqfOBJCpm8=",
-        "usagesDigest": "rsbDWWcEsfRym/giLjUsaFblUZe4I1JWHQj/UPIwWtQ=",
+        "usagesDigest": "/es1dlCJ3YpjHVj8EkSHb7nx0o2eC4dyZXjkDGxgiXY=",
         "recordedInputs": [
           "REPO_MAPPING:rules_python+,bazel_tools bazel_tools",
           "REPO_MAPPING:rules_python+,platforms platforms"
