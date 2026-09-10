@@ -19,6 +19,7 @@ package com.intellij.aspect.testing.tests.java
 import com.google.common.truth.Truth.assertThat
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
+import com.intellij.aspect.testing.rules.utils.assertThatOutputGroup
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,6 +53,6 @@ class ResourcesTest {
   @Test
   fun testOutputGroups() {
     val buildFiles = aspect.findOutputGroup(OutputGroups.BUILD)
-    assertThat(buildFiles.filter { it.endsWith("greeting.txt") }).isNotEmpty()
+    assertThatOutputGroup(buildFiles).containsFile("greeting.txt")
   }
 }

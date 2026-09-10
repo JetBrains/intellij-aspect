@@ -1,3 +1,4 @@
+load("//common:output_groups.bzl", "intellij_output_groups")
 load("//testing/rules:defs.bzl", "test_fixture")
 
 package(
@@ -66,6 +67,10 @@ test_fixture(
         "--inject_repository=external_module=module",
     ],
     modules = _MODULES,
+    output_groups = [
+        intellij_output_groups.SYNC,
+        intellij_output_groups.BUILD,
+    ],
     rule_sets = ["cc"],
     strip_prefix = "layout",
     targets = ["//main:main"],
@@ -80,6 +85,10 @@ test_fixture(
         "--inject_repository=external_module=module",
     ],
     modules = _MODULES,
+    output_groups = [
+        intellij_output_groups.SYNC,
+        intellij_output_groups.BUILD,
+    ],
     rule_sets = ["cc"],
     strip_prefix = "layout",
     targets = ["//main:main"],

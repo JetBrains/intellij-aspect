@@ -18,9 +18,11 @@ package com.intellij.aspect.testing.tests.cpp
 
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.DependencyType
+import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import com.intellij.aspect.testing.rules.utils.assertThatArtifacts
 import com.intellij.aspect.testing.rules.utils.assertThatDeps
+import com.intellij.aspect.testing.rules.utils.assertThatOutputGroup
 import com.intellij.aspect.testing.rules.utils.findCIdeInfo
 import org.junit.Rule
 import org.junit.Test
@@ -81,5 +83,18 @@ class LayoutTest {
       .withType(DependencyType.COMPILE_TIME)
       .keys()
       .contains(dep.key)
+  }
+
+  @Test
+  fun testSyncOutputGroup() {
+    val sync = aspect.findOutputGroup(OutputGroups.SYNC)
+    assertThatOutputGroup(sync).hasSize(1)
+    assertThatOutputGroup(sync).containsFile("srcs/lib.h")
+    assertThatOutputGroup(sync).doesNotContainFile("lib/generated.h")
+
+    val build = aspect.findOutputGroup(OutputGroups.BUILD)
+    assertThatOutputGroup(build).hasSize(2)
+    assertThatOutputGroup(build).containsFile("srcs/lib.h")
+    assertThatOutputGroup(build).containsFile("lib/generated.h")
   }
 }

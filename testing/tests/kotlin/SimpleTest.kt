@@ -19,6 +19,7 @@ package com.intellij.aspect.testing.tests.kotlin
 import com.google.common.truth.Truth.assertThat
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
+import com.intellij.aspect.testing.rules.utils.assertThatOutputGroup
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -113,12 +114,12 @@ class SimpleTest {
   @Test
   fun testOutputs() {
     val syncFiles = aspect.findOutputGroup(OutputGroups.SYNC)
-    assertThat(syncFiles.filter { it.endsWith("/kotlin-stdlib.jar") }).isNotEmpty()
-    assertThat(syncFiles.filter { it.endsWith("/main.jar") }).isEmpty()
+    assertThatOutputGroup(syncFiles).containsFile("kotlin-stdlib.jar")
+    assertThatOutputGroup(syncFiles).doesNotContainFile("main.jar")
 
     val buildFiles = aspect.findOutputGroup(OutputGroups.BUILD)
-    assertThat(buildFiles.filter { it.endsWith("/main.jar") }).isNotEmpty()
-    assertThat(buildFiles.filter { it.endsWith("/lib/util.jar") }).isNotEmpty()
-    assertThat(buildFiles.filter { it.endsWith("Main.kt") }).isNotEmpty()
+    assertThatOutputGroup(buildFiles).containsFile("main.jar")
+    assertThatOutputGroup(buildFiles).containsFile("lib/util.jar")
+    assertThatOutputGroup(buildFiles).containsFile("Main.kt")
   }
 }

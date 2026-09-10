@@ -24,6 +24,8 @@ import com.google.devtools.intellij.aspect.Common.ArtifactLocation
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.DependencyType
+import java.nio.file.FileSystems
+import java.nio.file.Path
 
 inline fun <reified T : Any> assertNotNull(value: T?): T {
   return value ?: throw AssertionError("value of type ${T::class} is null")
@@ -41,7 +43,7 @@ class ArtifactLocationsSubject(
 
 private val ARTIFACT_LOCATIONS_SUBJECT_FACTORY = Subject.Factory(::ArtifactLocationsSubject)
 
-fun assertThatArtifacts(actual: Iterable<ArtifactLocation>): ArtifactLocationsSubject {
+fun assertThatArtifacts(actual: Iterable<ArtifactLocation>?): ArtifactLocationsSubject {
   return assertAbout(ARTIFACT_LOCATIONS_SUBJECT_FACTORY).that(actual)
 }
 
@@ -67,6 +69,39 @@ class DependenciesSubject(
 
 private val DEPENDENCIES_SUBJECT_FACTORY = Subject.Factory(::DependenciesSubject)
 
-fun assertThatDeps(actual: Iterable<Dependency>): DependenciesSubject {
+fun assertThatDeps(actual: Iterable<Dependency>?): DependenciesSubject {
   return assertAbout(DEPENDENCIES_SUBJECT_FACTORY).that(actual)
+}
+
+class OutputGroupSubject(
+  metadata: FailureMetadata,
+  private val actual: Iterable<String>?,
+) : IterableSubject(metadata, actual) {
+
+  fun containsFile(suffix: String) {
+    check("contains file with suffix %s", suffix)
+      .that(actual?.filter { Path.of(it).endsWith(suffix) })
+      .isNotEmpty()
+  }
+
+  fun doesNotContainFile(suffix: String) {
+    check("contains no file with suffix %s", suffix)
+      .that(actual?.filter { Path.of(it).endsWith(suffix) })
+      .isEmpty()
+  }
+
+  /** Asserts that the group contains a file matching [glob], e.g. `materialized_*main.jdeps`. */
+  fun containsFileMatching(glob: String) {
+    val matcher = FileSystems.getDefault().getPathMatcher("glob:**$glob")
+
+    check("contains file matching %s", glob)
+      .that(actual?.filter { matcher.matches(Path.of(it)) })
+      .isNotEmpty()
+  }
+}
+
+private val OUTPUT_GROUP_SUBJECT_FACTORY = Subject.Factory(::OutputGroupSubject)
+
+fun assertThatOutputGroup(actual: Iterable<String>?): OutputGroupSubject {
+  return assertAbout(OUTPUT_GROUP_SUBJECT_FACTORY).that(actual)
 }
