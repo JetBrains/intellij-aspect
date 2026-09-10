@@ -415,7 +415,7 @@
     "//private:extension.bzl%bazel_registry": {
       "general": {
         "bzlTransitiveDigest": "2QGu2NncsL8WjOhFUuq2DycK0FwfH8DrgWDVbeKsdgM=",
-        "usagesDigest": "s0KYrj1KKZpPbGDT94WIyIPfV3wiLcVfYD6V36fzcQg=",
+        "usagesDigest": "N2QrHSUVdqYa5MFN4nT3CPKN1E6fidzBcjUn3TSa9fk=",
         "recordedInputs": [],
         "generatedRepoSpecs": {
           "bazelisk": {
@@ -458,13 +458,13 @@
               "sha256": "0e77ac04fafb1e5ce3772cd8b8eb40b98494c63ebeed5d5f8ba7861e06011ce5"
             }
           },
-          "google_pigweed": {
+          "score_communication": {
             "repoRuleId": "@@//private/repos:github_archive.bzl%github_archive",
             "attributes": {
-              "url": "https://github.com/pigweed-project/pigweed",
-              "commit": "766f56f0bfeb29624fc0f240cd141afb3398f839",
+              "url": "https://github.com/eclipse-score/communication",
+              "commit": "313f1178628189d267c8cd0d75971bdac04c20ee",
               "tag": "",
-              "sha256": "c813cbab0b56e71458c1576b4674fbcd7852c4db4221b61ecb5c4703fd50768a"
+              "sha256": "2dc81a3b8e80dca97b8ee0aac7b6443e7674dfdddb62c48a66dba25dade6f26e"
             }
           },
           "bazelbuild_bazel": {
