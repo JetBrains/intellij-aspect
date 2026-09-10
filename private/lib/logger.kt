@@ -59,8 +59,8 @@ open class Logger(sink: OutputStream = System.err, private val name: String? = n
   }
 
   /** Creates a child logger with a new name. */
-  fun child(name: String, out: OutputStream? = null): Logger {
-    return Logger(name = name, sink = out?.let { tee(it, this.out) } ?: this.out)
+  fun child(name: String? = null, out: OutputStream? = null): Logger {
+    return Logger(name = name ?: this.name, sink = out?.let { tee(it, this.out) } ?: this.out)
   }
 
   /** Reports an exception. Forces the logger to write to the underlying stream even if it is quiet. */
