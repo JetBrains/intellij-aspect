@@ -22,6 +22,7 @@ import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.private.lib.utils.isWindows
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import com.intellij.aspect.testing.rules.utils.assertThatDeps
+import com.intellij.aspect.testing.rules.utils.assertThatOutputGroup
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -72,10 +73,10 @@ class SimpleTest {
   fun testOutputGroups() {
     if (!isWindows()) {
       val buildFiles = aspect.findOutputGroup(OutputGroups.BUILD)
-      assertThat(buildFiles.filter { it.contains("consumerJava/main.jar") }).isNotEmpty()
-      assertThat(buildFiles.filter { it.contains("consumerJava/main-src.jar") }).isNotEmpty()
-      assertThat(buildFiles.filter { it.contains("libB/liblib_b") }).isNotEmpty()
-      assertThat(buildFiles.filter { it.contains("libA/liblib_a") }).isNotEmpty()
+      assertThatOutputGroup(buildFiles).containsFile("consumerJava/main.jar")
+      assertThatOutputGroup(buildFiles).containsFile("consumerJava/main-src.jar")
+      assertThatOutputGroup(buildFiles).containsFileMatching("libB/liblib_b*")
+      assertThatOutputGroup(buildFiles).containsFileMatching("libA/liblib_a*")
     }
   }
 

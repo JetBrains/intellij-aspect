@@ -22,6 +22,7 @@ import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import com.intellij.aspect.testing.rules.utils.assertThatArtifacts
 import com.intellij.aspect.testing.rules.utils.assertThatDeps
+import com.intellij.aspect.testing.rules.utils.assertThatOutputGroup
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -74,7 +75,7 @@ class PluginTest {
   @Test
   fun testOutputGroups() {
     val buildFiles = aspect.findOutputGroup(OutputGroups.BUILD)
-    assertThat(buildFiles.filter { it.endsWith("libjava_lib-gen.jar") }).isNotEmpty()
-    assertThat(buildFiles.filter { it.endsWith("libjava_lib-gensrc.jar") }).isNotEmpty()
+    assertThatOutputGroup(buildFiles).containsFile("libjava_lib-gen.jar")
+    assertThatOutputGroup(buildFiles).containsFile("libjava_lib-gensrc.jar")
   }
 }
