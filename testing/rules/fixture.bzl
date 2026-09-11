@@ -33,7 +33,7 @@ def _test_fixture_impl(ctx):
 
         worker_options = proto.encode_text(struct(
             bazelisk = ctx.file._bazelisk.path,
-            registry_file = ctx.file._registry_file.path,
+            registry_files = [file.path for file in ctx.files._registry_files],
             max_servers = ctx.attr._max_servers[BuildSettingInfo].value,
             repo_cache = ctx.attr._repo_cache[BuildSettingInfo].value,
             worker_dir = ctx.attr._worker_dir[BuildSettingInfo].value,
@@ -68,10 +68,9 @@ def _test_fixture_impl(ctx):
                 flagfile,
                 response_file,
                 ctx.file._bazelisk,
-                ctx.file._registry_file,
                 ctx.file.project,
                 ctx.file._aspect_bcr,
-            ],
+            ] + ctx.files._registry_files,
             executable = ctx.executable._builder,
             arguments = [worker_options, "@" + flagfile.path],
             outputs = [output_proto, profile_file, exec_log_file],
@@ -122,9 +121,9 @@ test_fixture = rule(
             allow_single_file = [".zip"],
             default = Label("//:archive_test"),
         ),
-        "_registry_file": attr.label(
-            allow_single_file = [".zip"],
-            default = Label("@bcr_archive//:bcr.zip"),
+        "_registry_files": attr.label_list(
+            allow_files = [".zip"],
+            default = [Label("@bcr_archive//:bcr.zip"), Label("//testing/fixtures/registry")],
         ),
         "_bazelisk": attr.label(
             allow_single_file = True,
