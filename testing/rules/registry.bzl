@@ -17,6 +17,8 @@ load("//testing/rules:module_dep.bzl", "TestModuleDep")
 
 _RegistryModule = provider(fields = ["name", "mapping"])
 
+# Every registry archive has a single top-level directory, which is stripped when
+# the worker extracts the archive into its own registry directory.
 _REGISTRY_PREFIX = "custom-registry"
 
 # Bazel resolves a relative "local_path" against "module_base_path" from
@@ -28,8 +30,7 @@ _SOURCE_JSON_TEMPLATE = """
 }
 """
 
-# The registry is materialized by merging this archive over the BCR archive, so
-# this file has to be unzipped last for "module_base_path" to survive.
+# Configures the root of this registry, i.e. the directory the archive is extracted to.
 _REGISTRY_JSON = """
 {
     "mirrors": [],
