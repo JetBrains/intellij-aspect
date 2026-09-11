@@ -57,7 +57,12 @@ def _implementation(target, ctx, attr):
     if PyInfo not in target:
         return None
 
-    to_build = target[PyInfo].transitive_sources
+    executable = getattr(target[DefaultInfo].files_to_run, "executable", None)
+    to_build = intellij_common.depset([
+        file
+        for file in target.files.to_list()
+        if not file.is_source and file != executable
+    ])
 
     # TODO: port python get_code_generator_rule_names
 
