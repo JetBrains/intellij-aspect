@@ -22,20 +22,24 @@ import java.io.PrintStream
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
+// 1MB is enough to explain a failure, while staying below the limit bazel applies to the output
+private const val BUFFER_SIZE = 1 shl 20
+
 private val TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
 
-class Logger(
-  sink: OutputStream = System.err,
-  private val quiet: Boolean = false,
-  private val name: String? = null,
-) {
+open class Logger(sink: OutputStream = System.err, private val name: String? = null) {
+
+  companion object {
+
+    fun quiet(sink: OutputStream = System.err, name: String? = null, capacity: Int = BUFFER_SIZE): Logger {
+      return QuietLogger(sink, RingOutputStream(capacity), name)
+    }
+  }
 
   private val out = PrintStream(sink)
 
   @Synchronized
   fun log(message: String) {
-    if (quiet) return
-
     val builder = StringBuilder()
 
     val time = LocalTime.now().format(TIME_FORMATTER)
@@ -58,8 +62,25 @@ class Logger(
   fun child(name: String? = null, out: OutputStream? = null): Logger = Logger(
     name = name ?: this.name,
     sink = out?.let { tee(it, this.out) } ?: this.out,
-    quiet = quiet,
   )
+
+  /** Reports an exception. Forces the logger to write to the underlying stream even if it is quiet. */
+  open fun error(cause: Throwable) {
+    log("ERROR: ${cause.message}")
+    cause.stackTraceToString().lines().forEach(::log)
+  }
+}
+
+private class QuietLogger(
+  private val sink: OutputStream,
+  private val buffer: RingOutputStream,
+  name: String?,
+) : Logger(buffer, name) {
+
+  override fun error(cause: Throwable) {
+    super.error(cause)
+    buffer.transferTo(sink)
+  }
 }
 
 private class LineOutputStream(private val sink: (String) -> Unit) : OutputStream() {
@@ -86,5 +107,30 @@ private class LineOutputStream(private val sink: (String) -> Unit) : OutputStrea
     buffer.reset()
 
     if (line.isNotBlank()) sink(line)
+  }
+}
+
+private class RingOutputStream(private val capacity: Int) : OutputStream() {
+
+  private val buffer = ByteArray(capacity)
+
+  private var offset = 0
+  private var wrapped = false
+
+  @Synchronized
+  override fun write(b: Int) {
+    if (offset == capacity) wrap()
+    buffer[offset++] = b.toByte()
+  }
+
+  private fun wrap() {
+    offset = 0
+    wrapped = true
+  }
+
+  @Synchronized
+  fun transferTo(dst: OutputStream) {
+    if (wrapped) dst.write(buffer, offset, capacity - offset)
+    dst.write(buffer, 0, offset)
   }
 }

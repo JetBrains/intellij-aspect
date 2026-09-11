@@ -40,7 +40,7 @@ message Metric {
 
 message Report {
   string project = 1;
-  string target = 2;
+  repeated string targets = 2;
   string bazel_version = 3;
 
   // whether only the analysis phase was executed

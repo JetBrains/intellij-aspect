@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
+
 def _project_archives(ctx):
     """Returns the archives to extract as destination to archive map, the project first."""
     archives = {"": ctx.file.project}
@@ -48,6 +50,7 @@ def _extract_project(ctx):
         command = "\n".join(commands),
         mnemonic = "ExtractProject",
         progress_message = "Extracting project for %{label}",
+        execution_requirements = {"no-cache": "1"},
     )
 
     return directory
@@ -58,15 +61,21 @@ def _heap_analysis_impl(ctx):
 
     args = ctx.actions.args()
     args.add(project.path)
-    args.add("--target", ctx.attr.target)
+    args.add("--targets", " ".join(ctx.attr.targets))
     args.add("--languages", ",".join(ctx.attr.languages))
     args.add("--repeat", str(ctx.attr.repeats))
     args.add("--report", report)
     args.add("--bazel_version", ctx.attr.bazel_version)
     args.add("--quiet")
 
+    repo_cache = ctx.attr._repo_cache[BuildSettingInfo].value
+    if repo_cache:
+        args.add("--repo_cache", repo_cache)
+
     if ctx.attr.nobuild:
         args.add("--nobuild")
+
+    args.add_all(ctx.attr.extra_flags, before_each = "--extra_flag")
 
     ctx.actions.run(
         inputs = [project],
@@ -77,8 +86,8 @@ def _heap_analysis_impl(ctx):
         progress_message = "Analysing aspect heap usage for %{label}",
         execution_requirements = {
             "requires-network": "1",
-            "no-cache": "1",
             "no-remote": "1",
+            "no-sandbox": "1",
         },
     )
 
@@ -98,11 +107,17 @@ heap_analysis = rule(
             default = 1,
             doc = "path segments to strip when extracting, GitHub archives have one top-level directory",
         ),
-        "target": attr.string(default = "//..."),
+        "targets": attr.string_list(default = ["//..."]),
         "languages": attr.string_list(mandatory = True),
-        "repeats": attr.int(default = 3),
+        "repeats": attr.int(default = 1),
         "bazel_version": attr.string(mandatory = True),
         "nobuild": attr.bool(default = False),
+        "extra_flags": attr.string_list(
+            doc = "extra flags for the measured builds, they override the flags set by the measurement",
+        ),
+        "_repo_cache": attr.label(
+            default = Label("//testing/rules:repo_cache"),
+        ),
         "_measure": attr.label(
             cfg = "exec",
             executable = True,

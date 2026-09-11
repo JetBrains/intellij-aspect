@@ -37,6 +37,15 @@ object LanguagesArgType : ArgType<Set<Rules>>(hasParameter = true) {
   }
 }
 
+/** Parses a space-separated list of strings. */
+object TargetsArgType : ArgType<List<String>>(hasParameter = true) {
+  override val description = "{ target[ target]* }"
+
+  override fun convert(value: kotlin.String, name: kotlin.String): List<kotlin.String> {
+    return value.split(" ")
+  }
+}
+
 /** Parses a comma-separated list of `ruleset=@repo` re-mappings into a [Rules] keyed map. */
 object RuleMapArgType : ArgType<Map<Rules, String>>(hasParameter = true) {
   override val description = "{ ruleset=@repo[,ruleset=@repo]* }"

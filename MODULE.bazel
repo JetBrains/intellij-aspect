@@ -55,21 +55,35 @@ bazel_registry.bcr(
 )
 bazel_registry.project(
     name = "intellij_android",
-    commit = "idea/2026.2.2",
     sha256 = "6a028768f90220d580935ccb16f21ec6885b801f1f8e005a139cbededb437748",
+    tag = "idea/2026.2.2",
     url = "https://github.com/JetBrains/android",
 )
 bazel_registry.project(
     name = "intellij_community",
-    commit = "idea/2026.2.2",
     sha256 = "0e77ac04fafb1e5ce3772cd8b8eb40b98494c63ebeed5d5f8ba7861e06011ce5",
+    tag = "idea/2026.2.2",
     url = "https://github.com/JetBrains/intellij-community",
+)
+bazel_registry.project(
+    name = "google_pigweed",
+    commit = "766f56f0bfeb29624fc0f240cd141afb3398f839",
+    sha256 = "c813cbab0b56e71458c1576b4674fbcd7852c4db4221b61ecb5c4703fd50768a",
+    url = "https://github.com/pigweed-project/pigweed",
+)
+bazel_registry.project(
+    name = "bazelbuild_bazel",
+    commit = "77d1415c3e74fd9d57f3f13d124f9fb58a1c96b5",
+    sha256 = "79d9954f115a6cff397f19079a221ee598fc3e8e5a65e270210566a0d872e4b2",
+    url = "https://github.com/bazelbuild/bazel",
 )
 use_repo(
     bazel_registry,
     "bazel_env",
+    "bazelbuild_bazel",
     "bazelisk",
     "bcr_archive",
+    "google_pigweed",
     "intellij_android",
     "intellij_community",
 )

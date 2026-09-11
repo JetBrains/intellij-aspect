@@ -30,7 +30,8 @@ _bcr = tag_class(attrs = {
 _project = tag_class(attrs = {
     "name": attr.string(mandatory = True),
     "url": attr.string(mandatory = True),
-    "commit": attr.string(mandatory = True),
+    "commit": attr.string(),
+    "tag": attr.string(),
     "sha256": attr.string(mandatory = True),
 })
 
@@ -74,10 +75,14 @@ def _bazel_registry_impl(mctx):
 
     for mod in mctx.modules:
         for tag in mod.tags.project:
+            if bool(tag.commit) == bool(tag.tag):
+                fail("project '%s' must specify exactly one of commit or tag" % tag.name)
+
             github_archive(
                 name = tag.name,
                 url = tag.url,
                 commit = tag.commit,
+                tag = tag.tag,
                 sha256 = tag.sha256,
             )
 
