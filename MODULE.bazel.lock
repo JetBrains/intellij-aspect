@@ -414,8 +414,8 @@
     },
     "//private:extension.bzl%bazel_registry": {
       "general": {
-        "bzlTransitiveDigest": "viLEb8caZB4nowlYXp0klBmcwGt2ECxLbmRRqeHYVTk=",
-        "usagesDigest": "cIYMzF+E02K+//0cAvJwRoTq1DgyRG2P1+NldH5lMYw=",
+        "bzlTransitiveDigest": "2QGu2NncsL8WjOhFUuq2DycK0FwfH8DrgWDVbeKsdgM=",
+        "usagesDigest": "s0KYrj1KKZpPbGDT94WIyIPfV3wiLcVfYD6V36fzcQg=",
         "recordedInputs": [],
         "generatedRepoSpecs": {
           "bazelisk": {
@@ -444,7 +444,8 @@
             "repoRuleId": "@@//private/repos:github_archive.bzl%github_archive",
             "attributes": {
               "url": "https://github.com/JetBrains/android",
-              "commit": "idea/2026.2.2",
+              "commit": "",
+              "tag": "idea/2026.2.2",
               "sha256": "6a028768f90220d580935ccb16f21ec6885b801f1f8e005a139cbededb437748"
             }
           },
@@ -452,8 +453,27 @@
             "repoRuleId": "@@//private/repos:github_archive.bzl%github_archive",
             "attributes": {
               "url": "https://github.com/JetBrains/intellij-community",
-              "commit": "idea/2026.2.2",
+              "commit": "",
+              "tag": "idea/2026.2.2",
               "sha256": "0e77ac04fafb1e5ce3772cd8b8eb40b98494c63ebeed5d5f8ba7861e06011ce5"
+            }
+          },
+          "google_pigweed": {
+            "repoRuleId": "@@//private/repos:github_archive.bzl%github_archive",
+            "attributes": {
+              "url": "https://github.com/pigweed-project/pigweed",
+              "commit": "766f56f0bfeb29624fc0f240cd141afb3398f839",
+              "tag": "",
+              "sha256": "c813cbab0b56e71458c1576b4674fbcd7852c4db4221b61ecb5c4703fd50768a"
+            }
+          },
+          "bazelbuild_bazel": {
+            "repoRuleId": "@@//private/repos:github_archive.bzl%github_archive",
+            "attributes": {
+              "url": "https://github.com/bazelbuild/bazel",
+              "commit": "77d1415c3e74fd9d57f3f13d124f9fb58a1c96b5",
+              "tag": "",
+              "sha256": "79d9954f115a6cff397f19079a221ee598fc3e8e5a65e270210566a0d872e4b2"
             }
           }
         }
@@ -526,7 +546,7 @@
     "@@aspect_tools_telemetry+//:extension.bzl%telemetry": {
       "general": {
         "bzlTransitiveDigest": "XVKR7Fz0TpsBTBIjxfUrpsRKdh9a5XZHQEJmfRGJOD8=",
-        "usagesDigest": "4eYfYGZkkZZem5Ss/tvRTn4oYAhl3RAUYpmiLLQszC0=",
+        "usagesDigest": "6Q9OCLeYxKnHawj/ALppnjkvMb8bM51clTXIIWF2Wh4=",
         "recordedInputs": [
           "REPO_MAPPING:aspect_tools_telemetry+,bazel_lib bazel_lib+",
           "REPO_MAPPING:aspect_tools_telemetry+,bazel_skylib bazel_skylib+",
@@ -537,10 +557,10 @@
             "repoRuleId": "@@aspect_tools_telemetry+//:extension.bzl%tel_repository",
             "attributes": {
               "deps": {
-                "aspect_rules_lint": "2.8.0",
+                "aspect_rules_lint": "2.9.0",
                 "aspect_tools_telemetry": "0.5.0"
               },
-              "last_notice": 0
+              "last_notice": 2
             }
           }
         },
@@ -652,7 +672,7 @@
     "@@rules_multitool+//multitool:extension.bzl%multitool": {
       "general": {
         "bzlTransitiveDigest": "s+rg9YTYK9CxhExLmokBLy6sbL6I8ELJ7FgNiXGKZu4=",
-        "usagesDigest": "eWpXzaD9ht18VnQw3S20m3gV480QjWem9SRAxNGDi6w=",
+        "usagesDigest": "s0jYV5Mp+svbi4uj/MxNFj54Y3TGXlAcRelm3CSsgBw=",
         "recordedInputs": [
           "REPO_MAPPING:bazel_features+,bazel_features_globals bazel_features++version_extension+bazel_features_globals",
           "REPO_MAPPING:bazel_features+,bazel_features_version bazel_features++version_extension+bazel_features_version",
@@ -871,7 +891,7 @@
     "@@rules_python+//python/uv:uv.bzl%uv": {
       "general": {
         "bzlTransitiveDigest": "DafUArm1CsjJZcemT0FvUq9rUch+pq38+JqfOBJCpm8=",
-        "usagesDigest": "rsbDWWcEsfRym/giLjUsaFblUZe4I1JWHQj/UPIwWtQ=",
+        "usagesDigest": "/es1dlCJ3YpjHVj8EkSHb7nx0o2eC4dyZXjkDGxgiXY=",
         "recordedInputs": [
           "REPO_MAPPING:rules_python+,bazel_tools bazel_tools",
           "REPO_MAPPING:rules_python+,platforms platforms"

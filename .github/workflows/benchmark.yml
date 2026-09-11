@@ -1,0 +1,79 @@
+name: Benchmark
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  deployments: write
+
+concurrency:
+  group: benchmark
+  cancel-in-progress: false
+
+jobs:
+  analysis:
+    runs-on: Large-Linux-x64-16-64-for-intellij-aspect-public
+    continue-on-error: true
+
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [ bazel, pigweed, intellij ]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Setup Bazel
+      uses: bazel-contrib/setup-bazel@0.18.0
+      with:
+        bazelisk-cache: true
+        disk-cache: ${{ github.workflow }}-perf
+        repository-cache: true
+        cache-save: true
+        cache-version: ${{ matrix.project }}
+
+    - name: Run heap analysis
+      run: bazel build //testing/tests/perf:${{ matrix.project }} --//testing/rules:repo_cache=$(bazel info repository_cache)
+
+    - name: Convert report
+      run: bazel run //tools/measure:benchmark -- $(pwd)/bazel-bin/testing/tests/perf/*.textproto > ${{ runner.temp }}/${{ matrix.project }}.json
+
+    - name: Upload report
+      uses: actions/upload-artifact@v4
+      with:
+        name: report-${{ matrix.project }}
+        path: ${{ runner.temp }}/${{ matrix.project }}.json
+        if-no-files-found: error
+
+  publish:
+    needs: analysis
+    if: ${{ !cancelled() }} # publish whatever finished, a failing project must not drop the other series
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Download reports
+      uses: actions/download-artifact@v4
+      with:
+        pattern: report-*
+        merge-multiple: true
+        path: ${{ runner.temp }}
+
+    - name: Combine reports
+      run: jq --slurp add ${{ runner.temp }}/*.json > ${{ runner.temp }}/report.json
+
+    - name: Store benchmark results
+      uses: benchmark-action/github-action-benchmark@v1
+      with:
+        name: Memory Overhead
+        tool: customSmallerIsBetter
+        output-file-path: ${{ runner.temp }}/report.json
+        auto-push: false
+
+    - name: Push benchmark results
+      run: git push origin gh-pages:gh-pages
