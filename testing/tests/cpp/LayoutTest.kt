@@ -49,6 +49,13 @@ class LayoutTest {
   }
 
   @Test
+  fun testTextualHeaders() {
+    val info = aspect.findCIdeInfo("//textual:textual")
+    assertThatArtifacts(info.ruleContext.textualHeadersList).relativePaths().contains("textual/textual.inc")
+    assertThatArtifacts(info.ruleContext.textualHeadersList).relativePaths().contains("textual/generated_textual.inc")
+  }
+
+  @Test
   fun testExternalSource() {
     val info = aspect.findTarget("//srcs:lib", externalRepo = "external_module")
     assertThatArtifacts(info.srcsList).relativePaths().contains("srcs/lib.cc")
@@ -88,13 +95,18 @@ class LayoutTest {
   @Test
   fun testSyncOutputGroup() {
     val sync = aspect.findOutputGroup(OutputGroups.SYNC)
-    assertThatOutputGroup(sync).hasSize(1)
+    assertThatOutputGroup(sync).hasSize(3)
     assertThatOutputGroup(sync).containsFile("srcs/lib.h")
+    assertThatOutputGroup(sync).containsFile("textual/header.h")
+    assertThatOutputGroup(sync).containsFile("textual/textual.inc")
     assertThatOutputGroup(sync).doesNotContainFile("lib/generated.h")
+    assertThatOutputGroup(sync).doesNotContainFile("textual/generated_textual.inc")
 
     val build = aspect.findOutputGroup(OutputGroups.BUILD)
-    assertThatOutputGroup(build).hasSize(1)
-    assertThatOutputGroup(build).doesNotContainFile("srcs/lib.h")
+    assertThatOutputGroup(build).hasSize(2)
     assertThatOutputGroup(build).containsFile("lib/generated.h")
+    assertThatOutputGroup(build).containsFile("textual/generated_textual.inc")
+    assertThatOutputGroup(build).doesNotContainFile("srcs/lib.h")
+    assertThatOutputGroup(build).doesNotContainFile("textual/textual.inc")
   }
 }

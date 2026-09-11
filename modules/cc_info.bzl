@@ -102,7 +102,7 @@ def _implementation(target, ctx, attr):
     compilation_context = target[CcInfo].compilation_context
 
     # only this target's own headers need to be added; headers of dependencies are contributed already
-    headers = getattr(compilation_context, "direct_headers", None) or compilation_context.headers.to_list()
+    headers = compilation_context.direct_headers + compilation_context.direct_textual_headers
 
     source_headers = [it for it in headers if it.is_source]
     generated_headers = [it for it in headers if not it.is_source]
