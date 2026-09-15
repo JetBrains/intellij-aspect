@@ -1,18 +1,21 @@
-# IntelliJ Aspect (Split Architecture)
+# IntelliJ Aspect
 
-A modular, non-templated Bazel aspect framework for IntelliJ IDE integration, designed as a
-drop-in replacement for the current monolithic aspect. The key design change is splitting
-language/toolchain logic into independent **modules** that each contribute a function that produces
-a dedicated struct that are then aggregated to a single textproto per target for IDE import.
-Each module provides its function through an aspect that contains the function in its returned
-provider (that is returned unconditionally). Those module aspects, however, do not walk the
-graph but are applied only to a single container target in order to collect the contributed
-functions.
+A modular, non-templated Bazel aspect framework for IntelliJ IDE integration. The key design change 
+is splitting language/toolchain logic into independent **modules** that each contribute a function 
+that produces a dedicated struct that are then aggregated to a single textproto per target for IDE 
+import. Each module provides its function through an aspect that contains the function in its returned
+provider (that is returned unconditionally). Those module aspects, however, do not walk the graph but 
+are applied only to a single container target to collect the contributed functions.
 
 This architecture significantly reduces templating (a major source of friction in the old
 aspect). When deployed from the BCR no templating is needed at all; the materialized
 fallback still requires rewriting load statements and generating a config file. The new
 design also enables publishing to the **Bazel Central Registry (BCR)**.
+
+> **Memory overhead:** the aspect's cost is benchmarked on every push to `main` against
+> IntelliJ Community, Pigweed and Bazel. The current numbers are charted at
+> <https://jetbrains.github.io/intellij-aspect/dev/bench/>, see
+> [Performance tests](#performance-tests) for how to run them locally.
 
 ## Project Structure
 
@@ -23,7 +26,7 @@ common/         Shared utilities (dependencies, artifact locations, IDE info ser
 config/         Configuration system (Bazel version detection via repository rule)
 sdk/            Public API: Kotlin deploy helpers and protobuf definitions
 testing/        Test infrastructure (fixtures, rules, workers)
-tools/          CLI utilities (deploy, differ, format)
+tools/          CLI utilities (deploy, measure, format)
 private/        Internal build rules and extensions (registry, bazelisk)
 ```
 
@@ -129,3 +132,72 @@ test_runner(
 ```sh
 bazel test //testing/tests/...
 ```
+
+### Performance tests
+
+The targets in `//testing/tests/perf:all` measure how much memory the aspect adds to an
+analysis of a large, real-world project. Each one is a `heap_analysis` rule that downloads a
+pinned snapshot of an upstream project (IntelliJ Community, Pigweed, Bazel), deploys the
+aspect into it, and then runs the `//tools/measure` tool against it: first a baseline build
+without the aspect, then a build with the aspect, repeated a few times each. The result is a
+textproto report per project holding both series side by side, so the overhead can be read off
+the `cmp` percentage.
+
+```sh
+bazel build //testing/tests/perf:intellij
+cat bazel-bin/testing/tests/perf/intellij.textproto
+```
+
+Because the benchmarks build whole projects they are tagged `manual`, so a
+`//testing/tests/...` wildcard never picks them up, and `exclusive`, so two of them never
+compete for the same machine and skew each other's numbers. Each target pins the Bazel
+version and the set of languages it measures. Expect multi-minute runtimes, and set the
+existing test-infrastructure flag in `user.bazelrc` to keep repository downloads between runs:
+
+```text
+build --//testing/rules:repo_cache=~/.cache/intellij-aspect-repo
+```
+
+Every push to `main` runs all three projects in the `Benchmark` workflow
+(`.github/workflows/benchmark.yml`). The reports are converted to JSON by
+`//tools/measure:benchmark` and published as a continuously updated chart to 
+<https://jetbrains.github.io/intellij-aspect/dev/bench/>.
+
+
+## Tools
+
+The CLI utilities under `tools/` are regular `bazel run` targets.
+
+### //tools/deploy
+
+Deploys the aspect into a project directory, which is what the IDE does on import and what the
+test fixtures do for every test configuration. The deployment method is the first argument
+(`bcr`, `materialized` or `builtin`), the target directory the second, and `-l/--languages`
+selects the rule sets to deploy:
+
+```sh
+bazel run //tools/deploy -- materialized /path/to/project -l java,kotlin
+```
+
+Useful options: `-b/--bazel_version` (defaults to 9.2.0), `--relative_path` to choose where
+inside the project the aspect is written, and `--rule_remap` to point a language at a
+non-standard rule set repository (e.g. `cc=@my_rules_cc`).
+
+### //tools/measure
+
+The benchmark tool behind the performance tests. It can be pointed at any local Bazel
+workspace directly:
+
+```sh
+bazel run //tools/measure -- /path/to/project -l java,kotlin -r 3
+```
+
+It measures against a fresh output base in a temporary directory, shutting the server down
+before every build so each repeat measures a cold analysis, and writes the textproto report to
+stdout (or to `--report <file>`). Pass `--nobuild` to stop after the analysis phase, `-t` to
+restrict the target patterns, and `--repo_cache <dir>` to reuse repository downloads between
+invocations. `//tools/measure:benchmark` converts one or more reports into the JSON format
+consumed by the benchmark chart.
+
+See [`tools/measure/README.md`](tools/measure/README.md) for the full description of the
+metrics, the report format and the `heap_analysis` rule.
