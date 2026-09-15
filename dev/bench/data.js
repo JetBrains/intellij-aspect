@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1789389375442,
+  "lastUpdate": 1789465945136,
   "repoUrl": "https://github.com/JetBrains/intellij-aspect",
   "entries": {
     "Memory Overhead": [
@@ -231,6 +231,90 @@ window.BENCHMARK_DATA = {
           {
             "name": "pigweed:analysis_heap_committed",
             "value": 33.92070484581498,
+            "unit": "%"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "daniel.brauner@jetbrains.com",
+            "name": "Daniel Brauner",
+            "username": "LeFrosch"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "21be2feb5d7b4eee60117c0ce423e56dbf19973b",
+          "message": "Update README.md (#215)",
+          "timestamp": "2026-09-15T11:34:33+02:00",
+          "tree_id": "9cc41dd676875f4b444bec63d88f8ecb6e8035a0",
+          "url": "https://github.com/JetBrains/intellij-aspect/commit/21be2feb5d7b4eee60117c0ce423e56dbf19973b"
+        },
+        "date": 1789465944628,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "bazel:used-heap-size-after-gc",
+            "value": 119.72477064220183,
+            "unit": "%"
+          },
+          {
+            "name": "bazel:peak-heap-size",
+            "value": 77.96610169491525,
+            "unit": "%"
+          },
+          {
+            "name": "bazel:analysis_heap_used",
+            "value": 120.27905884433406,
+            "unit": "%"
+          },
+          {
+            "name": "bazel:analysis_heap_committed",
+            "value": 102.803738317757,
+            "unit": "%"
+          },
+          {
+            "name": "intellij:used-heap-size-after-gc",
+            "value": 258.0343213728549,
+            "unit": "%"
+          },
+          {
+            "name": "intellij:peak-heap-size",
+            "value": 218.1937172774869,
+            "unit": "%"
+          },
+          {
+            "name": "intellij:analysis_heap_used",
+            "value": 258.0268686589267,
+            "unit": "%"
+          },
+          {
+            "name": "intellij:analysis_heap_committed",
+            "value": 106.96864111498259,
+            "unit": "%"
+          },
+          {
+            "name": "pigweed:used-heap-size-after-gc",
+            "value": 37.93774319066148,
+            "unit": "%"
+          },
+          {
+            "name": "pigweed:peak-heap-size",
+            "value": 34.0625,
+            "unit": "%"
+          },
+          {
+            "name": "pigweed:analysis_heap_used",
+            "value": 39.3781197497047,
+            "unit": "%"
+          },
+          {
+            "name": "pigweed:analysis_heap_committed",
+            "value": 35.24229074889868,
             "unit": "%"
           }
         ]
