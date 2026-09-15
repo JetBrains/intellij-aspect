@@ -26,6 +26,8 @@ import java.util.zip.ZipOutputStream
 
 private val EXECUTABLE_MARKER = byteArrayOf(0x45, 0x58)
 
+private val OVERWRITE = arrayOf(StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
+
 /**
  * Compress a directory into a ZIP file.
  *
@@ -33,7 +35,7 @@ private val EXECUTABLE_MARKER = byteArrayOf(0x45, 0x58)
  */
 @Throws(IOException::class)
 fun zip(srcDirectory: Path, outFile: Path) {
-  ZipOutputStream(Files.newOutputStream(outFile, StandardOpenOption.CREATE)).use { out ->
+  ZipOutputStream(Files.newOutputStream(outFile, *OVERWRITE)).use { out ->
     Files.walk(srcDirectory).use { stream ->
       stream.filter(Files::isRegularFile).forEach { file ->
         out.putNextEntry(createEntry(srcDirectory, file))
@@ -56,7 +58,7 @@ fun unzip(srcFile: Path, outDirectory: Path, stripPrefix: Int = 0) {
 
       val path = outDirectory.resolve(Path.of(entry.name).stripPrefix(stripPrefix))
       Files.createDirectories(path.parent)
-      Files.newOutputStream(path, StandardOpenOption.CREATE).use(src::transferTo)
+      Files.newOutputStream(path, *OVERWRITE).use(src::transferTo)
 
       if (entry.isExecutable()) {
         path.toFile().setExecutable(true)

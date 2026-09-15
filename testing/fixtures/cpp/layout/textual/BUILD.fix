@@ -1,0 +1,17 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+genrule(
+    name = "generate",
+    outs = ["generated_textual.inc"],
+    cmd = "echo '#define GENERATED_TEXTUAL_VALUE 1' > $@",
+)
+
+cc_library(
+    name = "textual",
+    hdrs = ["header.h"],
+    textual_hdrs = [
+        "generated_textual.inc",
+        "textual.inc",
+    ],
+    visibility = ["//visibility:public"],
+)

@@ -1,3 +1,4 @@
+load("//common:output_groups.bzl", "intellij_output_groups")
 load("//testing/rules:defs.bzl", "test_fixture")
 
 package(
@@ -12,8 +13,8 @@ _MODULES = [
 ]
 
 _OUTPUT_GROUPS = [
-    "intellij-sync",
-    "intellij-build",
+    intellij_output_groups.SYNC,
+    intellij_output_groups.BUILD,
 ]
 
 test_fixture(

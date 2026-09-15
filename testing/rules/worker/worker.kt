@@ -129,7 +129,7 @@ fun worker(
 @Throws(IOException::class)
 private fun resolveWorkingDirectory(configured: String): Path {
   val base = if (configured.isNotBlank()) {
-    Path.of(configured)
+    resolvePath(configured)
   } else {
     val projectName = Path.of("").toAbsolutePath().fileName.toString()
     resolveTempDirectory().resolve("bazel_worker_" + stableHash(projectName))

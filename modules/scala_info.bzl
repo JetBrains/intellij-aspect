@@ -123,7 +123,7 @@ def _get_outputs(target, ctx, java_outputs, extra_sync):
                 resolve_files += out.source_jars
     return {
         intellij_output_groups.SYNC: intellij_common.depset([f for f in extra_sync if f.is_source]),
-        intellij_output_groups.BUILD: intellij_common.depset(resolve_files, transitive = resolve_transitives),
+        intellij_output_groups.BUILD: intellij_common.depset([f for f in resolve_files if not f.is_source], transitive = resolve_transitives),
     }
 
 def _compiler_plugin_options(rule_attr):

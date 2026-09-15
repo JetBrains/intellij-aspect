@@ -21,6 +21,7 @@ import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.Dependenc
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import com.intellij.aspect.testing.rules.utils.assertThatDeps
+import com.intellij.aspect.testing.rules.utils.assertThatOutputGroup
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -142,13 +143,13 @@ class SimpleTest {
   @Test
   fun testOutputGroups() {
     val syncFiles = aspect.findOutputGroup(OutputGroups.SYNC)
-    assertThat(syncFiles).isNotEmpty() // contains at least the test runner
-    assertThat(syncFiles.filter { it.endsWith("main.jar") }).isEmpty()
+    assertThatOutputGroup(syncFiles).isNotEmpty() // contains at least the test runner
+    assertThatOutputGroup(syncFiles).doesNotContainFile("main.jar")
 
     val buildFiles = aspect.findOutputGroup(OutputGroups.BUILD)
-    assertThat(buildFiles.filter { it.endsWith("main.jar") }).isNotEmpty()
-    assertThat(buildFiles.filter { it.contains("materialized") && it.endsWith("main.jdeps") }).isNotEmpty()
-    assertThat(buildFiles.filter { it.endsWith("lib/libutil.jar") }).isNotEmpty()
-    assertThat(buildFiles.filter { it.contains("materialized") && it.endsWith("util.jdeps") }).isNotEmpty()
+    assertThatOutputGroup(buildFiles).containsFile("main.jar")
+    assertThatOutputGroup(buildFiles).containsFileMatching("materialized_*main.jdeps")
+    assertThatOutputGroup(buildFiles).containsFile("lib/libutil.jar")
+    assertThatOutputGroup(buildFiles).containsFileMatching("materialized_*util.jdeps")
   }
 }

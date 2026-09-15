@@ -18,9 +18,11 @@ package com.intellij.aspect.testing.tests.cpp
 
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.Dependency.DependencyType
+import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import com.intellij.aspect.testing.rules.utils.assertThatArtifacts
 import com.intellij.aspect.testing.rules.utils.assertThatDeps
+import com.intellij.aspect.testing.rules.utils.assertThatOutputGroup
 import com.intellij.aspect.testing.rules.utils.findCIdeInfo
 import org.junit.Rule
 import org.junit.Test
@@ -44,6 +46,13 @@ class LayoutTest {
   fun testMainGeneratedHeader() {
     val info = aspect.findCIdeInfo("//lib:lib")
     assertThatArtifacts(info.ruleContext.headersList).relativePaths().contains("lib/generated.h")
+  }
+
+  @Test
+  fun testTextualHeaders() {
+    val info = aspect.findCIdeInfo("//textual:textual")
+    assertThatArtifacts(info.ruleContext.textualHeadersList).relativePaths().contains("textual/textual.inc")
+    assertThatArtifacts(info.ruleContext.textualHeadersList).relativePaths().contains("textual/generated_textual.inc")
   }
 
   @Test
@@ -81,5 +90,23 @@ class LayoutTest {
       .withType(DependencyType.COMPILE_TIME)
       .keys()
       .contains(dep.key)
+  }
+
+  @Test
+  fun testSyncOutputGroup() {
+    val sync = aspect.findOutputGroup(OutputGroups.SYNC)
+    assertThatOutputGroup(sync).hasSize(3)
+    assertThatOutputGroup(sync).containsFile("srcs/lib.h")
+    assertThatOutputGroup(sync).containsFile("textual/header.h")
+    assertThatOutputGroup(sync).containsFile("textual/textual.inc")
+    assertThatOutputGroup(sync).doesNotContainFile("lib/generated.h")
+    assertThatOutputGroup(sync).doesNotContainFile("textual/generated_textual.inc")
+
+    val build = aspect.findOutputGroup(OutputGroups.BUILD)
+    assertThatOutputGroup(build).hasSize(2)
+    assertThatOutputGroup(build).containsFile("lib/generated.h")
+    assertThatOutputGroup(build).containsFile("textual/generated_textual.inc")
+    assertThatOutputGroup(build).doesNotContainFile("srcs/lib.h")
+    assertThatOutputGroup(build).doesNotContainFile("textual/textual.inc")
   }
 }

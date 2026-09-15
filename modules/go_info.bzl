@@ -105,7 +105,7 @@ def _implementation(target, ctx, attr):
         },
         outputs = {
             intellij_output_groups.SYNC: intellij_common.depset([f for f in sources if f.is_source]),
-            intellij_output_groups.BUILD: intellij_common.depset(sources),
+            intellij_output_groups.BUILD: intellij_common.depset([f for f in sources if not f.is_source]),
         },
     )
 
