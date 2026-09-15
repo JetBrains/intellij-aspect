@@ -173,7 +173,11 @@ message KotlinTargetInfo {
   // use associated_targets instead
   repeated TargetKey associated_targets = 301;
   repeated string kotlinc_opts = 400;
-  repeated ArtifactLocation stdlibs = 500;
+  // The class jars of stdlib_jars. Use stdlib_jars.
+  repeated ArtifactLocation stdlibs = 500 [deprecated = true];
+  // The stdlibs the Kotlin toolchain adds to every compilation, as the toolchain's JavaInfo
+  // reports them: each class jar with its interface jar and the source jar its target declares.
+  repeated JvmOutputs stdlib_jars = 501;
   repeated KotlincPluginInfo kotlinc_plugin_infos = 600;
   string module_name = 700;
   // use exported_compiler_plugin_targets instead
