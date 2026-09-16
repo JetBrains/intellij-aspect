@@ -36,7 +36,12 @@ jobs:
         cache-version: ${{ matrix.project }}
 
     - name: Run heap analysis
-      run: bazel build //testing/tests/perf:${{ matrix.project }} --//testing/rules:repo_cache=$(bazel info repository_cache)
+      run: | # retry, the large projects occasionally fail to fetch a dependency
+        for delay in 30 60 120; do
+          sleep $delay 
+          bazel build //testing/tests/perf:${{ matrix.project }} --//testing/rules:repo_cache=$(bazel info repository_cache) && exit 0
+        done
+        exit 1
 
     - name: Convert report
       run: bazel run //tools/measure:benchmark -- $(pwd)/bazel-bin/testing/tests/perf/*.textproto > ${{ runner.temp }}/${{ matrix.project }}.json
