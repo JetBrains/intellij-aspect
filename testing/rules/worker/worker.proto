@@ -25,8 +25,8 @@ message WorkerOptions {
   // Path to the bazelisk binary used to run builds.
   string bazelisk = 1;
 
-  // Archive of the BCR registry used by the worker. Can be empty.
-  string registry_file = 2;
+  // List of BCR registry archives used by the worker. Can be empty.
+  repeated string registry_files = 2;
 
   // Maximum number of concurrent Bazel servers per version.
   int32 max_servers = 3;

@@ -81,7 +81,7 @@ fun worker(
             bazeliskHome(shared.bazeliskHomeDirectory)
             diskCache(shared.diskCacheDirectory)
             repoCache(shared.repoCacheDirectory, shared.repoContentsCacheDirectory)
-            registry(shared.registryDirectory)
+            shared.registryDirectories.forEach(::registry)
 
             body(input)
           }
@@ -146,7 +146,7 @@ private fun stableHash(value: String): String {
 
 data class SharedResources(
   val bazeliskBinary: Path,
-  val registryDirectory: Path,
+  val registryDirectories: List<Path>,
   val repoCacheDirectory: Path,
   val repoContentsCacheDirectory: Path,
   val diskCacheDirectory: Path,
@@ -155,11 +155,16 @@ data class SharedResources(
 
 @Throws(IOException::class)
 private fun createResources(cwd: Path, options: WorkerOptions): SharedResources {
-  require(options.registryFile.isNotBlank())
+  require(options.registryFilesList.isNotEmpty())
   require(options.bazelisk.isNotBlank())
 
-  val registryDirectory = Files.createDirectories(cwd.resolve("registry"))
-  unzip(Path.of(options.registryFile), registryDirectory, stripPrefix = 1)
+  // every archive is a registry of its own, the list order defines the lookup precedence
+  val registryDirectories = options.registryFilesList.mapIndexed { index, file ->
+    val directory = Files.createDirectories(cwd.resolve("registries").resolve(index.toString()))
+    unzip(Path.of(file), directory, stripPrefix = 1)
+
+    directory
+  }
 
   val repoCacheDirectory = options.repoCache.takeIf { it.isNotBlank() }
     ?.let(::resolvePath)
@@ -167,7 +172,7 @@ private fun createResources(cwd: Path, options: WorkerOptions): SharedResources 
 
   return SharedResources(
     bazeliskBinary = Path.of(options.bazelisk).toAbsolutePath(),
-    registryDirectory = registryDirectory,
+    registryDirectories = registryDirectories,
     repoCacheDirectory = Files.createDirectories(repoCacheDirectory),
     repoContentsCacheDirectory = Files.createDirectories(cwd.resolve("repo_contents_cache")),
     diskCacheDirectory = Files.createDirectories(cwd.resolve("disk_cache")),
