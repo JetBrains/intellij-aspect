@@ -31,6 +31,7 @@ enum class OutputGroups(val groupName: String) {
   INFO("intellij-info"),
   SYNC("intellij-sync"),
   BUILD("intellij-build"),
+  HIDDEN_BUILD("_intellij-build"),
 }
 
 fun modulesForRules(rules: Iterable<Rules>): List<Modules> {

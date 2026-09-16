@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("//common:output_groups.bzl", "intellij_output_groups")
 load("//common:platform.bzl", "platform")
 load("//config:aspect.bzl", "intellij_aspect")
 
@@ -28,6 +29,22 @@ _aspect_transition = transition(
 )
 
 def _intellij_aspect_build_impl(ctx):
+    for dep in ctx.attr.deps:
+        outputs = dep[OutputGroupInfo]
+        if hasattr(outputs, intellij_output_groups.BUILD) != hasattr(outputs, intellij_output_groups.HIDDEN_BUILD):
+            fail("%s and %s must either both be present or both be absent" % (
+                intellij_output_groups.BUILD,
+                intellij_output_groups.HIDDEN_BUILD,
+            ))
+
+        build_outputs = getattr(outputs, intellij_output_groups.BUILD, depset())
+        hidden_build_outputs = getattr(outputs, intellij_output_groups.HIDDEN_BUILD, depset())
+        if build_outputs.to_list() != hidden_build_outputs.to_list():
+            fail("%s and %s must contain identical artifacts" % (
+                intellij_output_groups.BUILD,
+                intellij_output_groups.HIDDEN_BUILD,
+            ))
+
     info_files = [
         getattr(dep[OutputGroupInfo], "intellij-info", depset())
         for dep in ctx.attr.deps
