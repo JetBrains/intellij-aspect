@@ -17,6 +17,8 @@
 package com.intellij.aspect.testing.tests.kotlin
 
 import com.google.common.truth.Truth.assertThat
+import com.google.devtools.intellij.aspect.Common.ArtifactLocation
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.KotlinTargetInfo
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import com.intellij.aspect.testing.rules.utils.assertThatOutputGroup
@@ -55,8 +57,47 @@ class SimpleTest {
     }
 
     // Kotlin-specific information is present
-    assertThat(target.kotlinTargetInfo.stdlibsList).isNotEmpty()
+    assertStdlibJars(target.kotlinTargetInfo)
     assertThat(target.kotlinTargetInfo.languageVersion).isNotEmpty()
+  }
+
+  /**
+   * The stdlibs come as jar outputs read from the toolchain's JavaInfo: the default `jvm_stdlibs` of
+   * rules_kotlin, each as its distribution jar. The flat `stdlibs` list is the class jars of those
+   * entries, and every reported jar is in the build output group, so the IDE can open it.
+   */
+  @Suppress("DEPRECATION") // stdlibs is kept for older readers; this checks it stays consistent.
+  private fun assertStdlibJars(info: KotlinTargetInfo) {
+    val buildFiles = aspect.findOutputGroup(OutputGroups.BUILD)
+
+    fun assertBuilt(jar: ArtifactLocation) {
+      assertThat(jar.isSource).isTrue()
+      assertThat(jar.isExternal).isTrue()
+      assertThat(buildFiles.filter { it.endsWith("/" + jar.relativePath) }).isNotEmpty()
+    }
+
+    val binaryJars = info.stdlibJarsList.map { output ->
+      assertThat(output.binaryJarsList).hasSize(1)
+      output.binaryJarsList.single()
+    }
+    assertThat(binaryJars.map { it.relativePath }).containsExactly(
+      "lib/annotations-13.0.jar",
+      "lib/kotlin-stdlib.jar",
+      "lib/kotlin-stdlib-jdk7.jar",
+      "lib/kotlin-stdlib-jdk8.jar",
+    )
+    binaryJars.forEach(::assertBuilt)
+
+    // The fixtures build with rules_kotlin 2.2.0 and 2.3.20. Their toolchain wraps the stdlib files
+    // into a new JavaInfo without the source jars the imports declare, so none is reported. When the
+    // fixture matrix moves to a release that keeps them, the stdlib outputs carry the distribution's
+    // `-sources.jar` twins and this assertion changes to expect them.
+    info.stdlibJarsList.forEach { output ->
+      assertThat(output.interfaceJarsList).isEmpty()
+      assertThat(output.sourceJarsList).isEmpty()
+    }
+
+    assertThat(binaryJars).containsExactlyElementsIn(info.stdlibsList).inOrder()
   }
 
   @Test
@@ -107,7 +148,7 @@ class SimpleTest {
     }
 
     // Kotlin-specific information is present
-    assertThat(target.kotlinTargetInfo.stdlibsList).isNotEmpty()
+    assertStdlibJars(target.kotlinTargetInfo)
     assertThat(target.kotlinTargetInfo.languageVersion).isNotEmpty()
   }
 

@@ -122,15 +122,58 @@ def _extract_kt_compiler_plugin_info(plugin):
         kotlinc_plugin_options = kt_compiler_plugin_options,
     )
 
-def _get_kotlin_stdlibs(ctx):
-    if not TOOLCHAIN_TYPE in ctx.toolchains:
+def _get_kotlin_stdlib_java_info(ctx):
+    if TOOLCHAIN_TYPE not in ctx.toolchains:
+        return None
+    return getattr(ctx.toolchains[TOOLCHAIN_TYPE], "jvm_stdlibs", None)
+
+def _get_kotlin_stdlib_outputs(ctx):
+    """The toolchain stdlibs as jar outputs: each class jar with the source jar its target declares.
+    """
+    stdlibs = _get_kotlin_stdlib_java_info(ctx)
+    if stdlibs == None:
         return []
 
-    kotlin_toolchain = ctx.toolchains[TOOLCHAIN_TYPE]
-    if not hasattr(kotlin_toolchain, "jvm_stdlibs"):
-        return []
+    class_jars = []
+    compile_jars_by_class_jar = {}
+    source_jars_by_class_jar = {}
+    for output in getattr(stdlibs, "java_outputs", []):
+        class_jar = getattr(output, "class_jar", None)
+        if class_jar == None:
+            continue
+        if class_jar.path not in compile_jars_by_class_jar:
+            class_jars.append(class_jar)
+            compile_jars_by_class_jar[class_jar.path] = []
+            source_jars_by_class_jar[class_jar.path] = []
 
-    return [artifact_location.from_file(f) for f in kotlin_toolchain.jvm_stdlibs.compile_jars.to_list()]
+        # A compile jar of its own, as a java_import or a rules_jvm_external jvm_import produces.
+        compile_jar = getattr(output, "compile_jar", None)
+        if compile_jar and compile_jar != class_jar and compile_jar not in compile_jars_by_class_jar[class_jar.path]:
+            compile_jars_by_class_jar[class_jar.path].append(compile_jar)
+        for source_jar in _source_jars(output):
+            if source_jar not in source_jars_by_class_jar[class_jar.path]:
+                source_jars_by_class_jar[class_jar.path].append(source_jar)
+
+    outputs = [
+        intellij_common.struct(
+            binary_jars = [artifact_location.from_file(class_jar)],
+            interface_jars = [artifact_location.from_file(f) for f in compile_jars_by_class_jar[class_jar.path]],
+            source_jars = [artifact_location.from_file(f) for f in source_jars_by_class_jar[class_jar.path]],
+        )
+        for class_jar in class_jars
+    ]
+
+    # A JavaInfo without java_outputs (an older Bazel) still has its compile jars.
+    if not outputs:
+        outputs = [
+            intellij_common.struct(
+                binary_jars = [artifact_location.from_file(f)],
+                interface_jars = [],
+                source_jars = [],
+            )
+            for f in stdlibs.compile_jars.to_list()
+        ]
+    return outputs
 
 def _get_associates(target, ctx):
     associates = intellij_common.attr_as_label_list(ctx, "associates")
@@ -179,8 +222,10 @@ def _get_generated_jars(target, ctx):
 def _get_outputs(target, ctx, plugins):
     resolve_files = []
     transitives = []
-    if TOOLCHAIN_TYPE in ctx.toolchains and hasattr(ctx.toolchains[TOOLCHAIN_TYPE], "jvm_stdlibs"):
-        transitives += [ctx.toolchains[TOOLCHAIN_TYPE].jvm_stdlibs.compile_jars]
+    stdlibs = _get_kotlin_stdlib_java_info(ctx)
+    if stdlibs != None:
+        # The IDE opens the stdlib source jars it is told about, so they are built with the class jars.
+        transitives += [stdlibs.compile_jars, stdlibs.transitive_source_jars]
     for plugin in plugins:
         if KtCompilerPluginInfo in plugin:
             transitives += [plugin[KtCompilerPluginInfo].classpath]
@@ -222,6 +267,7 @@ def _implementation(target, ctx, attr):
         for target in target_list
     ]
     plugins = _get_kotlin_plugins(ctx, dep_targets)
+    stdlib_outputs = _get_kotlin_stdlib_outputs(ctx)
 
     return intellij_module.result(
         outputs = _get_outputs(target, ctx, plugins),
@@ -230,7 +276,9 @@ def _implementation(target, ctx, attr):
             api_version = getattr(target[KtJvmInfo], "language_version", None),  # API version currently not exposed
             associated_targets = _get_associates(target, ctx),
             kotlinc_opts = _get_kotlinc_options(ctx),
-            stdlibs = _get_kotlin_stdlibs(ctx),
+            # Deprecated: the class jars of stdlib_jars, for readers of older output.
+            stdlibs = [jar for output in stdlib_outputs for jar in output.binary_jars],
+            stdlib_jars = stdlib_outputs,
             kotlinc_plugin_infos = [
                 info
                 for info in [_extract_kt_compiler_plugin_info(plugin) for plugin in plugins]
