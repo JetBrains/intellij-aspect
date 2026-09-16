@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1789486149052,
+  "lastUpdate": 1789541031638,
   "repoUrl": "https://github.com/JetBrains/intellij-aspect",
   "entries": {
     "Memory Overhead": [
@@ -483,6 +483,70 @@ window.BENCHMARK_DATA = {
           {
             "name": "pigweed:analysis_heap_committed",
             "value": 29.130434782608695,
+            "unit": "%"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "daniel.brauner@jetbrains.com",
+            "name": "Daniel Brauner",
+            "username": "LeFrosch"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f91f7e1bf994091194d70c37d274ef768dbc0e72",
+          "message": "Build test fixture with cc_false_toolchain (#214)\n\nSince the llvm toolchain is actually not required for most test fixture builds and adds a lot of IO overhead, test fixture builds can be speed up by using a hermetic stub toolchain.",
+          "timestamp": "2026-09-16T08:39:33+02:00",
+          "tree_id": "0d1e6a59be93f8d948007ebe39ca11af6ad94ed6",
+          "url": "https://github.com/JetBrains/intellij-aspect/commit/f91f7e1bf994091194d70c37d274ef768dbc0e72"
+        },
+        "date": 1789541030791,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "bazel:used-heap-size-after-gc",
+            "value": 117.97235023041475,
+            "unit": "%"
+          },
+          {
+            "name": "bazel:peak-heap-size",
+            "value": 75.49295774647888,
+            "unit": "%"
+          },
+          {
+            "name": "bazel:analysis_heap_used",
+            "value": 117.1965245189566,
+            "unit": "%"
+          },
+          {
+            "name": "bazel:analysis_heap_committed",
+            "value": 108.65384615384615,
+            "unit": "%"
+          },
+          {
+            "name": "intellij:used-heap-size-after-gc",
+            "value": 260.7535321821036,
+            "unit": "%"
+          },
+          {
+            "name": "intellij:peak-heap-size",
+            "value": 220.78947368421052,
+            "unit": "%"
+          },
+          {
+            "name": "intellij:analysis_heap_used",
+            "value": 260.9820413298728,
+            "unit": "%"
+          },
+          {
+            "name": "intellij:analysis_heap_committed",
+            "value": 118.7725631768953,
             "unit": "%"
           }
         ]
