@@ -141,7 +141,14 @@ def _implemenation(target, ctx):
 
     intellij_info = intellij_info_builder.build(builder, target, ctx, results)
 
-    return [intellij_info, OutputGroupInfo(**intellij_info.outputs)]
+    # Alternative discovery protocol: a client requests the hidden transitive alias (built, but
+    # not reported) together with the direct group, which only names the nearest info files.
+    outputs = dict(intellij_info.outputs)
+    info_outputs = outputs.get(intellij_output_groups.INFO)
+    if info_outputs:
+        outputs[intellij_output_groups.HIDDEN_INFO] = info_outputs
+
+    return [intellij_info, OutputGroupInfo(**outputs)]
 
 def _unique_flatten(modules, field):
     unique = []

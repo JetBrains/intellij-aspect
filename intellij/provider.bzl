@@ -18,20 +18,33 @@ load("//common:provider.bzl", "intellij_provider")
 
 def _create():
     """Creates a new builder. Optimisation for creating more efficient depsets."""
-    return struct(outputs = {}, dependencies = {}, aspect_ids = {})
+    return struct(outputs = {}, dependencies = {}, aspect_ids = {}, direct_infos = [])
 
-def _append_depset(dst, src):
+def _append_depset(dst, src, skip = None):
     """Appends every depset from the source dict[depset] to the destination dict[list[depset]]."""
     for key in list(src):
-        if src[key]:
+        if src[key] and key != skip:
             if key in dst:
                 dst[key].append(src[key])
             else:
                 dst[key] = [src[key]]
 
+def _append_group_outputs(builder, src):
+    """Appends the outputs of a dependency's IntelliJInfo or a module result to the builder.
+
+    The direct info group is only inherited from dependencies while this target has no ide info
+    file of its own, so that the group always names the nearest info files (usually exactly the
+    files of the target itself) instead of the whole transitive closure.
+    """
+    _append_depset(
+        builder.outputs,
+        src.outputs,
+        skip = intellij_output_groups.DIRECT_INFO if builder.direct_infos else None,
+    )
+
 def _append(builder, src):
     """Appends all data from the source to the builder. Source must be either an IntellijInfo provider or a module result struct."""
-    _append_depset(builder.outputs, src.outputs)
+    _append_group_outputs(builder, src)
     _append_depset(builder.dependencies, src.dependencies)
 
     # only the module provider exposes the aspect ids
@@ -39,13 +52,17 @@ def _append(builder, src):
 
 def _append_outputs(builder, src):
     """Appends only the outputs of the sources to the builder. Source must be either an IntellijInfo provider or a module result struct."""
-    _append_depset(builder.outputs, src.outputs)
+    _append_group_outputs(builder, src)
 
 def _append_ide_infos(builder, files):
     """Appends a list intellij ide info files."""
     if not files:
         return
 
+    builder.direct_infos.extend(files)
+
+    # the direct group replaces whatever was inherited from dependencies before
+    builder.outputs[intellij_output_groups.DIRECT_INFO] = [depset(builder.direct_infos)]
     _append_depset(builder.outputs, {intellij_output_groups.INFO: depset(files)})
 
 def _append_dependencies(builder, group, deps):
