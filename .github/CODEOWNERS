@@ -1,0 +1,41 @@
+# ---------------------------------------------------------------------------
+# Shared code.
+# ---------------------------------------------------------------------------
+*                                   @aehlig @LeFrosch
+
+# ---------------------------------------------------------------------------
+# Language specific modules.
+# ---------------------------------------------------------------------------
+/modules/cc_info.bzl                @LeFrosch
+/modules/cc_toolchain_info.bzl      @LeFrosch
+/modules/go_info.bzl                @aehlig
+/modules/java_common_info.bzl       @aehlig
+/modules/java_info.bzl              @aehlig
+/modules/java_toolchain_info.bzl    @aehlig
+/modules/jvm_info.bzl               @aehlig
+/modules/kotlin_info.bzl            @aehlig
+/modules/proto_info.bzl             @aehlig
+/modules/protobuf_info.bzl          @aehlig
+/modules/py_info.bzl                @LeFrosch
+/modules/python_info.bzl            @aehlig
+/modules/rules_proto_info.bzl       @aehlig
+/modules/scala_info.bzl             @aehlig
+/modules/xcode_info.bzl             @LeFrosch
+
+# ---------------------------------------------------------------------------
+# Languages specific tests.
+# ---------------------------------------------------------------------------
+/testing/tests/cpp                  @LeFrosch
+/testing/fixtures/cpp               @LeFrosch
+/testing/tests/go                   @aehlig
+/testing/fixtures/go                @aehlig
+/testing/tests/java                 @aehlig
+/testing/fixtures/java              @aehlig
+/testing/tests/kotlin               @aehlig
+/testing/fixtures/kotlin            @aehlig
+/testing/tests/proto                @aehlig
+/testing/fixtures/proto             @aehlig
+/testing/tests/python               @aehlig
+/testing/fixtures/python            @aehlig
+/testing/tests/scala                @aehlig
+/testing/fixtures/scala             @aehlig
