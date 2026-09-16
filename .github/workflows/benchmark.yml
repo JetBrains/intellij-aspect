@@ -37,7 +37,8 @@ jobs:
 
     - name: Run heap analysis
       run: | # retry, the large projects occasionally fail to fetch a dependency
-        for attempt in 1 2 3; do
+        for delay in 30 60 120; do
+          sleep $delay 
           bazel build //testing/tests/perf:${{ matrix.project }} --//testing/rules:repo_cache=$(bazel info repository_cache) && exit 0
         done
         exit 1
