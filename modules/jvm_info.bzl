@@ -56,7 +56,9 @@ def _implementation(target, ctx, attr):
     return intellij_module.result(
         value = _get_jvm_info(ctx),
         outputs = {
-            intellij_output_groups.BUILD: intellij_common.depset(_get_resources(ctx)),
+            intellij_output_groups.BUILD: intellij_common.depset(
+                [f for f in _get_resources(ctx) if not f.is_source],
+            ),
         },
     )
 
