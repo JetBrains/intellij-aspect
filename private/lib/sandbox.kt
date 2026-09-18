@@ -43,7 +43,16 @@ class Sandbox internal constructor(
   private var repoContentsCache: Path? = null
   private val registries = mutableListOf<Path>()
 
-  val projectDirectory: Path by lazy { createDirectory("project") }
+  private val sandboxProject: Path by lazy { createDirectory("project") }
+  private var externalProject: Path? = null
+
+  /** The workspace bazel is launched in, a directory inside the sandbox unless overridden. */
+  val projectDirectory: Path get() = externalProject ?: sandboxProject
+
+  /** Overwrites the default project root, e.g. to avoid copying a project. */
+  fun externalProject(path: Path) {
+    externalProject = path.toAbsolutePath()
+  }
 
   /** Overwrites the default output root, e.g. to reuse a warm server outside the sandbox. */
   fun outputRoot(path: Path) {

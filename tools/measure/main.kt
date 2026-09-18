@@ -62,6 +62,9 @@ private const val ASPECT_DESTINATION = "aspect"
 // the build flag activating the deployed aspect
 private val ASPECT_FLAG = "--aspects=//$ASPECT_DESTINATION/${Aspects.INTELLIJ}"
 
+// keeps bazel from creating bazel-* convenience symlinks in the measured workspace
+private const val NO_CONVENIENCE_SYMLINKS = "--experimental_convenience_symlinks=ignore"
+
 // the output groups requested for the build
 private val OUTPUT_GROUPS = "--output_groups=" + OutputGroups.entries.joinToString(",") { it.groupName }
 
@@ -77,7 +80,7 @@ private const val TARGET_PATTERNS = "targets.txt"
 // targets listed explicitly fail the build when they are incompatible, a wildcard pattern skips them
 private const val SKIP_INCOMPATIBLE = "--skip_incompatible_explicit_targets"
 
-// project files that are not copied to the sandbox
+// project files that are not copied to the sandbox (or removed from the project)
 private val EXCLUDED_ENTRIES = setOf(".bazeliskrc", ".bazeliskversion")
 
 fun main(args: Array<String>): Unit = runBlocking {
@@ -152,6 +155,12 @@ fun main(args: Array<String>): Unit = runBlocking {
     description = "Execute the only the analysis phase.",
   ).default(false)
 
+  val nomirror by parser.option(
+    ArgType.Boolean,
+    fullName = "nomirror",
+    description = "Do not mirror the project into the sandbox, use the project directory.",
+  ).default(false)
+
   val extraFlags by parser.option(
     ArgType.String,
     fullName = "extra_flag",
@@ -179,7 +188,7 @@ fun main(args: Array<String>): Unit = runBlocking {
   val report = catchingSandbox(aspect, logger) {
     repoCache?.let { repoCache(resolvePath(it).toAbsolutePath()) }
 
-    linkProject(project, projectDirectory)
+    prepareWorkspace(project, nomirror, logger)
     deployBCRRegistry()
     deployAspectZip(projectDirectory, Path.of(ASPECT_DESTINATION), aspect)
 
@@ -224,6 +233,24 @@ private suspend fun <T> catchingSandbox(
   } catch (e: Throwable) {
     logger.error(e)
     exitProcess(2)
+  }
+}
+
+@Throws(IOException::class)
+private fun Sandbox.prepareWorkspace(project: Path, nomirror: Boolean, logger: Logger) {
+  val src = project.toAbsolutePath()
+
+  if (nomirror) {
+    logger.log("Measuring $src in place (expect modifications)...")
+
+    src.toFile().setWritable(true)
+    externalProject(src)
+
+    for (name in EXCLUDED_ENTRIES) Files.deleteIfExists(src.resolve(name))
+  } else {
+    logger.log("Mirroring $src into the sandbox ($projectDirectory)...")
+
+    linkProject(src, projectDirectory)
   }
 }
 
@@ -273,6 +300,7 @@ private suspend fun warmup() {
   val args = buildList {
     add("--nobuild")
     add(SKIP_INCOMPATIBLE)
+    add(NO_CONVENIENCE_SYMLINKS)
     addAll(ctx.extraFlags)
     add("--target_pattern_file=${ctx.patterns}")
   }
@@ -329,6 +357,7 @@ private suspend fun measureOnce(flags: List<String>, name: String): Map<String, 
     add(STABLE_HEAP_FLAG)
     add(OUTPUT_GROUPS)
     add(SKIP_INCOMPATIBLE)
+    add(NO_CONVENIENCE_SYMLINKS)
     addAll(ctx.extraFlags)
     add("--target_pattern_file=${ctx.patterns}")
   }
