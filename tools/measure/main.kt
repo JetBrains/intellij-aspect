@@ -203,6 +203,7 @@ fun main(args: Array<String>): Unit = runBlocking {
       Report.newBuilder()
         .setProject(project.toString())
         .addAllTargets(targets)
+        .addAllOutputGroups(OutputGroups.entries.map { it.groupName })
         .setBazelVersion(aspect.bazelVersion)
         .setNobuild(nobuild)
         .addAllMetrics(analyze(baselineRun, aspectRun))
