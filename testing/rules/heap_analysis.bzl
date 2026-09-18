@@ -72,6 +72,11 @@ def _heap_analysis_impl(ctx):
     if repo_cache:
         args.add("--repo_cache", repo_cache)
 
+    if ctx.attr.nosyncgroup:
+        args.add("--nosyncgroup")
+    if ctx.attr.nobuildgroup:
+        args.add("--nobuildgroup")
+
     if ctx.attr.nobuild:
         args.add("--nobuild")
 
@@ -112,6 +117,8 @@ heap_analysis = rule(
         "repeats": attr.int(default = 1),
         "bazel_version": attr.string(mandatory = True),
         "nobuild": attr.bool(default = False),
+        "nosyncgroup": attr.bool(default = False),
+        "nobuildgroup": attr.bool(default = False),
         "extra_flags": attr.string_list(
             doc = "extra flags for the measured builds, they override the flags set by the measurement",
         ),
