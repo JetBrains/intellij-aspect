@@ -50,7 +50,10 @@ def _extract_project(ctx):
         command = "\n".join(commands),
         mnemonic = "ExtractProject",
         progress_message = "Extracting project for %{label}",
-        execution_requirements = {"no-cache": "1"},
+        execution_requirements = {
+            "no-cache": "1",
+            "no-remote": "1",
+        },
     )
 
     return directory
@@ -67,6 +70,9 @@ def _heap_analysis_impl(ctx):
     args.add("--report", report)
     args.add("--bazel_version", ctx.attr.bazel_version)
     args.add("--quiet")
+
+    # the extracted project is a private, disposable copy, so it is measured as it lies
+    args.add("--nomirror")
 
     repo_cache = ctx.attr._repo_cache[BuildSettingInfo].value
     if repo_cache:
