@@ -214,7 +214,7 @@ def _get_generated_jars(target, ctx):
         return [
             struct(
                 binary_jars = artifact_location.from_files(class_jars),
-                source_jars = artifact_location.from_file(source_jars),
+                source_jars = artifact_location.from_files(source_jars),
             ),
         ]
     return []
