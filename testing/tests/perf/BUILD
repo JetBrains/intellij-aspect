@@ -5,42 +5,63 @@ TAGS = [
     "exclusive",  # building projects is expensive, it does not make sense to build many in parallel
 ]
 
-heap_analysis(
-    name = "intellij",
-    bazel_version = "9.2.0",
-    languages = [
-        "java",
-        "kotlin",
-    ],
-    overlays = {"android": "@intellij_android//:project.zip"},
-    project = "@intellij_community//:project.zip",
-    tags = TAGS,
-)
+USE_CASES = [
+    ("", False, False),
+    ("-nosync", True, False),
+    ("-plain", True, True),
+]
 
-heap_analysis(
-    name = "pigweed",
-    bazel_version = "8.7.0",
-    extra_flags = ["--workspace_status_command="],
-    languages = [
-        "cc",
-        "python",
-    ],
-    project = "@google_pigweed//:project.zip",
-    tags = TAGS,
-    targets = [
-        "//...",
-        "-//pw_build_info/...",
-    ],
-)
+[
+    heap_analysis(
+        name = "intellij" + extension,
+        bazel_version = "9.2.0",
+        languages = [
+            "java",
+            "kotlin",
+        ],
+        nobuildgroup = nobuild,
+        nosyncgroup = nosync,
+        overlays = {"android": "@intellij_android//:project.zip"},
+        project = "@intellij_community//:project.zip",
+        tags = TAGS,
+    )
+    for (extension, nosync, nobuild) in USE_CASES
+]
 
-heap_analysis(
-    name = "bazel",
-    bazel_version = "9.2.0",
-    languages = [
-        "cc",
-        "python",
-        "java",
-    ],
-    project = "@bazelbuild_bazel//:project.zip",
-    tags = TAGS,
-)
+[
+    heap_analysis(
+        name = "pigweed" + extension,
+        bazel_version = "8.7.0",
+        extra_flags = ["--workspace_status_command="],
+        languages = [
+            "cc",
+            "python",
+        ],
+        nobuildgroup = nobuild,
+        nosyncgroup = nosync,
+        project = "@google_pigweed//:project.zip",
+        tags = TAGS,
+        targets = [
+            "//...",
+            "-//pw_build_info/...",
+        ],
+    )
+    for (extension, nosync, nobuild) in USE_CASES
+]
+
+[
+    heap_analysis(
+        name = "bazel" + extension,
+        bazel_version = "9.2.0",
+        languages = [
+            "cc",
+            "python",
+            "java",
+        ],
+        nobuildgroup = nobuild,
+        nosyncgroup = nosync,
+        project = "@bazelbuild_bazel//:project.zip",
+        tags = TAGS,
+    )
+    for (extension, nosync, nobuild) in USE_CASES
+]

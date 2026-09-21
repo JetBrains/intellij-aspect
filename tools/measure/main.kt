@@ -65,9 +65,6 @@ private val ASPECT_FLAG = "--aspects=//$ASPECT_DESTINATION/${Aspects.INTELLIJ}"
 // keeps bazel from creating bazel-* convenience symlinks in the measured workspace
 private const val NO_CONVENIENCE_SYMLINKS = "--experimental_convenience_symlinks=ignore"
 
-// the output groups requested for the build
-private val OUTPUT_GROUPS = "--output_groups=" + OutputGroups.entries.joinToString(",") { it.groupName }
-
 // rule kinds that can crash the analysis (Bazel 8 problem)
 private const val EXCLUDED_KINDS = "config_setting|bool_flag|string_setting|string_flag|toolchain_type|alias"
 
@@ -110,6 +107,18 @@ fun main(args: Array<String>): Unit = runBlocking {
     fullName = "languages",
     description = "Comma separated list of languages to deploy",
   ).required()
+
+  val noSyncGroup by parser.option(
+    ArgType.Boolean,
+    fullName = "nosyncgroup",
+    description = "Do not request the sync output group.",
+  ).default(false)
+
+  val noBuildGroup by parser.option(
+    ArgType.Boolean,
+    fullName = "nobuildgroup",
+    description = "Do not request the build output group.",
+  ).default(false)
 
   val repeat by parser.option(
     ArgType.Int,
@@ -194,7 +203,14 @@ fun main(args: Array<String>): Unit = runBlocking {
 
     val patterns = targetPatternFile?.toAbsolutePath() ?: expandTargetPatterns(targets, logger)
 
-    val report = context(Context(this, patterns, nobuild, extraFlags, logger)) {
+    val outputGroups =
+      buildList {
+        addAll(listOf(OutputGroups.INFO))
+        addAll(if (noBuildGroup) listOf() else listOf(OutputGroups.BUILD))
+        addAll(if (noSyncGroup) listOf() else listOf(OutputGroups.SYNC))
+      }
+
+    val report = context(Context(this, patterns, nobuild, extraFlags, logger, outputGroups)) {
       warmup()
 
       val baselineRun = measureRun("baseline", emptyList(), repeat)
@@ -203,6 +219,7 @@ fun main(args: Array<String>): Unit = runBlocking {
       Report.newBuilder()
         .setProject(project.toString())
         .addAllTargets(targets)
+        .addAllOutputGroups(outputGroups.map { it.groupName })
         .setBazelVersion(aspect.bazelVersion)
         .setNobuild(nobuild)
         .addAllMetrics(analyze(baselineRun, aspectRun))
@@ -289,6 +306,7 @@ private data class Context(
   val nobuild: Boolean,
   val extraFlags: List<String>,
   val logger: Logger,
+  val outputGroups: List<OutputGroups>,
 )
 
 /** Pre-warms the output base by fetching the project's external repositories. */
@@ -355,7 +373,7 @@ private suspend fun measureOnce(flags: List<String>, name: String): Map<String, 
     addAll(flags)
     add("--memory_profile=$profile")
     add(STABLE_HEAP_FLAG)
-    add(OUTPUT_GROUPS)
+    add("--output_groups=" + ctx.outputGroups.joinToString(",") { it.groupName })
     add(SKIP_INCOMPATIBLE)
     add(NO_CONVENIENCE_SYMLINKS)
     addAll(ctx.extraFlags)
