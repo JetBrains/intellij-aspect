@@ -31,9 +31,9 @@ def _build_depset(direct = None, *, transitive = None):
         transitive = transitive,
     )
 
-def _from_files(files = None, *, build_transitive = None):
+def _from_files(files = None, *, build_transitive = None, include_sync = True):
     return {
-        _SYNC: _source_depset(files),
+        _SYNC: _source_depset(files) if include_sync else None,
         _BUILD: _build_depset(files, transitive = build_transitive),
     }
 

@@ -128,15 +128,7 @@ def _get_outputs(target, ctx, jdeps):
                 resolve_transitives += [out.source_jars]
             else:
                 resolve_files += out.source_jars
-    return {
-        intellij_output_groups.SYNC: intellij_common.depset(
-            [f for f in resolve_files if f.is_source],
-        ),
-        intellij_output_groups.BUILD: intellij_common.depset(
-            [f for f in resolve_files if not f.is_source] + jdeps,
-            transitive = resolve_transitives,
-        ),
-    }
+    return intellij_output_groups.from_files(resolve_files + jdeps, build_transitive = resolve_transitives)
 
 def _get_jdeps(target, ctx):
     jdeps = [jo.jdeps for jo in target[JavaInfo].java_outputs if jo.jdeps != None]

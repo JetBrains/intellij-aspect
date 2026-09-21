@@ -103,10 +103,7 @@ def _implementation(target, ctx, attr):
         dependencies = {
             intellij_deps.COMPILE_TIME: intellij_deps.collect(ctx, COMPILE_TIME_DEPS),
         },
-        outputs = {
-            intellij_output_groups.SYNC: intellij_common.depset([f for f in sources if f.is_source]),
-            intellij_output_groups.BUILD: intellij_common.depset([f for f in sources if not f.is_source]),
-        },
+        outputs = intellij_output_groups.from_files(sources),
     )
 
 _aspect = intellij_module.aspect(

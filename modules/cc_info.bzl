@@ -104,14 +104,8 @@ def _implementation(target, ctx, attr):
     # only this target's own headers need to be added; headers of dependencies are contributed already
     headers = compilation_context.direct_headers + compilation_context.direct_textual_headers
 
-    source_headers = [it for it in headers if it.is_source]
-    generated_headers = [it for it in headers if not it.is_source]
-
     return intellij_module.result(
-        outputs = {
-            intellij_output_groups.SYNC: intellij_common.depset(source_headers),
-            intellij_output_groups.BUILD: intellij_common.depset(generated_headers),
-        },
+        outputs = intellij_output_groups.from_files(headers),
         value = intellij_common.struct(
             rule_context = _collect_rule_context(ctx),
             compilation_context = _collect_compilation_context(ctx, target),
