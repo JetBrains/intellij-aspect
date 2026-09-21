@@ -153,6 +153,7 @@ message CToolchainIdeInfo {
   string sysroot = 8;
   map<string, string> c_environment = 9;
   map<string, string> cpp_environment = 10;
+  repeated ArtifactLocation all_files = 11;
 }
 
 message KotlincPluginOption {
