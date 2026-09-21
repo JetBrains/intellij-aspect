@@ -65,7 +65,7 @@ def _get_jvm_outputs(target):
         intellij_common.struct(
             binary_jars = [artifact_location.from_file(output.class_jar)] if output.class_jar else [],
             interface_jars = [artifact_location.from_file(output.ijar)] if output.ijar else [],
-            source_jars = [artifact_location.from_file(f) for f in _source_jars(output)],
+            source_jars = artifact_location.from_files(_source_jars(output)),
         )
         for output in getattr(getattr(target[KtJvmInfo], "outputs", struct()), "jars", [])
     ]
@@ -157,8 +157,8 @@ def _get_kotlin_stdlib_outputs(ctx):
     outputs = [
         intellij_common.struct(
             binary_jars = [artifact_location.from_file(class_jar)],
-            interface_jars = [artifact_location.from_file(f) for f in compile_jars_by_class_jar[class_jar.path]],
-            source_jars = [artifact_location.from_file(f) for f in source_jars_by_class_jar[class_jar.path]],
+            interface_jars = artifact_location.from_files(compile_jars_by_class_jar[class_jar.path]),
+            source_jars = artifact_location.from_files(source_jars_by_class_jar[class_jar.path]),
         )
         for class_jar in class_jars
     ]
@@ -213,8 +213,8 @@ def _get_generated_jars(target, ctx):
             class_jars = class_jars + [jar for jar in target[KtJvmInfo].all_output_jars]
         return [
             struct(
-                binary_jars = [artifact_location.from_file(jar) for jar in class_jars],
-                source_jars = [artifact_location.from_file(jar) for jar in source_jars],
+                binary_jars = artifact_location.from_files(class_jars),
+                source_jars = artifact_location.from_file(source_jars),
             ),
         ]
     return []

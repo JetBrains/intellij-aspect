@@ -97,7 +97,7 @@ def _implementation(target, ctx, attr):
         value = intellij_common.struct(
             import_path = _import_path(ctx),
             sdk_home_path = _go_sdk(ctx),
-            sources = [artifact_location.from_file(f) for f in sources],
+            sources = artifact_location.from_files(sources),
             embed = _embed(ctx),
         ),
         dependencies = {

@@ -84,7 +84,7 @@ def _get_jvm_outputs(target):
         intellij_common.struct(
             binary_jars = [artifact_location.from_file(output.class_jar)] if output.class_jar else [],
             interface_jars = [artifact_location.from_file(output.compile_jar)] if output.compile_jar else [],
-            source_jars = [artifact_location.from_file(f) for f in _source_jars(output)],
+            source_jars = artifact_location.from_files(_source_jars(output)),
         )
         for output in target[JavaInfo].java_outputs
     ]
@@ -194,7 +194,7 @@ def _implementation(target, ctx, attr):
             java_common = intellij_common.struct(
                 jars = _get_jvm_outputs(target),
                 generated_jars = _get_generated_jars(target),
-                jdeps = [artifact_location.from_file(jdep) for jdep in jdeps],
+                jdeps = artifact_location.from_files(jdeps),
                 javac_opts = _get_javacopts(target, ctx),
                 jvm_target = True,
             ),

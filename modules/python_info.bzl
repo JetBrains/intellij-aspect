@@ -109,7 +109,7 @@ def _implementation(target, ctx, attr):
                           artifact_location.from_execpath_do_not_use(getattr(runtime, "interpreter_path", None)),  # TODO: this alternative has to be dropped once the interpreter_path is used in the plugin
             interpreter_path = getattr(runtime, "interpreter_path", None),
             imports = imports,
-            generated_sources = [artifact_location.from_file(f) for f in generated_sources],
+            generated_sources = artifact_location.from_files(generated_sources),
         ),
         outputs = intellij_output_groups.from_files(generated_sources, include_sync = False),
     )

@@ -44,13 +44,9 @@ def _from_file(file):
         is_external = intellij_common.label_is_external(file.owner),
     )
 
-def _from_list(targets):
-    """Converts a list of targets to a list of artifact locations."""
-    return [
-        _from_file(f)
-        for target in targets
-        for f in target.files.to_list()
-    ]
+def _from_files(files):
+    """Converts a list of files to a list of artifact locations."""
+    return [_from_file(f) for f in files]
 
 def _from_depset(filedepset):
     """Converts a depset of files to a list of artifact locations."""
@@ -61,7 +57,11 @@ def _from_depset(filedepset):
 
 def _from_attr(ctx, name):
     """Converts a rule attribute to a list of artifact locations. Rule attribute should be of type label list."""
-    return _from_list(intellij_common.attr_as_label_list(ctx, name))
+    return [
+        _from_file(f)
+        for target in intellij_common.attr_as_label_list(ctx, name)
+        for f in target.files.to_list()
+    ]
 
 def _from_execpath(exec_path):
     """DEPRICATED return plain path instead, converts an execution-root-relative path to an artifact location."""
@@ -96,6 +96,6 @@ artifact_location = struct(
     from_depset = _from_depset,
     from_execpath_do_not_use = _from_execpath,
     from_file = _from_file,
-    from_list = _from_list,
+    from_files = _from_files,
     from_attr = _from_attr,
 )

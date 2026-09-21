@@ -91,7 +91,7 @@ def _get_jvm_outputs(java_outputs):
         intellij_common.struct(
             binary_jars = [artifact_location.from_file(output.class_jar)] if output.class_jar else [],
             interface_jars = [artifact_location.from_file(output.compile_jar)] if output.compile_jar else [],
-            source_jars = [artifact_location.from_file(f) for f in _source_jars(output)],
+            source_jars = artifact_location.from_files(_source_jars(output)),
         )
         for output in java_outputs
     ]
@@ -142,7 +142,7 @@ def _implementation(target, ctx, attr):
             scalac = ctx.rule.attr._scalac
             compiler_classpath = find_scalac_classpath(scalac.default_runfiles.files.to_list())
             if compiler_classpath:
-                compiler_classpath_info = [artifact_location.from_file(f) for f in compiler_classpath]
+                compiler_classpath_info = artifact_location.from_files(compiler_classpath)
                 if intellij_common.label_is_external(scalac.label):
                     extra_sync = compiler_classpath
     else:
