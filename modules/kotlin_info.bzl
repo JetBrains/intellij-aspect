@@ -243,15 +243,7 @@ def _get_outputs(target, ctx, plugins):
                 resolve_files += out.source_jars
         if hasattr(out, "source_jar") and out.source_jar != None:
             resolve_files += [out.source_jar]
-    return {
-        intellij_output_groups.SYNC: intellij_common.depset(
-            [f for f in resolve_files if f.is_source],
-        ),
-        intellij_output_groups.BUILD: intellij_common.depset(
-            [f for f in resolve_files if not f.is_source],
-            transitive = transitives,
-        ),
-    }
+    return intellij_output_groups.from_files(resolve_files, build_transitive = transitives)
 
 def _implementation(target, ctx, attr):
     if not KtJvmInfo in target:

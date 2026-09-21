@@ -111,9 +111,7 @@ def _implementation(target, ctx, attr):
             imports = imports,
             generated_sources = [artifact_location.from_file(f) for f in generated_sources],
         ),
-        outputs = {
-            intellij_output_groups.BUILD: intellij_common.depset([f for f in generated_sources if not f.is_source]),
-        },
+        outputs = intellij_output_groups.from_files(generated_sources, include_sync = False),
     )
 
 _aspect = intellij_module.aspect(
