@@ -65,7 +65,7 @@ fun deleteRecursive(directory: Path) {
           return FileVisitResult.SKIP_SUBTREE
         }
 
-        // fetched repositories may be write protected, e.g. hermetic toolchains
+        // fetched repositories maybe write protected, e.g. hermetic toolchains
         if (!Files.isWritable(dir)) {
           dir.toFile().setWritable(true)
         }
@@ -74,7 +74,7 @@ fun deleteRecursive(directory: Path) {
       }
 
       override fun visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult {
-        if (!Files.isWritable(file)) {
+        if (!attrs.isSymbolicLink && !Files.isWritable(file)) {
           file.toFile().setWritable(true)
         }
 
