@@ -19,7 +19,12 @@ package com.intellij.aspect.testing.tests.cpp
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.CToolchainIdeInfo
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
+import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
+import com.intellij.aspect.testing.rules.utils.assertNotNull
+import com.intellij.aspect.testing.rules.utils.assertThatArtifacts
+import com.intellij.aspect.testing.rules.utils.assertThatOutputGroup
+import com.intellij.aspect.testing.rules.utils.execrootPath
 import com.intellij.aspect.testing.rules.utils.findToolchainInfo
 import org.junit.Rule
 import org.junit.Test
@@ -78,5 +83,43 @@ class CustomToolchainTest {
 
     assertThat(info.cppOptionList).contains("-std=c++17")
     assertThat(info.cppOptionList).doesNotContain("-std=gnu11")
+  }
+
+  @Test
+  fun testAllFiles() {
+    assertThatArtifacts(info.allFilesList).relativePaths().containsExactly(
+      "toolchain/bin/qcc",
+      "toolchain/include/qnx.h",
+      "toolchain/include/generated_config.h",
+    )
+  }
+
+  @Test
+  fun testAllFilesDistinguishSourceAndGenerated() {
+    val artifacts = info.allFilesList.associateBy { it.relativePath }
+
+    val source = assertNotNull(artifacts["toolchain/bin/qcc"])
+    assertThat(source.isSource).isTrue()
+    assertThat(source.isExternal).isFalse()
+    assertThat(source.rootPath).isEmpty()
+    assertThat(source.execrootPath()).isEqualTo("toolchain/bin/qcc")
+
+    val generated = assertNotNull(artifacts["toolchain/include/generated_config.h"])
+    assertThat(generated.isSource).isFalse()
+    assertThat(generated.rootPath).isNotEmpty()
+    assertThat(generated.execrootPath()).endsWith("/toolchain/include/generated_config.h")
+  }
+
+  @Test
+  fun testAllFilesInOutputGroups() {
+    val sync = aspect.findOutputGroup(OutputGroups.SYNC)
+    assertThatOutputGroup(sync).containsFile("toolchain/bin/qcc")
+    assertThatOutputGroup(sync).containsFile("toolchain/include/qnx.h")
+    assertThatOutputGroup(sync).doesNotContainFile("toolchain/include/generated_config.h")
+
+    val build = aspect.findOutputGroup(OutputGroups.BUILD)
+    assertThatOutputGroup(build).containsFile("toolchain/include/generated_config.h")
+    assertThatOutputGroup(build).doesNotContainFile("toolchain/bin/qcc")
+    assertThatOutputGroup(build).doesNotContainFile("toolchain/include/qnx.h")
   }
 }

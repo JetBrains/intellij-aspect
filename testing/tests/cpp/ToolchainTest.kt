@@ -17,9 +17,13 @@
 package com.intellij.aspect.testing.tests.cpp
 
 import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.assertWithMessage
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.*
 import com.intellij.aspect.private.lib.utils.isMacOS
+import com.intellij.aspect.private.lib.utils.joinBazelPath
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
+import com.intellij.aspect.testing.rules.utils.assertThatArtifacts
+import com.intellij.aspect.testing.rules.utils.execrootPath
 import com.intellij.aspect.testing.rules.utils.findToolchainInfo
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
@@ -57,6 +61,42 @@ class ToolchainTest {
   fun testHasCompileOptions() {
     assertThat(info.cOptionList).isNotEmpty()
     assertThat(info.cppOptionList).isNotEmpty()
+  }
+
+  @Test
+  fun testAllFilesContainsCompiler() {
+    assumeTrue(aspect.bazelVersion(max = 8))
+
+    assertThatArtifacts(info.allFilesList).execrootPaths().contains(info.cCompiler)
+    assertThatArtifacts(info.allFilesList).execrootPaths().contains(info.cppCompiler)
+  }
+
+  @Test
+  fun testAllFilesContainsBin() {
+    assumeTrue(aspect.bazelVersion(min = 9))
+
+    assertThatArtifacts(info.allFilesList).relativePaths().contains("bin")
+  }
+
+  @Test
+  fun testAllFilesContainsBuildInIncludeDirectories() {
+    val allFiles = info.allFilesList.map { it.execrootPath() }
+
+    for (include in info.builtInIncludeDirectoryList) {
+      if (include.startsWith("/")) continue
+
+      // for Bazel 8 or lower all files are listed explicitly
+      val hasChildFile = allFiles.any { it.startsWith(include) }
+
+      // for Bazel 9 or higher, only parent directories are listed
+      val hasParentDirectory = include.split("/")
+        .runningFold("") { path, dir -> joinBazelPath(path, dir) }
+        .any { allFiles.contains(it) }
+
+      assertWithMessage("expected include ($include) in all files: ${allFiles.joinToString(", ")}")
+        .that(hasChildFile || hasParentDirectory)
+        .isTrue()
+    }
   }
 
   @Test

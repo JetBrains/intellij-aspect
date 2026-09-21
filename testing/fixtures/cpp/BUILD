@@ -53,6 +53,10 @@ test_fixture(
     srcs = glob(["custom_toolchain/**"]),
     extra_flags = ["--extra_toolchains=//:sdp_toolchain"],
     modules = _MODULES,
+    output_groups = [
+        intellij_output_groups.SYNC,
+        intellij_output_groups.BUILD,
+    ],
     rule_sets = ["cc"],
     targets = ["//:main"],
 )
