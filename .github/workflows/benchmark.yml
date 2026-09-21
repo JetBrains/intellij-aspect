@@ -21,6 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         project: [ bazel, pigweed, intellij ]
+        flavor: [ "", "-nosync", "-plain" ]
 
     steps:
     - name: Checkout code
@@ -39,18 +40,18 @@ jobs:
       run: | # retry, the large projects occasionally fail to fetch a dependency
         for delay in 30 60 120; do
           sleep $delay 
-          bazel build //testing/tests/perf:${{ matrix.project }} --//testing/rules:repo_cache=$(bazel info repository_cache) && exit 0
+          bazel build //testing/tests/perf:${{ matrix.project }}${{ matrix.flavor }} --//testing/rules:repo_cache=$(bazel info repository_cache) && exit 0
         done
         exit 1
 
     - name: Convert report
-      run: bazel run //tools/measure:benchmark -- $(pwd)/bazel-bin/testing/tests/perf/*.textproto > ${{ runner.temp }}/${{ matrix.project }}.json
+      run: bazel run //tools/measure:benchmark -- $(pwd)/bazel-bin/testing/tests/perf/*.textproto > ${{ runner.temp }}/${{ matrix.project }}${{ matrix.flavor }}.json
 
     - name: Upload report
       uses: actions/upload-artifact@v4
       with:
-        name: report-${{ matrix.project }}
-        path: ${{ runner.temp }}/${{ matrix.project }}.json
+        name: report-${{ matrix.project }}${{ matrix.flavor }}
+        path: ${{ runner.temp }}/${{ matrix.project }}${{ matrix.flavor }}.json
         if-no-files-found: error
 
   publish:
