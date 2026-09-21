@@ -93,3 +93,10 @@ fun deleteRecursive(directory: Path) {
 fun asBazelPath(path: Path): String {
   return path.toString().replace('\\', '/').removeSuffix("/")
 }
+
+fun joinBazelPath(vararg parts: String): String {
+  return parts
+    .mapIndexed { i, part -> if (i == 0) part.trimEnd('/') else part.trim('/') }
+    .filter { it.isNotEmpty() }
+    .joinToString("/")
+}

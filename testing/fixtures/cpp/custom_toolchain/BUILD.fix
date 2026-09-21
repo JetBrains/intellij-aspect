@@ -12,9 +12,25 @@ cc_toolchain_config(
     name = "sdp_toolchain_config",
 )
 
+genrule(
+    name = "generate_config_header",
+    outs = ["toolchain/include/generated_config.h"],
+    cmd = "echo '#define __QNX_SDP__ 1' > $@",
+)
+
+# the files shipped with the toolchain, a mix of source and generated files
+filegroup(
+    name = "sdp_all_files",
+    srcs = [
+        "toolchain/bin/qcc",
+        "toolchain/include/qnx.h",
+        ":generate_config_header",
+    ],
+)
+
 cc_toolchain(
     name = "sdp_cc_toolchain",
-    all_files = ":empty",
+    all_files = ":sdp_all_files",
     ar_files = ":empty",
     compiler_files = ":empty",
     dwp_files = ":empty",

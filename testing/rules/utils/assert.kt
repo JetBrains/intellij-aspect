@@ -37,7 +37,11 @@ class ArtifactLocationsSubject(
 ) : IterableSubject(metadata, actual) {
 
   fun relativePaths(): UsingCorrespondence<ArtifactLocation, String> {
-    return comparingElementsUsing(Correspondence.transforming({ it?.relativePath }, "has relative path"))
+    return comparing("has relative path") { it.relativePath }
+  }
+
+  fun execrootPaths(): UsingCorrespondence<ArtifactLocation, String> {
+    return comparing("has execroot path") { it.execrootPath() }
   }
 }
 
