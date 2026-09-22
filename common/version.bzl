@@ -55,7 +55,9 @@ def _parse_bazel_version(bazel_version):
     version = _extract_version_number(bazel_version)
     if not version:
         return (999999, 999999, 999999)
-    return tuple([int(n) for n in version.split(".")])
+
+    parts = [int(n) for n in version.split(".")]
+    return tuple(parts + [0] * (3 - len(parts)))
 
 # load the version written to the repository rule and parse it
 _BAZEL_VERSION = _parse_bazel_version(config.bazel_version)
