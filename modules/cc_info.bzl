@@ -68,7 +68,7 @@ def _collect_compilation_context(ctx, target):
     external_includes = getattr(compilation_context, "external_includes", depset()).to_list()
 
     return intellij_common.struct(
-        headers = [artifact_location.from_file(it) for it in compilation_context.headers.to_list()],
+        headers = artifact_location.from_files(compilation_context.headers.to_list()),
         defines = compilation_context.defines.to_list() + local_defines,
         includes = compilation_context.includes.to_list(),
         quote_includes = compilation_context.quote_includes.to_list(),

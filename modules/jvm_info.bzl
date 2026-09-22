@@ -40,13 +40,12 @@ def _get_resources(ctx):
     return resources
 
 def _get_jvm_info(ctx):
-    resource_files = [artifact_location.from_file(f) for f in _get_resources(ctx)]
     return intellij_common.struct(
         args = intellij_common.attr_as_list(ctx, "args"),
         main_class = getattr(ctx.rule.attr, "main_class", None),
         jvm_flags = expand_make_variables(ctx, True, intellij_common.attr_as_list(ctx, "jvm_flags")),
         resource_strip_prefix = _get_reosource_strip_prefix(ctx),
-        resources = resource_files,
+        resources = artifact_location.from_files(_get_resources(ctx)),
     )
 
 def _implementation(target, ctx, attr):
