@@ -76,7 +76,7 @@ test_module_deps(
     ],
     module_name = "protobuf",
     versions = [
-        "34.1",
+        "36.2",
         "21.7",
     ],
 )
