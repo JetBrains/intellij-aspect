@@ -79,6 +79,30 @@ main aspect that actually walks the target graph. The results of
 those function calls can contribute to the overall result for the
 respective target.
 
+## Output groups
+
+The aspect defines three output groups.
+
+- **`intellij-info`** -- The output group containing the text-proto
+  files with the IDE-relevant information on the targets used,
+  using a [`TargetIdeInfo`](sdk/proto/ide_info.proto) message.
+
+- **`intellij-build`** -- The output group with generated files
+  needed for full indexing of the project, typically generated
+  sources, e.g., by the the protobuf compiler.
+
+- **`intellij-sync`** -- An output group with relevant files that
+  are sources in the sense of bazel. This group is mainly for
+  historic reasons; it used to contain also certain generated
+  files where the effort of building was considered acceptable for
+  a non-building sync. However, it turned out that there wasn't
+  a reliable heuristics of which generated artifacts are "cheap
+  to build", especially as often generated tooling is involved.
+  Therefore, it was decided that this group should contain only
+  source files. Unless a setup with source files only living in the
+  remote execution will become relevant for an IDE use case, this
+  group will likely be removed in the future.
+
 ## Testing Infrastructure
 
 Tests live under `testing/` and are built around a matrix-based fixture system.
