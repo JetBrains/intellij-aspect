@@ -82,7 +82,7 @@ jobs:
           ${{ runner.temp }}/test_exec.log
 
   windows-test:
-    runs-on: windows-latest
+    runs-on: Windows-runners-for-intellij-aspect-ADM-165001
 
     steps:
     - name: Configure Git line endings
@@ -101,7 +101,7 @@ jobs:
         bazelisk-cache: true
         disk-cache: ${{ github.workflow }}-windows
         repository-cache: true
-        bazelrc: common --repo_contents_cache= --//testing/rules:max_servers=1 --//testing/rules:repo_cache=~/.cache/bazel-repo
+        bazelrc: common --repo_contents_cache= --//testing/rules:max_servers=2 --//testing/rules:repo_cache=~/.cache/bazel-repo
         cache-save: ${{ github.ref == 'refs/heads/main' }}
 
     - name: Build all targets
