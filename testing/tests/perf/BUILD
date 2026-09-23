@@ -65,3 +65,19 @@ USE_CASES = [
     )
     for (extension, nosync, nobuild) in USE_CASES
 ]
+
+[
+    heap_analysis(
+        name = "bbremote" + extension,
+        bazel_version = "9.1.0",
+        languages = [
+            "go",
+            "proto",
+        ],
+        nobuildgroup = nobuild,
+        nosyncgroup = nosync,
+        project = "@bb_remote_execution//:project.zip",
+        tags = TAGS,
+    )
+    for (extension, nosync, nobuild) in USE_CASES
+]

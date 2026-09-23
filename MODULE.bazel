@@ -77,11 +77,18 @@ bazel_registry.project(
     sha256 = "79d9954f115a6cff397f19079a221ee598fc3e8e5a65e270210566a0d872e4b2",
     url = "https://github.com/bazelbuild/bazel",
 )
+bazel_registry.project(
+    name = "bb_remote_execution",
+    commit = "f93300e75902b3c6ac420498e946ddc98d9aca48",
+    sha256 = "1b407e596bc936dccac5d4e4945560a2f386acbb811b636edcfd4aa4d18d008b",
+    url = "https://github.com/buildbarn/bb-remote-execution",
+)
 use_repo(
     bazel_registry,
     "bazel_env",
     "bazelbuild_bazel",
     "bazelisk",
+    "bb_remote_execution",
     "bcr_archive",
     "google_pigweed",
     "intellij_android",

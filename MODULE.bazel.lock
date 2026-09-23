@@ -415,7 +415,7 @@
     "//private:extension.bzl%bazel_registry": {
       "general": {
         "bzlTransitiveDigest": "2QGu2NncsL8WjOhFUuq2DycK0FwfH8DrgWDVbeKsdgM=",
-        "usagesDigest": "9ufZgdmQAgkwsrQyOPOAB90Pr+7L8sF8G0mUPK6/hQA=",
+        "usagesDigest": "8E8gFzirQt32iGAtL/csGPNpmZwcAVIrApqEUkpsPRc=",
         "recordedInputs": [],
         "generatedRepoSpecs": {
           "bazelisk": {
@@ -474,6 +474,15 @@
               "commit": "77d1415c3e74fd9d57f3f13d124f9fb58a1c96b5",
               "tag": "",
               "sha256": "79d9954f115a6cff397f19079a221ee598fc3e8e5a65e270210566a0d872e4b2"
+            }
+          },
+          "bb_remote_execution": {
+            "repoRuleId": "@@//private/repos:github_archive.bzl%github_archive",
+            "attributes": {
+              "url": "https://github.com/buildbarn/bb-remote-execution",
+              "commit": "f93300e75902b3c6ac420498e946ddc98d9aca48",
+              "tag": "",
+              "sha256": "1b407e596bc936dccac5d4e4945560a2f386acbb811b636edcfd4aa4d18d008b"
             }
           }
         }

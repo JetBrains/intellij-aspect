@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: [ bazel, pigweed, intellij ]
+        project: [ bazel, pigweed, intellij, bbremote ]
         flavor: [ "", "-nosync", "-plain" ]
 
     steps:
