@@ -9,7 +9,7 @@ package(
 _MODULES = [
     "//testing/fixtures:rules_cc_0_1_1",
     "//testing/fixtures:rules_cc_0_2_9",
-    "//testing/fixtures:rules_cc_0_2_14",
+    "//testing/fixtures:rules_cc_latest",
 ]
 
 test_fixture(

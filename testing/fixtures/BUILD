@@ -10,7 +10,7 @@ test_module_deps(
     versions = [
         "0.1.1",
         "0.2.9",
-        "0.2.14",
+        "0.2.25",
     ],
 )
 
@@ -23,7 +23,7 @@ test_module_deps(
     versions = [
         "8.16.1",
         "9.3.0",
-        "9.8.0",
+        "9.9.0",
     ],
 )
 
@@ -38,7 +38,7 @@ test_module_deps(
     versions = [
         "2.2.0",
         "2.3.20",
-        "2.4.10",
+        "2.4.20",
     ],
 )
 
@@ -66,6 +66,7 @@ test_module_deps(
     module_name = "rules_scala",
     versions = [
         "7.1.6",
+        "7.3.0",
     ],
 )
 
@@ -76,16 +77,16 @@ test_module_deps(
     ],
     module_name = "protobuf",
     versions = [
-        "36.2",
         "21.7",
+        "36.2",
     ],
 )
 
 test_module_deps(
     module_name = "rules_proto",
     versions = [
-        "7.1.0",
         "5.3.0-21.7",
+        "7.1.0",
     ],
 )
 
@@ -94,7 +95,7 @@ test_module_deps(
     versions = [
         "1.4.0",
         "1.6.3",
-        "1.7.0",
+        "2.3.4",
     ],
 )
 
@@ -106,7 +107,7 @@ test_module_deps(
     module_name = "rules_go",
     versions = [
         "0.49.0",
-        "0.61.1",
+        "0.63.0",
     ],
 )
 

@@ -8,7 +8,7 @@ package(
 
 _MODULES = [
     "//testing/fixtures:rules_java_8_16_1",
-    "//testing/fixtures:rules_java_9_8_0",
+    "//testing/fixtures:rules_java_latest",
     "//testing/fixtures/registry:cc_false_toolchain",
 ]
 
