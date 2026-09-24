@@ -17,10 +17,16 @@
 package com.intellij.aspect.testing.tests.cpp
 
 import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.assertWithMessage
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.*
 import com.intellij.aspect.private.lib.utils.isMacOS
+import com.intellij.aspect.private.lib.utils.isWindows
+import com.intellij.aspect.private.lib.utils.joinBazelPath
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
+import com.intellij.aspect.testing.rules.utils.assertThatArtifacts
+import com.intellij.aspect.testing.rules.utils.execrootPath
 import com.intellij.aspect.testing.rules.utils.findToolchainInfo
+import org.junit.Assume.assumeFalse
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
@@ -57,6 +63,34 @@ class ToolchainTest {
   fun testHasCompileOptions() {
     assertThat(info.cOptionList).isNotEmpty()
     assertThat(info.cppOptionList).isNotEmpty()
+  }
+
+  @Test
+  fun testAllFilesContainsCompiler() {
+    assumeTrue(aspect.bazelVersion(max = 8))
+    assumeFalse(isWindows())
+
+    assertThatArtifacts(info.allFilesList).execrootPaths().contains(info.cCompiler)
+    assertThatArtifacts(info.allFilesList).execrootPaths().contains(info.cppCompiler)
+  }
+
+  @Test
+  fun testAllFilesContainsBin() {
+    assumeTrue(aspect.bazelVersion(min = 9))
+    assumeFalse(isWindows())
+
+    assertThatArtifacts(info.allFilesList).relativePaths().contains("bin")
+  }
+
+  @Test
+  fun testAllFilesContainsBuildInIncludeDirectories() {
+    assumeFalse(isWindows())
+
+    val includes = info.allFilesList
+      .map { it.relativePath }
+      .count { it.startsWith("include/c++") }
+
+    assertThat(includes).isGreaterThan(0)
   }
 
   @Test
