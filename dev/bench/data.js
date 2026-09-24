@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1790169850741,
+  "lastUpdate": 1790230588192,
   "repoUrl": "https://github.com/JetBrains/intellij-aspect",
   "entries": {
     "Memory Overhead": [
@@ -3199,6 +3199,270 @@ window.BENCHMARK_DATA = {
           {
             "name": "pigweed:analysis_heap_committed",
             "value": 32.589285714285715,
+            "unit": "%"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d215371c65c106f6fdb571ad0fff3a8f03fc15bd",
+          "message": "Bump rules_cc from 0.2.22 to 0.2.25 (#230)\n\nBumps [rules_cc](https://github.com/bazelbuild/rules_cc) from 0.2.22 to 0.2.25.\n- [Release notes](https://github.com/bazelbuild/rules_cc/releases)\n- [Commits](https://github.com/bazelbuild/rules_cc/compare/0.2.22...0.2.25)\n\n---\nupdated-dependencies:\n- dependency-name: rules_cc\n  dependency-version: 0.2.25\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2026-09-24T07:59:35+02:00",
+          "tree_id": "95de501dd84af6ae758f7801282b7cdfb8f9da9e",
+          "url": "https://github.com/JetBrains/intellij-aspect/commit/d215371c65c106f6fdb571ad0fff3a8f03fc15bd"
+        },
+        "date": 1790230587305,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "bazel-nosync:used-heap-size-after-gc",
+            "value": 115.42056074766356,
+            "unit": "%"
+          },
+          {
+            "name": "bazel-nosync:peak-heap-size",
+            "value": 74.43181818181817,
+            "unit": "%"
+          },
+          {
+            "name": "bazel-nosync:analysis_heap_used",
+            "value": 114.85911623437384,
+            "unit": "%"
+          },
+          {
+            "name": "bazel-nosync:analysis_heap_committed",
+            "value": 110.00000000000001,
+            "unit": "%"
+          },
+          {
+            "name": "bazel-plain:used-heap-size-after-gc",
+            "value": 35.348837209302324,
+            "unit": "%"
+          },
+          {
+            "name": "bazel-plain:peak-heap-size",
+            "value": 20.113314447592067,
+            "unit": "%"
+          },
+          {
+            "name": "bazel-plain:analysis_heap_used",
+            "value": 34.448589362781874,
+            "unit": "%"
+          },
+          {
+            "name": "bazel-plain:analysis_heap_committed",
+            "value": 34.61538461538461,
+            "unit": "%"
+          },
+          {
+            "name": "bazel:used-heap-size-after-gc",
+            "value": 117.67441860465115,
+            "unit": "%"
+          },
+          {
+            "name": "bazel:peak-heap-size",
+            "value": 76.13636363636364,
+            "unit": "%"
+          },
+          {
+            "name": "bazel:analysis_heap_used",
+            "value": 117.56229251964578,
+            "unit": "%"
+          },
+          {
+            "name": "bazel:analysis_heap_committed",
+            "value": 113.99999999999999,
+            "unit": "%"
+          },
+          {
+            "name": "bbremote-nosync:used-heap-size-after-gc",
+            "value": 23.668639053254438,
+            "unit": "%"
+          },
+          {
+            "name": "bbremote-nosync:peak-heap-size",
+            "value": 13.175675675675674,
+            "unit": "%"
+          },
+          {
+            "name": "bbremote-nosync:analysis_heap_used",
+            "value": 24.33564323847336,
+            "unit": "%"
+          },
+          {
+            "name": "bbremote-nosync:analysis_heap_committed",
+            "value": 4.444444444444445,
+            "unit": "%"
+          },
+          {
+            "name": "bbremote-plain:used-heap-size-after-gc",
+            "value": 14.117647058823529,
+            "unit": "%"
+          },
+          {
+            "name": "bbremote-plain:peak-heap-size",
+            "value": 9.427609427609427,
+            "unit": "%"
+          },
+          {
+            "name": "bbremote-plain:analysis_heap_used",
+            "value": 14.461340639534189,
+            "unit": "%"
+          },
+          {
+            "name": "bbremote-plain:analysis_heap_committed",
+            "value": 11.494252873563218,
+            "unit": "%"
+          },
+          {
+            "name": "bbremote:used-heap-size-after-gc",
+            "value": 27.647058823529413,
+            "unit": "%"
+          },
+          {
+            "name": "bbremote:peak-heap-size",
+            "value": 15.151515151515152,
+            "unit": "%"
+          },
+          {
+            "name": "bbremote:analysis_heap_used",
+            "value": 28.3365468060406,
+            "unit": "%"
+          },
+          {
+            "name": "bbremote:analysis_heap_committed",
+            "value": 18.88888888888889,
+            "unit": "%"
+          },
+          {
+            "name": "intellij-nosync:used-heap-size-after-gc",
+            "value": 105.74912891986064,
+            "unit": "%"
+          },
+          {
+            "name": "intellij-nosync:peak-heap-size",
+            "value": 91.27324749642347,
+            "unit": "%"
+          },
+          {
+            "name": "intellij-nosync:analysis_heap_used",
+            "value": 106.24653804699066,
+            "unit": "%"
+          },
+          {
+            "name": "intellij-nosync:analysis_heap_committed",
+            "value": 90.6614785992218,
+            "unit": "%"
+          },
+          {
+            "name": "intellij-plain:used-heap-size-after-gc",
+            "value": 40.316901408450704,
+            "unit": "%"
+          },
+          {
+            "name": "intellij-plain:peak-heap-size",
+            "value": 33.71757925072046,
+            "unit": "%"
+          },
+          {
+            "name": "intellij-plain:analysis_heap_used",
+            "value": 40.047608704350054,
+            "unit": "%"
+          },
+          {
+            "name": "intellij-plain:analysis_heap_committed",
+            "value": 37.6,
+            "unit": "%"
+          },
+          {
+            "name": "intellij:used-heap-size-after-gc",
+            "value": 111.3240418118467,
+            "unit": "%"
+          },
+          {
+            "name": "intellij:peak-heap-size",
+            "value": 96.4131994261119,
+            "unit": "%"
+          },
+          {
+            "name": "intellij:analysis_heap_used",
+            "value": 111.59515757625209,
+            "unit": "%"
+          },
+          {
+            "name": "intellij:analysis_heap_committed",
+            "value": 102.42914979757086,
+            "unit": "%"
+          },
+          {
+            "name": "pigweed-nosync:used-heap-size-after-gc",
+            "value": 30.784313725490197,
+            "unit": "%"
+          },
+          {
+            "name": "pigweed-nosync:peak-heap-size",
+            "value": 28.57142857142857,
+            "unit": "%"
+          },
+          {
+            "name": "pigweed-nosync:analysis_heap_used",
+            "value": 32.10630454711231,
+            "unit": "%"
+          },
+          {
+            "name": "pigweed-nosync:analysis_heap_committed",
+            "value": 29.515418502202646,
+            "unit": "%"
+          },
+          {
+            "name": "pigweed-plain:used-heap-size-after-gc",
+            "value": 16.2426614481409,
+            "unit": "%"
+          },
+          {
+            "name": "pigweed-plain:peak-heap-size",
+            "value": 14.98422712933754,
+            "unit": "%"
+          },
+          {
+            "name": "pigweed-plain:analysis_heap_used",
+            "value": 16.271198640312853,
+            "unit": "%"
+          },
+          {
+            "name": "pigweed-plain:analysis_heap_committed",
+            "value": 10.13215859030837,
+            "unit": "%"
+          },
+          {
+            "name": "pigweed:used-heap-size-after-gc",
+            "value": 35.09803921568627,
+            "unit": "%"
+          },
+          {
+            "name": "pigweed:peak-heap-size",
+            "value": 33.175355450236964,
+            "unit": "%"
+          },
+          {
+            "name": "pigweed:analysis_heap_used",
+            "value": 36.471084686518175,
+            "unit": "%"
+          },
+          {
+            "name": "pigweed:analysis_heap_committed",
+            "value": 31.818181818181817,
             "unit": "%"
           }
         ]
