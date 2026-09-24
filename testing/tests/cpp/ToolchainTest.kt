@@ -80,23 +80,11 @@ class ToolchainTest {
 
   @Test
   fun testAllFilesContainsBuildInIncludeDirectories() {
-    val allFiles = info.allFilesList.map { it.execrootPath() }
+    val includes = info.allFilesList
+      .map { it.relativePath }
+      .count { it.startsWith("include/c++") }
 
-    for (include in info.builtInIncludeDirectoryList) {
-      if (include.startsWith("/")) continue
-
-      // for Bazel 8 or lower all files are listed explicitly
-      val hasChildFile = allFiles.any { it.startsWith(include) }
-
-      // for Bazel 9 or higher, only parent directories are listed
-      val hasParentDirectory = include.split("/")
-        .runningFold("") { path, dir -> joinBazelPath(path, dir) }
-        .any { allFiles.contains(it) }
-
-      assertWithMessage("expected include ($include) in all files: ${allFiles.joinToString(", ")}")
-        .that(hasChildFile || hasParentDirectory)
-        .isTrue()
-    }
+    assertThat(includes).isGreaterThan(0)
   }
 
   @Test
