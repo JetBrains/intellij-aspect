@@ -61,7 +61,8 @@ class ToolchainTest {
 
   @Test
   fun testHasXcodeInfo() {
-    assumeTrue(aspect.bazelVersion(min = 8))
+    // requires toolchains aspects
+    assumeTrue(aspect.bazelVersion(min = 9))
     assumeTrue(isMacOS())
 
     val info = aspect.findToolchainInfo<XcodeIdeInfo>("//:main", TargetIdeInfo.XCODE_IDE_INFO_FIELD_NUMBER)

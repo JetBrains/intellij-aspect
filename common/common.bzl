@@ -155,7 +155,10 @@ def _target_key(target, ctx, aspect_ids):
 
 def _aspect(**kwargs):
     """A replacement for the standard `aspect` function that modifies some of the arguments."""
-    if bazel_version.le(8):
+
+    # while toolchains aspects are available since Bazel 8 they cause native crashes for certian targets
+    # https://github.com/bazelbuild/bazel/issues/31281
+    if bazel_version.le(9):
         kwargs.pop("toolchains_aspects", None)
 
     return aspect(**kwargs)
