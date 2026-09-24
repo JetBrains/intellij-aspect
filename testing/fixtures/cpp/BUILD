@@ -59,6 +59,7 @@ test_fixture(
     ],
     rule_sets = ["cc"],
     targets = ["//:main"],
+    use_msys2 = True,
 )
 
 test_fixture(
