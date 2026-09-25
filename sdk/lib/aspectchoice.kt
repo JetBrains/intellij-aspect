@@ -44,6 +44,7 @@ fun repoMappingForRules(mapping: Map<Rules, String>): Map<String, String> {
   return mapping.mapKeys { (language, _) -> language.rulesetName }
 }
 
+@Deprecated("Use ASPECT_NAME to obtain the name of the only aspect")
 enum class Aspects(val pkg: String, val file: String, val aspect: String) {
   INTELLIJ("config", "aspect.bzl", "intellij_aspect"),
   ;
@@ -62,3 +63,5 @@ enum class Aspects(val pkg: String, val file: String, val aspect: String) {
     }
   }
 }
+
+val ASPECT_NAME: String = Aspects.INTELLIJ.toString()
