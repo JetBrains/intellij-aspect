@@ -8,7 +8,7 @@ package(
 _MODULES = [
     "//testing/fixtures:rules_python_1_4_0",
     "//testing/fixtures:rules_python_1_6_3",
-    "//testing/fixtures:rules_python_1_7_0",
+    "//testing/fixtures:rules_python_latest",
     "//testing/fixtures/registry:cc_false_toolchain",
 ]
 
