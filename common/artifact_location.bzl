@@ -63,20 +63,6 @@ def _from_attr(ctx, name):
         for f in target.files.to_list()
     ]
 
-def _from_execpath(exec_path):
-    """DEPRICATED return plain path instead, converts an execution-root-relative path to an artifact location."""
-    if exec_path == None:
-        return None
-    relative_path = _strip_external_workspace_prefix(exec_path)
-    root_exec_path_fragment = exec_path[:-(len("/" + relative_path))] if relative_path != "" else exec_path
-
-    return _create(
-        root_path = root_exec_path_fragment,
-        relative_path = relative_path,
-        is_external = root_exec_path_fragment.startswith("external/") or root_exec_path_fragment.startswith("../"),
-        is_source = False,
-    )
-
 def _strip_root_path(path, root_path):
     """Strips the root_path from the path."""
     if root_path and path.startswith(root_path + "/"):
@@ -94,7 +80,6 @@ def _strip_external_workspace_prefix(path):
 artifact_location = struct(
     create = _create,
     from_depset = _from_depset,
-    from_execpath_do_not_use = _from_execpath,
     from_file = _from_file,
     from_files = _from_files,
     from_attr = _from_attr,
