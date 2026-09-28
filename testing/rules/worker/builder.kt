@@ -17,8 +17,8 @@ package com.intellij.aspect.testing.rules.worker
 
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
 import com.google.protobuf.TextFormat
+import com.intellij.aspect.lib.ASPECT_NAME
 import com.intellij.aspect.lib.AspectConfig
-import com.intellij.aspect.lib.Aspects
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.lib.Rules
 import com.intellij.aspect.lib.deployAspectZip
@@ -83,11 +83,9 @@ fun main(args: Array<String>) {
       else -> throw IllegalArgumentException("unknown aspect deployment: $deployment")
     }
 
-    val aspects = Aspects.forRules(rulesets).map { ASPECT_PREFIX.getValue(deployment) + it.toString() }
-
     val files = build(
       targets = input.targetsList,
-      aspects = aspects,
+      aspects = listOf(ASPECT_PREFIX.getValue(deployment) + ASPECT_NAME),
       outputGroups = listOf(OutputGroups.INFO.groupName) + input.outputGroupsList,
       profile = Path.of(input.outputProfile),
       execLog = Path.of(input.outputExecLog),

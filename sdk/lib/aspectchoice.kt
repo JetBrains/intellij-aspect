@@ -44,24 +44,4 @@ fun repoMappingForRules(mapping: Map<Rules, String>): Map<String, String> {
   return mapping.mapKeys { (language, _) -> language.rulesetName }
 }
 
-@Deprecated("Use ASPECT_NAME to obtain the name of the only aspect")
-enum class Aspects(val pkg: String, val file: String, val aspect: String) {
-  INTELLIJ("config", "aspect.bzl", "intellij_aspect"),
-  ;
-
-  override fun toString(): String {
-    return "$pkg:$file%$aspect"
-  }
-
-  companion object {
-    /**
-     * For the specified rulesets, returns the list of aspects to be run in the correct order.
-     */
-    @JvmStatic
-    fun forRules(languages: Set<Rules>): List<Aspects> {
-      return listOf(INTELLIJ)
-    }
-  }
-}
-
-val ASPECT_NAME: String = Aspects.INTELLIJ.toString()
+val ASPECT_NAME: String = "config:aspect.bzl%intellij_aspect"
