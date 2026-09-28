@@ -103,13 +103,13 @@ message DartIdeInfo {
 }
 
 message JavaToolchainInfo {
+  reserved 3, 4;
+  reserved "java_home", "boot_clas_java_home";
   string source_version = 1;
   string target_version = 2;
 
-  ArtifactLocation java_home = 3 [deprecated = true];
   string java_home_path = 6;
 
-  ArtifactLocation boot_classpath_java_home = 4 [deprecated = true];
   string boot_classpath_java_home_path = 7;
 
   bool is_exec_config = 5;

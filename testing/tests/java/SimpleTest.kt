@@ -64,11 +64,8 @@ class SimpleTest {
 
     val toolchain = toolchains.first()
     assertThat(toolchain.javaToolchainInfo.sourceVersion).isEqualTo("21")
-    assertThat(toolchain.javaToolchainInfo.javaHome.rootPath).isNotEmpty()
-    assertThat(toolchain.javaToolchainInfo.javaHome.isExternal).isTrue()
     assertThat(toolchain.javaToolchainInfo.javaHomePath).startsWith("external/rules_java")
     assertThat(toolchain.javaToolchainInfo.javaHomePath).contains("remotejdk")
-    assertThat(toolchain.javaToolchainInfo.bootClasspathJavaHome.rootPath).contains("remotejdk")
     assertThat(toolchain.javaToolchainInfo.bootClasspathJavaHomePath).startsWith("external/rules_java")
     assertThat(toolchain.javaToolchainInfo.bootClasspathJavaHomePath).contains("remotejdk")
   }
@@ -111,7 +108,6 @@ class SimpleTest {
       target.depsList.map { aspect.findTarget(it.target.label) }.filter { it.hasJavaToolchainInfo() }
     assertThat(toolchains).isNotEmpty()
     assertThat(toolchains.first().javaToolchainInfo.sourceVersion).isEqualTo("21")
-    assertThat(toolchains.first().javaToolchainInfo.javaHome.rootPath).isNotEmpty()
   }
 
   @Test
