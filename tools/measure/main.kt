@@ -17,8 +17,8 @@
 package com.intellij.aspect.tools.measure
 
 import com.google.protobuf.TextFormat
+import com.intellij.aspect.lib.ASPECT_NAME
 import com.intellij.aspect.lib.AspectConfig
-import com.intellij.aspect.lib.Aspects
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.lib.Rules
 import com.intellij.aspect.lib.deployAspectZip
@@ -60,7 +60,7 @@ private const val STABLE_HEAP_FLAG = "--memory_profile_stable_heap_parameters=4,
 private const val ASPECT_DESTINATION = "aspect"
 
 // the build flag activating the deployed aspect
-private val ASPECT_FLAG = "--aspects=//$ASPECT_DESTINATION/${Aspects.INTELLIJ}"
+private val ASPECT_FLAG = "--aspects=//$ASPECT_DESTINATION/${ASPECT_NAME}"
 
 // keeps bazel from creating bazel-* convenience symlinks in the measured workspace
 private const val NO_CONVENIENCE_SYMLINKS = "--experimental_convenience_symlinks=ignore"
