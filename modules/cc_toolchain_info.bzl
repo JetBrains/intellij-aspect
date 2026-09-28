@@ -18,6 +18,7 @@
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
 load("@rules_cc//cc:defs.bzl", "cc_common")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_TYPE")
+load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//common:output_groups.bzl", "intellij_output_groups")
 load("//common:provider.bzl", "intellij_provider")
@@ -112,9 +113,13 @@ def _implementation(target, ctx, attrs):
         target_name = cc_toolchain.target_gnu_system_name,
         compiler_name = cc_toolchain.compiler,
         sysroot = cc_toolchain.sysroot,
+        all_files = artifact_location.from_depset(cc_toolchain.all_files),
     )
 
-    return intellij_module.result(info)
+    return intellij_module.result(
+        value = info,
+        outputs = intellij_output_groups.from_files(cc_toolchain.all_files.to_list()),
+    )
 
 _aspect = intellij_module.aspect(
     provider = intellij_provider.CcToolchainInfo,
