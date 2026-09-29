@@ -87,7 +87,7 @@ def _merge_target_info(builder, target, ctx, results):
     info = {
         container[provider].field: result.value
         for (provider, result) in results.items()
-        if container[provider].field
+        if container[provider].field and result.value != None
     }
 
     # do not generate a intellij-info.txt if there is no language module attached
