@@ -31,6 +31,10 @@ inline fun <reified T : Any> assertNotNull(value: T?): T {
   return value ?: throw AssertionError("value of type ${T::class} is null")
 }
 
+inline fun <reified T : Any> assertIsInstance(value: Any?): T {
+  return value as? T ?: throw AssertionError("value $value is not of type ${T::class}")
+}
+
 class ArtifactLocationsSubject(
   metadata: FailureMetadata,
   private val actual: Iterable<ArtifactLocation>?,

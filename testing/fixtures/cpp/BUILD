@@ -22,6 +22,20 @@ test_fixture(
 )
 
 test_fixture(
+    name = "apple_support",
+    srcs = glob(["simple/**"]),
+    bazel = ">=9",
+    modules = [
+        "//testing/fixtures:rules_cc_latest",
+        "//testing/fixtures:apple_support_latest",
+    ],
+    rule_sets = ["cc"],
+    strip_prefix = "simple",
+    target_compatible_with = ["@platforms//os:macos"],
+    targets = ["//:main"],
+)
+
+test_fixture(
     name = "transition",
     srcs = glob(["transition/**"]),
     modules = _MODULES + ["//testing/fixtures/registry:cc_false_toolchain"],

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("@rules_cc//cc:defs.bzl", "CcToolchainConfigInfo", "cc_common")
+load("@rules_cc//cc:defs.bzl", "cc_common")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_TYPE")
 load("//common:common.bzl", "intellij_common")
 load("//common:ide_info.bzl", "ide_info")
@@ -22,24 +22,15 @@ load(":module.bzl", "intellij_module")
 
 def _find_result(ctx):
     """
-    Tries to find the previously populated created result in the rule's
-    attributes. There is no need to check toolchains since there is no need to
-    propagate along these edges.
+    Tries to find a result previously propagated by any of the rule's
+    attributes. There is no need to check toolchains here.
     """
 
-    # check if there is any single target attribute that has the XcodeToolchainInfo
-    # provider, this is a little optimization since all attributes where this needs
-    # to propagate are single target attributes
     for name in dir(ctx.rule.attr):
-        target = intellij_common.attr_as_target(ctx, name)
-        if not target:
-            continue
-
-        result = intellij_module.lookup_target(target, intellij_provider.XcodeInfo)
-        if not result:
-            continue
-
-        return result
+        for target in intellij_common.attr_as_label_list(ctx, name):
+            result = intellij_module.lookup_target(target, intellij_provider.XcodeInfo)
+            if result:
+                return result
 
     return None
 
@@ -76,29 +67,25 @@ def _create_result(target, ctx):
     return None
 
 def _implementation(target, ctx, attr):
-    """Collects Xcode configuration data and propagates it through the toolchain.
+    """Collects Xcode configuration data and propagates it up to the cc toolchain.
 
     This aspect collects data from either XcodeVersionConfig (Bazel 9+) or
-    XcodeProperties (Bazel 8) providers and propagates the data up to the
-    top-most toolchain target.
-
-    Assumes that the target defining the Xcode configuration is a direct
-    dependency of the toolchain configuration.
+    XcodeProperties (Bazel 8) providers and propagates the data through any
+    intermediate target (e.g. toolchain configs or helper rules of rules based
+    toolchains) up to the first cc toolchain target, where it is exposed.
     """
 
-    # try to create the provider if any of the xcode providers is present
-    result = _create_result(target, ctx)
-    if result:
-        return intellij_module.result(result, cross_target_internal_value = result)
+    # either create the result from the xcode providers or pick it up from a dependency
+    result = _create_result(target, ctx) or _find_result(ctx)
+    if not result:
+        return None
 
-    # propaget the the created provider if this is a toolchain target
-    if cc_common.CcToolchainInfo in target or CcToolchainConfigInfo in target:
-        result = _find_result(ctx)
-        if result:
-            return intellij_module.result(result, cross_target_internal_value = result)
+    # expose the result on the cc toolchain and stop propagating
+    if cc_common.CcToolchainInfo in target:
+        return intellij_module.result(result)
 
-    # otherwise default to the empty provider
-    return None
+    # otherwise only propagate the result, without a value no ide info is written
+    return intellij_module.result(None, cross_target_internal_value = result)
 
 _aspect = intellij_module.aspect(
     provider = intellij_provider.XcodeInfo,

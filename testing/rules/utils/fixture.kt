@@ -44,15 +44,17 @@ fun AspectFixture.findPyIdeInfo(
   return target.pyIdeInfo
 }
 
-inline fun <reified T : Message> AspectFixture.findToolchainInfo(label: String, fieldNumber: Int): T {
+fun AspectFixture.findToolchain(label: String, fieldNumber: Int): TargetIdeInfo {
   val descriptor = assertNotNull(TargetIdeInfo.getDescriptor().findFieldByNumber(fieldNumber))
 
   val target = findTarget(label).depsList.asSequence()
     .map { findTarget(it.target.label) }
-    .filter { it.hasField(descriptor) }
-    .map { it.getField(descriptor) }
-    .filterIsInstance<T>()
-    .firstOrNull()
+    .firstOrNull { it.hasField(descriptor) }
 
   return assertNotNull(target)
+}
+
+inline fun <reified T : Message> AspectFixture.findToolchainInfo(label: String, fieldNumber: Int): T {
+  val descriptor = assertNotNull(TargetIdeInfo.getDescriptor().findFieldByNumber(fieldNumber))
+  return assertIsInstance<T>(findToolchain(label, fieldNumber).getField(descriptor))
 }
