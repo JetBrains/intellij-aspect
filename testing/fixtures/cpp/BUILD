@@ -31,6 +31,7 @@ test_fixture(
     ],
     rule_sets = ["cc"],
     strip_prefix = "simple",
+    target_compatible_with = ["@platforms//os:macos"],
     targets = ["//:main"],
 )
 

@@ -69,7 +69,8 @@ def test_fixture(
         bcr = True,
         strip_prefix = "",
         use_msys2 = False,
-        extra_flags = []):
+        extra_flags = [],
+        **kwargs):
     """Creates a test fixture with the result of the IntelliJ aspect applied to the project.
 
     Packages a small Bazel project, builds it with the aspect across multiple
@@ -90,6 +91,7 @@ def test_fixture(
             the project archive. Defaults to the fixture name if not specified.
         use_msys2: If True, the BAZEL_SH environment variable is forwarded from the host
             to the nested Bazel invocations.
+        extra_flags: Additional flags passed to the Bazel build.
 
     Example:
         test_module_dep(name = "rules_cc", version = "0.2.14")
@@ -167,6 +169,7 @@ def test_fixture(
         output_groups = output_groups,
         use_msys2 = use_msys2,
         extra_flags = extra_flags,
+        **kwargs
     )
 
 def _derive_test_class(test):
@@ -180,7 +183,7 @@ def _derive_test_class(test):
 
     return "com.intellij.aspect.%s.%s" % (relative_path, class_name)
 
-def test_runner(test, fixture, deps = None, env = None, test_name = None):
+def test_runner(test, fixture, deps = None, env = None, test_name = None, **kwargs):
     """
     Creates a test runner. Runs the test for iterations of the fixture. The
     fixture can be loaded and iterated in the test using the AspectFixture rule:
@@ -214,6 +217,7 @@ def test_runner(test, fixture, deps = None, env = None, test_name = None):
         env = (env or {}) | {
             "ASPECT_FIXTURES": "$(rlocationpaths %s)" % (fixture),
         },
+        **kwargs
     )
 
 def junit_test(test, deps = None, **kwargs):

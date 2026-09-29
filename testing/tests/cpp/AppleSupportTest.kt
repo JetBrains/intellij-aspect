@@ -18,11 +18,8 @@ package com.intellij.aspect.testing.tests.cpp
 
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.*
-import com.intellij.aspect.private.lib.utils.isMacOS
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import com.intellij.aspect.testing.rules.utils.findToolchain
-import org.junit.Assume.assumeTrue
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,11 +31,6 @@ class AppleSupportTest {
   @Rule
   @JvmField
   val aspect = AspectFixture()
-
-  @Before
-  fun setUp() {
-    assumeTrue(isMacOS())
-  }
 
   private val target: TargetIdeInfo
     get() = aspect.findToolchain("//:main", TargetIdeInfo.C_TOOLCHAIN_IDE_INFO_FIELD_NUMBER)
