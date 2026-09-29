@@ -22,6 +22,11 @@ test_runner(
 )
 
 test_runner(
+    fixture = "//testing/fixtures/cpp:apple_support",
+    test = "AppleSupportTest.kt",
+)
+
+test_runner(
     fixture = "//testing/fixtures/cpp:custom_toolchain",
     test = "CustomToolchainTest.kt",
 )

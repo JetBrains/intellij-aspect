@@ -111,6 +111,11 @@ test_module_deps(
     ],
 )
 
+test_module_deps(
+    module_name = "apple_support",
+    versions = ["2.9.0"],
+)
+
 _TOOLCHAINS_LLVM_CONFIG = """
 llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm")
 llvm.toolchain(llvm_version = "20.1.0")
