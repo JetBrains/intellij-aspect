@@ -5,7 +5,7 @@
     "com.google.code.findbugs:jsr305": 495355163,
     "com.google.code.gson:gson": 2063056812,
     "com.google.errorprone:error_prone_annotations": 911823543,
-    "com.google.guava:guava": 965079090,
+    "com.google.guava:guava": 671676083,
     "com.google.j2objc:j2objc-annotations": 2003271689,
     "com.google.truth:truth": 1696781452,
     "com.pinterest.ktlint:ktlint-cli": 423561227,
@@ -33,10 +33,10 @@
     "com.google.code.gson:gson": -1663769307,
     "com.google.errorprone:error_prone_annotations": 652227016,
     "com.google.guava:failureaccess": 1715931538,
-    "com.google.guava:guava": 311464563,
+    "com.google.guava:guava": 713545847,
     "com.google.guava:listenablefuture": 1079558157,
     "com.google.j2objc:j2objc-annotations": -1008747351,
-    "com.google.truth:truth": 1461853498,
+    "com.google.truth:truth": 1950906127,
     "com.pinterest.ktlint:ktlint-cli": -185164476,
     "com.pinterest.ktlint:ktlint-cli-reporter-baseline": -1392370743,
     "com.pinterest.ktlint:ktlint-cli-reporter-checkstyle": -1570476793,
@@ -191,9 +191,9 @@
     },
     "com.google.guava:guava": {
       "shasums": {
-        "jar": "796d8e28ac64e83a47c4c5935a8fecc4682650a04bbdead738ef0f5a3a0e6c46"
+        "jar": "b530942257fb935f8b2cfaa5f8eb5bd59c555fd8e8d01b8ce98912e077ea606c"
       },
-      "version": "33.7.1-jre"
+      "version": "33.7.2-jre"
     },
     "com.google.guava:listenablefuture": {
       "shasums": {
