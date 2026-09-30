@@ -18,6 +18,7 @@ package com.intellij.aspect.lib
 
 enum class Rules(val rulesetName: String) {
   CC("@rules_cc"),
+  FOREIGN_CC("@rules_foreign_cc"),
   PYTHON("@rules_python"),
   JAVA("@rules_java"),
   KOTLIN("@rules_kotlin"),
