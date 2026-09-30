@@ -1,0 +1,21 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load(":forward.bzl", "forward_cc")
+
+cc_library(name = "public", hdrs = ["public.h"])
+cc_library(name = "left", deps = [":public"])
+cc_library(name = "right", deps = [":public"])
+cc_library(name = "textual", textual_hdrs = ["textual.inc"])
+cc_library(name = "ignored", hdrs = ["ignored.h"])
+
+genrule(name = "generate", outs = ["generated.h"], cmd = "echo '// generated' > $@")
+cc_library(name = "implementation", hdrs = ["generated.h"])
+
+cc_library(
+    name = "library",
+    hdrs = ["own.h"],
+    deps = [":left", ":right", ":textual"],
+    implementation_deps = [":implementation"],
+)
+cc_library(name = "consumer", deps = [":library"])
+forward_cc(name = "forward", exported = ":library", deps = [":ignored"])
+cc_library(name = "forward_consumer", deps = [":forward"])

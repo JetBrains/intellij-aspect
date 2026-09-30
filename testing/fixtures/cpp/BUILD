@@ -13,6 +13,19 @@ _MODULES = [
 ]
 
 test_fixture(
+    name = "header_propagation",
+    srcs = glob(["header_propagation/**"]),
+    bazel = ">=8",
+    modules = _MODULES + ["//testing/fixtures/registry:cc_false_toolchain"],
+    output_groups = [
+        intellij_output_groups.SYNC,
+        intellij_output_groups.BUILD,
+    ],
+    rule_sets = ["cc"],
+    targets = ["//:all"],
+)
+
+test_fixture(
     name = "simple",
     srcs = glob(["simple/**"]),
     modules = _MODULES + ["//testing/fixtures:toolchains_llvm_latest"],

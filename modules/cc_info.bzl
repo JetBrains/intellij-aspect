@@ -49,7 +49,23 @@ def _collect_rule_context(ctx):
         strip_include_prefix = intellij_common.attr_as_str(ctx, "strip_include_prefix"),
     )
 
-def _collect_compilation_context(ctx, target):
+def _header_locations(ctx, compilation_context):
+    """Collects reusable header locations from this target and its dependencies."""
+    transitive = []
+    for name in ["deps", "implementation_deps"]:
+        for dep in intellij_common.attr_as_label_list(ctx, name):
+            info = intellij_module.lookup_target(dep, intellij_provider.CcInfo)
+            if info:
+                transitive.append(info.header_locations)
+    direct = [
+        struct(file = file, location = artifact_location.from_file(file))
+        for file in compilation_context.direct_headers + compilation_context.direct_textual_headers
+    ]
+    locations = intellij_common.depset(direct, transitive = transitive)
+    by_file = {entry.file: entry.location for entry in locations.to_list()} if locations else {}
+    return locations, by_file
+
+def _collect_compilation_context(ctx, target, header_locations):
     """Collect information from the compilation context provided by the CcInfo provider."""
     compilation_context = target[CcInfo].compilation_context
 
@@ -68,7 +84,7 @@ def _collect_compilation_context(ctx, target):
     external_includes = getattr(compilation_context, "external_includes", depset()).to_list()
 
     return intellij_common.struct(
-        headers = artifact_location.from_files(compilation_context.headers.to_list()),
+        headers = [header_locations.get(file) or artifact_location.from_file(file) for file in compilation_context.headers.to_list()],
         defines = compilation_context.defines.to_list() + local_defines,
         includes = compilation_context.includes.to_list(),
         quote_includes = compilation_context.quote_includes.to_list(),
@@ -101,6 +117,8 @@ def _implementation(target, ctx, attr):
 
     compilation_context = target[CcInfo].compilation_context
 
+    locations, header_locations = _header_locations(ctx, compilation_context)
+
     # only this target's own headers need to be added; headers of dependencies are contributed already
     headers = compilation_context.direct_headers + compilation_context.direct_textual_headers
 
@@ -108,11 +126,12 @@ def _implementation(target, ctx, attr):
         outputs = intellij_output_groups.from_files(headers),
         value = intellij_common.struct(
             rule_context = _collect_rule_context(ctx),
-            compilation_context = _collect_compilation_context(ctx, target),
+            compilation_context = _collect_compilation_context(ctx, target, header_locations),
         ),
         dependencies = {
             intellij_deps.COMPILE_TIME: intellij_deps.collect(ctx, COMPILE_TIME_DEPS),
         },
+        cross_target_internal_value = struct(header_locations = locations) if locations else None,
     )
 
 _aspect = intellij_module.aspect(
