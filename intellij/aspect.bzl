@@ -51,12 +51,21 @@ def _merge_dependencies(builder, ctx):
 
 def _serialize_dependencies(builder):
     """Serializes all dependencies currently tracked by the builder."""
-    return depset([
-        struct(target = dep.key, dependency_type = key)
-        for key, list_of_sets in builder.dependencies.items()
-        for set in list_of_sets
-        for dep in set.to_list()
-    ]).to_list()
+    dependencies = []
+    for key, list_of_sets in builder.dependencies.items():
+        if key == intellij_deps.COMPILE_TIME:
+            dependencies.extend([
+                struct(target = dep.key)
+                for set in list_of_sets
+                for dep in set.to_list()
+            ])
+        else:
+            dependencies.extend([
+                struct(target = dep.key, dependency_type = key)
+                for set in list_of_sets
+                for dep in set.to_list()
+            ])
+    return depset(dependencies).to_list()
 
 def _run_modules(target, ctx):
     """Runs all available modules in the order they are defined in intellij_provider."""
