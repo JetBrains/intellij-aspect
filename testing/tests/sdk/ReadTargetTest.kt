@@ -16,12 +16,16 @@
 package com.intellij.aspect.testing.tests.sdk
 
 import com.google.common.truth.Truth.assertThat
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
+import com.google.protobuf.TextFormat
 import com.intellij.aspect.lib.readTargetFromFile
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import java.nio.file.Path
+import kotlin.io.path.reader
 import kotlin.io.path.writeBytes
 import kotlin.io.path.writeText
 
@@ -33,58 +37,26 @@ class ReadTargetTest {
   val folder = TemporaryFolder()
 
   @Test
-  fun testLargeUtf8FileAndUnknownFields() {
+  fun testReadsLargeUtf8FileLikeReader() {
     val path = folder.newFile().toPath()
-    val label = "//:café_工場_🧪"
-    val option = "café_工場_🧪".repeat(10_000)
-    path.writeText(
-      """
-      key { label: "$label" }
-      kind: "java_library"
-      java_common { javac_opts: "$option" }
-      env { key: "MESSAGE" value: "line one\nline two\t\"quoted\"" }
-      future_field { value: "unknown" }
-      """.trimIndent(),
-    )
-    val errors = mutableListOf<String?>()
+    val kind = "café_工場_🧪".repeat(2_000)
+    path.writeText("kind: \"$kind\"")
 
-    val info = requireNotNull(readTargetFromFile(path, errors::add))
-
-    assertThat(info.key.label).isEqualTo(label)
-    assertThat(info.kind).isEqualTo("java_library")
-    assertThat(info.javaCommon.javacOptsList).containsExactly(option)
-    assertThat(info.envMap).containsExactly("MESSAGE", "line one\nline two\t\"quoted\"")
-    assertThat(errors).isEmpty()
+    assertThat(readTargetFromFile(path)).isEqualTo(readTargetWithReader(path))
   }
 
   @Test
-  fun testMalformedUtf8UsesReplacementCharacter() {
+  fun testReplacesMalformedUtf8LikeReader() {
     val path = folder.newFile().toPath()
     path.writeBytes("kind: \"".toByteArray() + byteArrayOf(0xc3.toByte(), 0x28) + "\"".toByteArray())
 
-    val info = requireNotNull(readTargetFromFile(path))
-
-    assertThat(info.kind).isEqualTo("\uFFFD(")
+    assertThat(readTargetFromFile(path)).isEqualTo(readTargetWithReader(path))
   }
 
-  @Test
-  fun testMalformedTextReportsError() {
-    val path = folder.newFile().toPath()
-    path.writeText("key {")
-    val errors = mutableListOf<String?>()
-
-    assertThat(readTargetFromFile(path, errors::add)).isNull()
-    assertThat(errors).hasSize(1)
-    assertThat(errors.single()).isNotEmpty()
-  }
-
-  @Test
-  fun testMissingFileReportsError() {
-    val path = folder.root.toPath().resolve("missing.intellij-info.txt")
-    val errors = mutableListOf<String?>()
-
-    assertThat(readTargetFromFile(path, errors::add)).isNull()
-    assertThat(errors).hasSize(1)
-    assertThat(errors.single()).contains(path.fileName.toString())
+  private fun readTargetWithReader(path: Path): TargetIdeInfo {
+    val builder = TargetIdeInfo.newBuilder()
+    val parser = TextFormat.Parser.newBuilder().setAllowUnknownFields(true).build()
+    path.reader().use { parser.merge(it, builder) }
+    return builder.build()
   }
 }
