@@ -15,6 +15,13 @@ test_module_deps(
 )
 
 test_module_deps(
+    module_name = "rules_foreign_cc",
+    versions = [
+        "0.16.0",
+    ],
+)
+
+test_module_deps(
     flags = [
         "build --java_runtime_version=remotejdk_21 --java_language_version=21",
         "build --tool_java_runtime_version=remotejdk_21 --tool_java_language_version=21",

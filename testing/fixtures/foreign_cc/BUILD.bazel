@@ -1,0 +1,27 @@
+load("//common:output_groups.bzl", "intellij_output_groups")
+load("//testing/rules:defs.bzl", "test_fixture")
+
+package(
+    default_testonly = 1,
+    default_visibility = ["//testing/tests:__subpackages__"],
+)
+
+_MODULES = [
+    "//testing/fixtures:rules_cc_latest",
+    "//testing/fixtures:rules_foreign_cc_latest",
+]
+
+test_fixture(
+    name = "make",
+    srcs = glob(["make/**"]),
+    modules = _MODULES,
+    rule_sets = [
+        "cc",
+        "foreign_cc",
+    ],
+    targets = [
+        "//:format_test",
+        "//:format_app",
+    ],
+    use_msys2 = True,
+)

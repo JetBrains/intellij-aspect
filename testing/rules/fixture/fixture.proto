@@ -34,6 +34,7 @@ enum AspectDeployment {
 
 enum RuleSet {
     CC = 0;
+    FOREIGN_CC = 8;
     PYTHON = 1;
     JAVA = 2;
     KOTLIN = 3;
