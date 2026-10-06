@@ -107,7 +107,7 @@ test_module_deps(
     module_name = "rules_go",
     versions = [
         "0.49.0",
-        "0.63.0",
+        "0.64.1",
     ],
 )
 
