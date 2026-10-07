@@ -56,6 +56,10 @@ message CIdeInfo {
   CompilationContext compilation_context = 2;
 }
 
+message ForeignCcInfo {
+  bool is_foreign = 1;
+}
+
 message PyIdeInfo {
   enum PythonVersion {
     UNKNOWN = 0;
@@ -263,6 +267,7 @@ message TargetIdeInfo {
   int64 sync_time_millis = 20;
 
   CIdeInfo c_ide_info = 120;
+  ForeignCcInfo foreign_cc = 123;
   CToolchainIdeInfo c_toolchain_ide_info = 121;
   XcodeIdeInfo xcode_ide_info = 122;
 

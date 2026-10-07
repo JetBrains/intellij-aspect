@@ -46,6 +46,7 @@ private val ASPECT_PREFIX = mapOf(
 
 private val RULES = mapOf(
   RuleSet.CC to Rules.CC,
+  RuleSet.FOREIGN_CC to Rules.FOREIGN_CC,
   RuleSet.PYTHON to Rules.PYTHON,
   RuleSet.JAVA to Rules.JAVA,
   RuleSet.KOTLIN to Rules.KOTLIN,

@@ -1,0 +1,7 @@
+load("//intellij:testing.bzl", "intellij_aspect_test")
+load("//testing/rules:defs.bzl", "test_runner")
+
+test_runner(
+    fixture = "//testing/fixtures/foreign_cc:make",
+    test = "MakeTest.kt",
+)

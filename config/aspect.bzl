@@ -15,6 +15,7 @@
 load("//intellij:aspect.bzl", "intellij_configure_aspect")
 load("//modules:cc_info.bzl", cc_info = "module")
 load("//modules:cc_toolchain_info.bzl", cc_toolchain_info = "module")
+load("//modules:foreign_cc_info.bzl", foreign_cc = "module")
 load("//modules:go_info.bzl", go_info = "module")
 load("//modules:java_common_info.bzl", java_common_info = "module")
 load("//modules:java_info.bzl", java_info = "module")
@@ -35,6 +36,7 @@ MODULES = [
     test_info,
     xcode_info,
     cc_info,
+    foreign_cc,
     cc_toolchain_info,
     java_info,
     java_toolchain_info,

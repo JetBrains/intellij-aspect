@@ -34,6 +34,7 @@ def _create_module_provider():
 _IntelliJRunInfo = _create_module_provider()
 _IntelliJTestInfo = _create_module_provider()
 _IntelliJCcInfo = _create_module_provider()
+_IntellijForeignCcInfo = _create_module_provider()
 _IntelliJCcToolchainInfo = _create_module_provider()
 _IntelliJXcodeInfo = _create_module_provider()
 _IntelliJJavaInfo = _create_module_provider()
@@ -56,6 +57,7 @@ _ORDERED = [
     _IntelliJXcodeInfo,
     _IntelliJCcToolchainInfo,
     _IntelliJCcInfo,
+    _IntellijForeignCcInfo,
     _IntelliJJavaToolchainInfo,
     _IntelliJJavaInfo,
     _IntelliJKotlinInfo,
@@ -84,6 +86,7 @@ intellij_provider = struct(
     RunInfo = _IntelliJRunInfo,
     TestInfo = _IntelliJTestInfo,
     CcInfo = _IntelliJCcInfo,
+    ForeignCcInfo = _IntellijForeignCcInfo,
     CcToolchainInfo = _IntelliJCcToolchainInfo,
     XcodeInfo = _IntelliJXcodeInfo,
     JavaInfo = _IntelliJJavaInfo,

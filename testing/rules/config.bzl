@@ -71,6 +71,7 @@ def serialize_test_config(config):
         "go": 5,
         "proto": 6,
         "legacy_rules_proto": 7,
+        "foreign_cc": 8,
     }
 
     return struct(
