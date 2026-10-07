@@ -52,8 +52,8 @@ use_repo(maven, "maven")
 bazel_registry = use_extension("//private:extension.bzl", "bazel_registry")
 bazel_registry.bazelisk(version = "1.25.0")
 bazel_registry.bcr(
-    commit = "7d60e9e22d24e88e1ca79311e14195772449ed8b",
-    sha256 = "d57f12a02f09c5f961a1b00e135a9e9f8d855fb4e41c2d81cc2e12c08c7d8006",
+    commit = "63104ee4f2bd000d5b227cc1b5327512278ff078",
+    sha256 = "ddcd494b74cc75d8dd9eaf19b810c3dc660c08b0f67fe504b4f9d4ceda51e870",
 )
 bazel_registry.project(
     name = "intellij_android",
