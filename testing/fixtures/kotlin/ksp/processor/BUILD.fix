@@ -10,6 +10,9 @@ kt_jvm_library(
 kt_jvm_library(
     name = "processor_lib",
     srcs = ["HelloProcessor.kt"],
+    # KSP2 discovers SymbolProcessorProvider implementations with a ServiceLoader.
+    resource_strip_prefix = "processor/resources",
+    resources = glob(["resources/**"]),
     visibility = ["//visibility:public"],
     deps = [
         ":annotation",
