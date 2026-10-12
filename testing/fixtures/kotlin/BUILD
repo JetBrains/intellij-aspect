@@ -68,6 +68,7 @@ test_fixture(
     name = "ksp",
     srcs = glob(["ksp/**"]),
     modules = _MODULES_KSP,
+    output_groups = _OUTPUT_GROUPS,
     rule_sets = ["kotlin"],
     targets = [
         "//:A",

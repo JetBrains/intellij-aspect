@@ -203,21 +203,28 @@ def _normalize_jars(jars):
     else:
         return [jars]
 
+def _get_generated_files(target):
+    """The class jars and the source jars of the annotation processing and KSP outputs, or None."""
+    if not getattr(target[KtJvmInfo], "annotation_processing", None) or not target[KtJvmInfo].annotation_processing.enabled:
+        return None
+    class_jars = [jar for jar in _normalize_jars(target[KtJvmInfo].annotation_processing.class_jar) if jar != None]
+    source_jars = [jar for jar in _normalize_jars(target[KtJvmInfo].annotation_processing.source_jar) if jar != None]
+    if hasattr(target[KtJvmInfo], "additional_generated_source_jars"):
+        source_jars = source_jars + [jar for jar in target[KtJvmInfo].additional_generated_source_jars]
+    if hasattr(target[KtJvmInfo], "all_output_jars"):
+        class_jars = class_jars + [jar for jar in target[KtJvmInfo].all_output_jars]
+    return struct(class_jars = class_jars, source_jars = source_jars)
+
 def _get_generated_jars(target, ctx):
-    if getattr(target[KtJvmInfo], "annotation_processing", None) and target[KtJvmInfo].annotation_processing.enabled:
-        class_jars = [jar for jar in _normalize_jars(target[KtJvmInfo].annotation_processing.class_jar) if jar != None]
-        source_jars = [jar for jar in _normalize_jars(target[KtJvmInfo].annotation_processing.source_jar) if jar != None]
-        if hasattr(target[KtJvmInfo], "additional_generated_source_jars"):
-            source_jars = source_jars + [jar for jar in target[KtJvmInfo].additional_generated_source_jars]
-        if hasattr(target[KtJvmInfo], "all_output_jars"):
-            class_jars = class_jars + [jar for jar in target[KtJvmInfo].all_output_jars]
-        return [
-            struct(
-                binary_jars = artifact_location.from_files(class_jars),
-                source_jars = artifact_location.from_files(source_jars),
-            ),
-        ]
-    return []
+    generated = _get_generated_files(target)
+    if generated == None:
+        return []
+    return [
+        struct(
+            binary_jars = artifact_location.from_files(generated.class_jars),
+            source_jars = artifact_location.from_files(generated.source_jars),
+        ),
+    ]
 
 def _get_outputs(target, ctx, plugins):
     resolve_files = []
@@ -243,6 +250,12 @@ def _get_outputs(target, ctx, plugins):
                 resolve_files += out.source_jars
         if hasattr(out, "source_jar") and out.source_jar != None:
             resolve_files += [out.source_jar]
+
+    # The generated jars are reported as generated_jars. With a remote or a disk cache, Bazel
+    # downloads only the requested outputs, so the jars must be in the build output group.
+    generated = _get_generated_files(target)
+    if generated != None:
+        resolve_files += generated.class_jars + generated.source_jars
     return intellij_output_groups.from_files(resolve_files, build_transitive = transitives)
 
 def _implementation(target, ctx, attr):

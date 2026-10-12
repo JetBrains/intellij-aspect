@@ -17,7 +17,9 @@
 package com.intellij.aspect.testing.tests.kotlin
 
 import com.google.common.truth.Truth.assertThat
+import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
+import com.intellij.aspect.testing.rules.utils.assertThatOutputGroup
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -58,5 +60,19 @@ class KspTest {
     val generatedSourceJars = target.javaCommon.generatedJarsList.flatMap { it.sourceJarsList }
     assertThat(generatedBinaryJars).isNotEmpty()
     assertThat(generatedSourceJars).isNotEmpty()
+  }
+
+  /**
+   * The IDE opens the generated jars it is told about. With a remote or a disk cache, Bazel downloads
+   * only the requested outputs, so every reported generated jar is in the build output group.
+   */
+  @Test
+  fun testGeneratedJarsInBuildOutputGroup() {
+    val target = aspect.findTarget("//:A")
+    val generatedJars = target.javaCommon.generatedJarsList.flatMap { it.binaryJarsList + it.sourceJarsList }
+    assertThat(generatedJars).isNotEmpty()
+
+    val buildFiles = aspect.findOutputGroup(OutputGroups.BUILD)
+    generatedJars.forEach { assertThatOutputGroup(buildFiles).containsFile(it.relativePath) }
   }
 }
