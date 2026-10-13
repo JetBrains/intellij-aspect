@@ -38,12 +38,20 @@ def _collect_toolchains(ctx, toolchain_types):
     if not toolchains:
         return
 
-    # it is save to assume that every toolchain carries our provider, otherweise something went quite wrong
-    return intellij_common.depset([
-        toolchains[toolchain_type.label][intellij_provider.IntelliJInfo]
-        for toolchain_type in toolchain_types
-        if toolchain_type.label in toolchains
-    ])
+    result = []
+    for toolchain_type in toolchain_types:
+        if toolchain_type.label not in toolchains:
+            continue
+
+        # optional toolchains (mandatory = False) resolve to `None` if no matching toolchain was found
+        toolchain = toolchains[toolchain_type.label]
+        if toolchain == None:
+            continue
+
+        # it is save to assume that every toolchain carries our provider
+        result.append(toolchain[intellij_provider.IntelliJInfo])
+
+    return intellij_common.depset(result)
 
 intellij_deps = struct(
     COMPILE_TIME = _COMPILE_TIME,
