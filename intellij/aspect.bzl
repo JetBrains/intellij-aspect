@@ -44,10 +44,16 @@ def _merge_dependencies(builder, ctx):
 
     for toolchain_type in ctx.attr._toolchains:
         label = toolchain_type.label
+        if label not in toolchains:
+            continue
+
+        # optional toolchains (mandatory = False) resolve to `None` if no matching toolchain was found
+        toolchain = toolchains[label]
+        if toolchain == None:
+            continue
 
         # it is save to assume that every toolchain carries our provider
-        if label in toolchains:
-            intellij_info_builder.append(builder, toolchains[label][intellij_provider.IntelliJInfo])
+        intellij_info_builder.append(builder, toolchain[intellij_provider.IntelliJInfo])
 
 def _serialize_dependencies(builder):
     """Serializes all dependencies currently tracked by the builder."""
