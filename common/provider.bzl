@@ -34,6 +34,7 @@ def _create_module_provider():
 _IntelliJRunInfo = _create_module_provider()
 _IntelliJTestInfo = _create_module_provider()
 _IntelliJCcInfo = _create_module_provider()
+_IntelliJCompileCommandsInfo = _create_module_provider()
 _IntellijForeignCcInfo = _create_module_provider()
 _IntelliJCcToolchainInfo = _create_module_provider()
 _IntelliJXcodeInfo = _create_module_provider()
