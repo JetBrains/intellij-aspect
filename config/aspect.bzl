@@ -15,7 +15,6 @@
 load("//intellij:aspect.bzl", "intellij_configure_aspect")
 load("//modules:cc_info.bzl", cc_info = "module")
 load("//modules:cc_toolchain_info.bzl", cc_toolchain_info = "module")
-load("//modules:compilecommands.bzl", compilecommands_info = "module")
 load("//modules:foreign_cc_info.bzl", foreign_cc = "module")
 load("//modules:go_info.bzl", go_info = "module")
 load("//modules:java_common_info.bzl", java_common_info = "module")
@@ -54,10 +53,5 @@ MODULES = [
 
 intellij_aspect = intellij_configure_aspect(
     modules = MODULES,
-    container = "//:module_container",
-)
-
-compilecommands = intellij_configure_aspect(
-    modules = [cc_info, cc_toolchain_info, compilecommands_info],
     container = "//:module_container",
 )

@@ -1,7 +1,17 @@
+load("//intellij:aspect.bzl", "intellij_configure_aspect")
+load("//modules:cc_info.bzl", cc_info = "module")
+load("//modules:cc_toolchain_info.bzl", cc_toolchain_info = "module")
+load("//modules:compilecommands.bzl", compilecommands_info = "module")
+
+compilecommands_aspect = intellij_configure_aspect(
+    modules = [cc_info, cc_toolchain_info, compilecommands_info],
+    container = "//:module_container",
+)
+
 def _ccdb_impl(ctx):
     packages = []
 
-    outputs = [] # TODO: calculate .clangd files from packages in the files
+    outputs = []  # TODO: calculate .clangd files from packages in the files
 
     ctx.actions.run(
         inputs = ctx.files.deps,
@@ -17,11 +27,11 @@ ccdb = rule(
     attrs = {
         "deps": attr.label_list(
             mandatory = True,
-            aspect = xxx,
+            aspects = [compilecommands_aspect],
         ),
-        "_tool": attr.label(
-            default = Label("..."),
-            executable = True,
-        )
-    }
+        # "_tool": attr.label(
+        #     default = Label("..."),
+        #     executable = True,
+        # ),
+    },
 )
