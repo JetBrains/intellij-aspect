@@ -14,11 +14,30 @@
  * limitations under the License.
  */
 
+import com.intellij.aspect.tools.ccdb.JsonScanner;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
+
+private record CompileCommands(Path file, List<String> sources) {
+
+  public Path getDatabase() {
+    // compile commands are always generated as <package>/<target>.compile_commands/compile_commands.json
+    return file.getParent();
+  }
+
+  public String getPackage() {
+    return getDatabase().getParent().toString();
+  }
+
+  public Path getBinDirectory() {
+    // compile commands are always generated in the bin directory: bazel-out/<config>/bin
+    return file.subpath(0, 3);
+  }
+}
 
 void main(String[] args) throws IOException {
   if (args.length != 2 || !args[1].startsWith("@")) {
@@ -29,8 +48,12 @@ void main(String[] args) throws IOException {
   final var outputFile = Path.of(args[0]);
   final var compdbFiles = expandParamFile(args[1]);
 
-  final var json = JsonParser.parse(compdbFiles.getFirst());
-  System.out.println(json);
+  for (final var entry : compileCommandsByPackage(compdbFiles).entrySet()) {
+    final var file = Path.of(entry.getKey(),".clangd");
+    final var content = generateClangdYaml(entry.getValue());
+
+    Files.writeString(file, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+  }
 
   Files.createFile(outputFile);
 }
@@ -43,4 +66,49 @@ private List<Path> expandParamFile(String arg) throws IOException {
   } catch (InvalidPathException e) {
     throw new IOException("Invalid path in params file '%s'".formatted(arg), e);
   }
+}
+
+private Map<String, List<CompileCommands>> compileCommandsByPackage(List<Path> files) {
+  return files.stream()
+    .map(this::parseCompileCommands)
+    .filter(Objects::nonNull)
+    .collect(Collectors.groupingBy(CompileCommands::getPackage));
+}
+
+private CompileCommands parseCompileCommands(Path file) {
+  try {
+    return new CompileCommands(file, JsonScanner.scan(file, "file"));
+  } catch (IOException e) {
+    return null;
+  }
+}
+
+private String generateClangdYaml(List<CompileCommands> commands) {
+  return commands.stream()
+    .map(this::generateClangdYaml)
+    .collect(Collectors.joining("---\n"));
+}
+
+private String generateClangdYaml(CompileCommands commands) {
+  final var builder = new StringBuilder();
+  final var pkg = Path.of(commands.getPackage());
+
+  builder.append("If:\n  PathMatch:\n");
+  for (final var source : commands.sources()) {
+    var path = Path.of(source);
+
+    if (!path.startsWith(commands.getBinDirectory())) {
+      path = commands.getBinDirectory().resolve(path);
+    }
+
+    builder.append("    - '");
+    builder.append(pkg.relativize(path));
+    builder.append("'\n");
+  }
+
+  builder.append("CompileFlags:\n  CompilationDatabase: ");
+  builder.append(pkg.relativize(commands.getDatabase()));
+  builder.append("\n");
+
+  return builder.toString();
 }

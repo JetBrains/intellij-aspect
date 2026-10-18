@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.intellij.aspect.tools.ccdb;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -21,7 +22,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * Fast scanner which extracts the string values of a specific key without
@@ -35,6 +35,9 @@ public final class JsonScanner {
   // bounds of the last string, the content is [stringStart, stringEnd)
   private int stringStart = 0;
   private int stringEnd = 0;
+
+  // whether the next string is the value of the key
+  private boolean readingValue = false;
 
   private final ArrayList<String> result = new ArrayList<>();
 
@@ -56,39 +59,33 @@ public final class JsonScanner {
   }
 
   private List<String> scan() {
+    for (var i = 0; i < content.length; i++) {
+      switch (content[i]) {
+        case '"' -> {
+          stringStart = i + 1;
+          stringEnd = findStringEnd(stringStart);
+          i = stringEnd;
 
-    try {
-      for (var i = 0; i < content.length; i++) {
-        switch (content[i]) {
-          case '"' -> {
-            stringStart = i + 1;
-            stringEnd = findStringEnd(stringStart);
-            i = stringEnd;
-          }
-
-          case ':' -> {
-            // the last string was a key, since colons only occur after keys
-            if (!Arrays.equals(content, stringStart, stringEnd, needle, 0, needle.length)) {
-              continue;
-            }
-
-            i = skipWhitespace(content, i + 1);
-            if (i >= content.length || content[i] != '"') {
-              throw new IllegalStateException("value of '%s' is not a string at offset %d".formatted(key, i));
-            }
-
-            stringStart = i + 1;
-            stringEnd = findStringEnd(stringStart);
-            i = stringEnd;
-
+          if (readingValue) {
             result.add(decodeString(stringStart, stringEnd));
-          }
-          default -> {
+            readingValue = false;
           }
         }
+
+        case ':' -> {
+          // the last string was a key, since colons only occur after keys
+          readingValue = Arrays.equals(content, stringStart, stringEnd, needle, 0, needle.length);
+        }
+
+        case '[', '{' -> {
+          // the value is not a string, ignore it
+          readingValue = false;
+        }
+
+        default -> {
+          // nothing todo, consume character
+        }
       }
-    } catch (IllegalStateException e) {
-      throw new IOException("Failed to scan '%s'".formatted(file), e);
     }
 
     return result;
@@ -113,14 +110,6 @@ public final class JsonScanner {
     }
 
     throw new IllegalStateException("unterminated string at offset %d".formatted(start - 1));
-  }
-
-  private static int skipWhitespace(byte[] input, int pos) {
-    while (pos < input.length && (input[pos] == ' ' || input[pos] == '\t' || input[pos] == '\n' || input[pos] == '\r')) {
-      pos++;
-    }
-
-    return pos;
   }
 
   /**

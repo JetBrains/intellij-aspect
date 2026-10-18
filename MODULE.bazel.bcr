@@ -20,5 +20,8 @@ scala_deps.scala()
 # Therefore, we do *not* add the dependency of "rules_proto" which would be
 # bazel_dep(name = "rules_proto", version = "7.1.0", max_compatibility_level = 1)
 
+# required for ccdb
+bazel_dep(name = "with_cfg.bzl", version = "1.0.1")
+
 config = use_extension("//config:extension.bzl", "config")
 use_repo(config, "intellij_config")

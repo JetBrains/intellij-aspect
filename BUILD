@@ -1,6 +1,4 @@
-load("@bazel_jar_jar//:jar_jar.bzl", "jar_jar")
 load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
-load("@rules_java//java:defs.bzl", "java_binary")
 load("@rules_pkg//pkg:mappings.bzl", "pkg_filegroup", "pkg_files")
 load("@rules_pkg//pkg:pkg.bzl", "pkg_tar", "pkg_zip")
 load("//modules:module.bzl", "intellij_module")
@@ -30,6 +28,7 @@ pkg_filegroup(
         "//config",
         "//intellij",
         "//modules",
+        "//tools/ccdb",
     ],
 )
 
@@ -70,23 +69,10 @@ local_registry(
     visibility = ["//visibility:public"],
 )
 
-# The full deploy jar, without the kotlin stdlib, before renaming any classes.
-java_binary(
-    name = "sdk_plain",
-    create_executable = False,
-    deploy_env = ["//third_party/kotlin:deploy_env"],
-    runtime_deps = ["//sdk"],
-)
-
-# The sdk jar used to interact with the aspect. To avoid conflicts with other versions of protobuf,
-# the protobuf infrastructure is renamed to be internal to this project, consumers are expected to provide
-# the kotlin stdlib themselves on their runtime classpath.
-jar_jar(
+# alias for backwards compatability with TC builds
+alias(
     name = "sdk",
-    inline_rules = ["rule com.google.protobuf.** com.intellij.aspect.internal.protoinfra.@1"],
-    input_jar = "//:sdk_plain_deploy.jar",
-    output_jar = "sdk_deploy.jar",
-    visibility = ["//visibility:public"],
+    actual = "//third_party/ultimate:sdk",
 )
 
 # the container required to configure the aspect locally

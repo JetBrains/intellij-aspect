@@ -1,0 +1,19 @@
+load("@rules_java//java:defs.bzl", "java_library")
+load(":ccdb.bzl", "ccdb")
+load(":java_25_binary.bzl", "java_25_binary")
+
+java_library(
+    name = "json_scanner",
+    srcs = ["JsonScanner.java"],
+    tags = ["manual"],
+    visibility = ["//visibility:private"],
+)
+
+java_25_binary(
+    name = "generator",
+    srcs = ["Generator.java"],
+    tags = ["manual"],
+    main_class = "Generator",
+    visibility = ["//visibility:public"],
+    deps = [":json_scanner"],
+)

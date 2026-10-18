@@ -1,10 +1,12 @@
 load("@rules_java//java:defs.bzl", "java_library")
+load("//private/rules:aspect_lib.bzl", "aspect_lib")
 load(":ccdb.bzl", "ccdb")
 load(":java_25_binary.bzl", "java_25_binary")
 
 java_library(
-    name = "json",
-    srcs = ["Json.java"],
+    name = "json_scanner",
+    srcs = ["JsonScanner.java"],
+    visibility = ["//testing/tests/ccdb:__pkg__"],
 )
 
 java_25_binary(
@@ -12,10 +14,15 @@ java_25_binary(
     srcs = ["Generator.java"],
     main_class = "Generator",
     visibility = ["//visibility:public"],
-    deps = [":json"],
+    deps = [":json_scanner"],
 )
 
-ccdb(
-    name = "abseil",
-    deps = ["@abseil-cpp//absl/time"],
+aspect_lib(
+    name = "ccdb",
+    build = ":BUILD.bcr",
+    files = glob([
+        "*.bzl",
+        "*.java",
+    ]),
+    visibility = ["//:__pkg__"],
 )

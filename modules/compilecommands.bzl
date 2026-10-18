@@ -75,10 +75,6 @@ def _compilecommands(target, ctx, attr):
     c_arguments = [toolchain_info.c_compiler] + toolchain_info.c_option
     cpp_arguments = [toolchain_info.cpp_compiler] + toolchain_info.cpp_option
 
-    for include in toolchain_info.built_in_include_directory:
-        c_arguments.append("-isystem%s" % include)
-        cpp_arguments.append("-isystem%s" % include)
-
     if getattr(toolchain_info, "sysroot", None):
         c_arguments.append("--sysroot=%s" % toolchain_info.sysroot)
         cpp_arguments.append("--sysroot=%s" % toolchain_info.sysroot)
@@ -96,7 +92,9 @@ def _compilecommands(target, ctx, attr):
     template = ctx.actions.declare_file(target.label.name + ".compile_commands.json.tpl")
     ctx.actions.write(template, json.encode(commands))
 
-    file = ctx.actions.declare_file(target.label.name + ".compile_commands.json")
+    # clangd expects a directory containing a compile_commands.json file
+    file = ctx.actions.declare_file(target.label.name + ".compile_commands/compile_commands.json")
+
     ctx.actions.run_shell(
         inputs = [template],
         outputs = [file],
