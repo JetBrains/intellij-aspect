@@ -71,3 +71,22 @@ makevar_binary = rule(
         "data": attr.label_list(allow_files = True),
     },
 )
+
+# Transition to different platform, so bazel cannot match toolchain
+def _unknown_platform_impl(settings, attr):
+    return {"//command_line_option:platforms": str(Label("//:unknown_platform"))}
+
+_unknown_platform_transition = transition(
+    implementation = _unknown_platform_impl,
+    inputs = [],
+    outputs = ["//command_line_option:platforms"],
+)
+
+optional_toolchain_binary = rule(
+    implementation = _executable_impl,
+    executable = True,
+    cfg = _unknown_platform_transition,
+    toolchains = [
+        config_common.toolchain_type("@bazel_tools//tools/cpp:toolchain_type", mandatory = False),
+    ],
+)

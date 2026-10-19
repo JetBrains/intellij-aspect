@@ -4,12 +4,17 @@ load(
     "custom_library",
     "custom_test",
     "makevar_binary",
+    "optional_toolchain_binary",
     "weird_binary",
     "weird_library",
     "weird_test",
 )
 
 custom_binary(name = "custom_bin")
+
+platform(name = "unknown_platform")
+
+optional_toolchain_binary(name = "optional_toolchain_bin")
 
 custom_test(name = "custom_test")
 

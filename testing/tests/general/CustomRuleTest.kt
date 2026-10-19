@@ -77,6 +77,13 @@ class CustomRuleTest {
   }
 
   @Test
+  fun testUnresolvedOptionalToolchainIsSkipped() {
+    val target = aspect.findTarget("//:optional_toolchain_bin")
+    assertThat(target.kind).isEqualTo("optional_toolchain_binary")
+    assertThat(target.hasExecutableInfo()).isTrue()
+  }
+
+  @Test
   fun testMakeVariableExpansionInEnv() {
     val target = aspect.findTarget("//:makevar_bin")
     assertThat(target.envMap["PLAIN"]).isEqualTo("value")
