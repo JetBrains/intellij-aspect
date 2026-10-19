@@ -63,7 +63,7 @@ fun worker(
 
       launch(Dispatchers.IO) {
         val server = pool.acquireOrCreate { version, slot -> createServer(logger, cwd, version, slot, shared) }
-        val sandboxRoot = Files.createTempDirectory(cwd, "sandbox_").toAbsolutePath()
+        val sandboxRoot = server.prepareSandbox()
 
         server.logger.log("build started: ${input.projectArchive}}")
 
@@ -187,6 +187,7 @@ data class BazelServer(
   val root: Path,
   val outputRootDirectory: Path,
   val outputBaseDirectory: Path,
+  val sandboxDirectory: Path,
   val logger: Logger,
 )
 
@@ -201,8 +202,21 @@ private fun createServer(logger: Logger, cwd: Path, version: String, slot: Int, 
     root = root,
     outputRootDirectory = Files.createDirectories(root.resolve("output_root")),
     outputBaseDirectory = Files.createDirectories(root.resolve("output_base")),
+    sandboxDirectory = root.resolve("sandbox"),
     logger = logger.child(name = "$version#$slot"),
   ).also { it.logger.log("created") }
+}
+
+/**
+ * Prepares the sandbox for the next build on this server. The location has to be stable, since bazel
+ * treats the workspace directory as a startup option and restarts the server whenever it changes.
+ */
+@Throws(IOException::class)
+private fun BazelServer.prepareSandbox(): Path {
+  // remove leftovers in case a previous build was not cleaned up
+  if (Files.exists(sandboxDirectory)) deleteRecursive(sandboxDirectory)
+
+  return Files.createDirectories(sandboxDirectory)
 }
 
 /** Makes [version] safe to use as a single path segment. */
