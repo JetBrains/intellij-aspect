@@ -34,6 +34,10 @@ message WorkerOptions {
   // The location of the shared repo cache. May be located in user defined location.
   string repo_cache = 4;
 
+  // The location of the shared repo-contents cache. May be located in user defined location.
+  // Only used for bazel versions supporting it.
+  string repo_contents_cache = 6;
+
   // The location of the workers working directory. May be located in user defined location.
   string worker_dir = 5;
 }

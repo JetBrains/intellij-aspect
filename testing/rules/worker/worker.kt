@@ -172,11 +172,15 @@ private fun createResources(cwd: Path, options: WorkerOptions): SharedResources 
     ?.let(::resolvePath)
     ?: cwd.resolve("repo_cache")
 
+  val repoContentsCacheDirectory = options.repoContentsCache.takeIf { it.isNotBlank() }
+    ?.let(::resolvePath)
+    ?: cwd.resolve("repo_contents_cache")
+
   return SharedResources(
     bazeliskBinary = Path.of(options.bazelisk).toAbsolutePath(),
     registryDirectories = registryDirectories,
     repoCacheDirectory = Files.createDirectories(repoCacheDirectory),
-    repoContentsCacheDirectory = Files.createDirectories(cwd.resolve("repo_contents_cache")),
+    repoContentsCacheDirectory = Files.createDirectories(repoContentsCacheDirectory),
     diskCacheDirectory = Files.createDirectories(cwd.resolve("disk_cache")),
     bazeliskHomeDirectory = Files.createDirectories(cwd.resolve("bazelisk_home")),
   )

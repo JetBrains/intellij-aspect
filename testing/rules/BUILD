@@ -13,6 +13,12 @@ string_flag(
 )
 
 string_flag(
+    name = "repo_contents_cache",
+    build_setting_default = "",
+    visibility = ["//visibility:public"],
+)
+
+string_flag(
     name = "worker_dir",
     build_setting_default = "",
     visibility = ["//visibility:public"],

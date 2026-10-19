@@ -36,6 +36,7 @@ def _test_fixture_impl(ctx):
             registry_files = [file.path for file in ctx.files._registry_files],
             max_servers = ctx.attr._max_servers[BuildSettingInfo].value,
             repo_cache = ctx.attr._repo_cache[BuildSettingInfo].value,
+            repo_contents_cache = ctx.attr._repo_contents_cache[BuildSettingInfo].value,
             worker_dir = ctx.attr._worker_dir[BuildSettingInfo].value,
         ))
 
@@ -140,6 +141,9 @@ test_fixture = rule(
         ),
         "_repo_cache": attr.label(
             default = Label("//testing/rules:repo_cache"),
+        ),
+        "_repo_contents_cache": attr.label(
+            default = Label("//testing/rules:repo_contents_cache"),
         ),
         "_worker_dir": attr.label(
             default = Label("//testing/rules:worker_dir"),
