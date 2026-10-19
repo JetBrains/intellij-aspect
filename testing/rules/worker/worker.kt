@@ -20,6 +20,7 @@ import com.intellij.aspect.private.lib.utils.*
 import com.intellij.aspect.testing.rules.worker.WorkerProto.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Semaphore
@@ -30,6 +31,9 @@ import java.nio.file.Path
 import java.security.MessageDigest
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
+
+// total backoff of ~3s before giving up on the stable sandbox location
+private const val SANDBOX_CLEANUP_ATTEMPTS = 5
 
 fun worker(
   args: Array<String>,
@@ -63,8 +67,6 @@ fun worker(
 
       launch(Dispatchers.IO) {
         val server = pool.acquireOrCreate { version, slot -> createServer(logger, cwd, version, slot, shared) }
-        val sandboxRoot = server.prepareSandbox()
-
         server.logger.log("build started: ${input.projectArchive}}")
 
         val log = ByteArrayOutputStream()
@@ -73,7 +75,7 @@ fun worker(
           sandbox(
             bazelisk = shared.bazeliskBinary,
             version = server.version,
-            root = sandboxRoot,
+            root = server.prepareSandbox(),
             logger = server.logger.child(out = log),
           ) {
             outputRoot(server.outputRootDirectory)
@@ -202,7 +204,7 @@ private fun createServer(logger: Logger, cwd: Path, version: String, slot: Int, 
     root = root,
     outputRootDirectory = Files.createDirectories(root.resolve("output_root")),
     outputBaseDirectory = Files.createDirectories(root.resolve("output_base")),
-    sandboxDirectory = root.resolve("sandbox"),
+    sandboxDirectory = Files.createTempDirectory(root, "sandbox_"),
     logger = logger.child(name = "$version#$slot"),
   ).also { it.logger.log("created") }
 }
@@ -210,13 +212,27 @@ private fun createServer(logger: Logger, cwd: Path, version: String, slot: Int, 
 /**
  * Prepares the sandbox for the next build on this server. The location has to be stable, since bazel
  * treats the workspace directory as a startup option and restarts the server whenever it changes.
+ *
+ * On Windows, files of the previous build can remain pending for deletion for a short while, hence
+ * the cleanup is retried. If the sandbox still cannot be cleaned, a fresh directory is used instead,
+ * at the cost of a server restart.
  */
 @Throws(IOException::class)
-private fun BazelServer.prepareSandbox(): Path {
-  // remove leftovers in case a previous build was not cleaned up
-  if (Files.exists(sandboxDirectory)) deleteRecursive(sandboxDirectory)
+private suspend fun BazelServer.prepareSandbox(): Path {
+  repeat(SANDBOX_CLEANUP_ATTEMPTS) { attempt ->
+    try {
+      // remove leftovers in case a previous build was not cleaned up
+      if (Files.exists(sandboxDirectory)) deleteRecursive(sandboxDirectory)
 
-  return Files.createDirectories(sandboxDirectory)
+      return Files.createDirectories(sandboxDirectory)
+    } catch (e: IOException) {
+      logger.log("could not clean sandbox (attempt ${attempt + 1}): $e")
+      delay(100L shl attempt)
+    }
+  }
+
+  logger.log("falling back to a fresh sandbox, the server will be restarted")
+  return Files.createTempDirectory(root, "sandbox_")
 }
 
 /** Makes [version] safe to use as a single path segment. */
