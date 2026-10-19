@@ -138,10 +138,6 @@ class SimpleTest {
 
   @Test
   fun testOutputGroups() {
-    val syncFiles = aspect.findOutputGroup(OutputGroups.SYNC)
-    assertThatOutputGroup(syncFiles).isNotEmpty() // contains at least the test runner
-    assertThatOutputGroup(syncFiles).doesNotContainFile("main.jar")
-
     val buildFiles = aspect.findOutputGroup(OutputGroups.BUILD)
     assertThatOutputGroup(buildFiles).containsFile("main.jar")
     assertThatOutputGroup(buildFiles).containsFileMatching("/main.jdeps.intellij-generated-*")

@@ -1,4 +1,3 @@
-load("//common:output_groups.bzl", "intellij_output_groups")
 load("//testing/rules:defs.bzl", "test_fixture")
 
 package(
@@ -67,10 +66,7 @@ test_fixture(
     srcs = glob(["custom_toolchain/**"]),
     extra_flags = ["--extra_toolchains=//:sdp_toolchain"],
     modules = _MODULES,
-    output_groups = [
-        intellij_output_groups.SYNC,
-        intellij_output_groups.BUILD,
-    ],
+    outputs = "build",
     rule_sets = ["cc"],
     targets = ["//:main"],
     use_msys2 = True,
@@ -85,10 +81,7 @@ test_fixture(
         "--inject_repository=external_module=module",
     ],
     modules = _MODULES + ["//testing/fixtures/registry:cc_false_toolchain"],
-    output_groups = [
-        intellij_output_groups.SYNC,
-        intellij_output_groups.BUILD,
-    ],
+    outputs = "build",
     rule_sets = ["cc"],
     strip_prefix = "layout",
     targets = ["//main:main"],
@@ -103,10 +96,7 @@ test_fixture(
         "--inject_repository=external_module=module",
     ],
     modules = _MODULES + ["//testing/fixtures/registry:cc_false_toolchain"],
-    output_groups = [
-        intellij_output_groups.SYNC,
-        intellij_output_groups.BUILD,
-    ],
+    outputs = "build",
     rule_sets = ["cc"],
     strip_prefix = "layout",
     targets = ["//main:main"],

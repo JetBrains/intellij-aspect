@@ -112,11 +112,6 @@ class CustomToolchainTest {
 
   @Test
   fun testAllFilesInOutputGroups() {
-    val sync = aspect.findOutputGroup(OutputGroups.SYNC)
-    assertThatOutputGroup(sync).containsFile("toolchain/bin/qcc")
-    assertThatOutputGroup(sync).containsFile("toolchain/include/qnx.h")
-    assertThatOutputGroup(sync).doesNotContainFile("toolchain/include/generated_config.h")
-
     val build = aspect.findOutputGroup(OutputGroups.BUILD)
     assertThatOutputGroup(build).containsFile("toolchain/include/generated_config.h")
     assertThatOutputGroup(build).doesNotContainFile("toolchain/bin/qcc")

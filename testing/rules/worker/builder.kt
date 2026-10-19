@@ -31,6 +31,7 @@ import com.intellij.aspect.testing.rules.fixture.FixtureProto.BazelModule
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.OutputGroup
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.RuleSet
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.TestFixture
+import com.intellij.aspect.testing.rules.worker.WorkerProto.WorkArguments.Outputs
 import java.io.IOException
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
@@ -87,7 +88,10 @@ fun main(args: Array<String>) {
     val files = build(
       targets = input.targetsList,
       aspects = listOf(ASPECT_PREFIX.getValue(deployment) + ASPECT_NAME),
-      outputGroups = listOf(OutputGroups.INFO.groupName) + input.outputGroupsList,
+      outputGroups = when (input.outputs) {
+        Outputs.INFO -> listOf(OutputGroups.INFO.groupName)
+        else -> listOf(OutputGroups.INFO.groupName, OutputGroups.BUILD.groupName)
+      },
       profile = Path.of(input.outputProfile),
       execLog = Path.of(input.outputExecLog),
       flags = input.extraFlagsList,

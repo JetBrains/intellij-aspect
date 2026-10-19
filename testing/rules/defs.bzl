@@ -62,7 +62,7 @@ def test_fixture(
         modules,
         rule_sets,
         targets,
-        output_groups = [],
+        outputs = "info",
         bazel = None,
         builtin = False,
         materialized = True,
@@ -85,6 +85,8 @@ def test_fixture(
         modules: Label list of test_module_dep targets the fixture depends upon.
         rule_sets: List of rule sets for which to use the respective aspects.
         targets: List of targets to build in the test project.
+        outputs: Which outputs to collect. "info" (the default) only requests the
+            intellij-info output group and "build" also requests intellij-build.
         builtin: If True, also tests the builtin aspect deployment mode.
         bcr: If True (the default) also test the BCR deployment mode.
         strip_prefix: Optional. Prefix to strip from source file paths when creating
@@ -166,7 +168,7 @@ def test_fixture(
         project = name + "_project",
         testonly = 1,
         targets = targets,
-        output_groups = output_groups,
+        outputs = outputs,
         use_msys2 = use_msys2,
         extra_flags = extra_flags,
         **kwargs

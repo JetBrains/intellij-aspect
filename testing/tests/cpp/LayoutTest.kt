@@ -93,15 +93,7 @@ class LayoutTest {
   }
 
   @Test
-  fun testSyncOutputGroup() {
-    val sync = aspect.findOutputGroup(OutputGroups.SYNC)
-    assertThatOutputGroup(sync).hasSize(3)
-    assertThatOutputGroup(sync).containsFile("srcs/lib.h")
-    assertThatOutputGroup(sync).containsFile("textual/header.h")
-    assertThatOutputGroup(sync).containsFile("textual/textual.inc")
-    assertThatOutputGroup(sync).doesNotContainFile("lib/generated.h")
-    assertThatOutputGroup(sync).doesNotContainFile("textual/generated_textual.inc")
-
+  fun testBuildOutputGroup() {
     val build = aspect.findOutputGroup(OutputGroups.BUILD)
     assertThatOutputGroup(build).hasSize(2)
     assertThatOutputGroup(build).containsFile("lib/generated.h")
