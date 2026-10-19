@@ -144,8 +144,8 @@ class SimpleTest {
 
     val buildFiles = aspect.findOutputGroup(OutputGroups.BUILD)
     assertThatOutputGroup(buildFiles).containsFile("main.jar")
-    assertThatOutputGroup(buildFiles).containsFileMatching("materialized_*main.jdeps")
+    assertThatOutputGroup(buildFiles).containsFileMatching("/main.jdeps.intellij-generated-*")
     assertThatOutputGroup(buildFiles).containsFile("lib/libutil.jar")
-    assertThatOutputGroup(buildFiles).containsFileMatching("materialized_*util.jdeps")
+    assertThatOutputGroup(buildFiles).containsFileMatching("/libutil.jdeps.intellij-generated-*")
   }
 }

@@ -98,7 +98,7 @@ class OutputGroupSubject(
       .isEmpty()
   }
 
-  /** Asserts that the group contains a file matching [glob], e.g. `materialized_*main.jdeps`. */
+  /** Asserts that the group contains a file matching [glob], e.g. `main.jdeps.intellij-generated-*`. */
   fun containsFileMatching(glob: String) {
     val matcher = FileSystems.getDefault().getPathMatcher("glob:**$glob")
 

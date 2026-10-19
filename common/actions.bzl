@@ -18,7 +18,19 @@
 
 load("//config:config.bzl", "config")
 
-def copy(ctx, src, dst, progress, mnemonic):
+def _declare_unique_file(ctx, *, name, hash_hint = None):
+    parts = [name]
+    parts.append(hash_hint or "")
+
+    # The tags implicitly enter the action as "execution info" which is also part of the action equality. Therefore, we have to include
+    # them in the hash included in the output path to avoid non-sharable actions with the same output.
+    parts.extend(ctx.rule.attr.tags)
+
+    name = "%s.intellij-generated-%s" % (name, str(abs(hash(".".join(parts)))))
+
+    return ctx.actions.declare_file(name)
+
+def _copy(ctx, *, src, dst):
     if config.os.startswith("windows"):
         bat = ctx.actions.declare_file(dst.basename.replace(".", "_") + "-cmds.bat")
         ctx.actions.write(
@@ -34,17 +46,22 @@ def copy(ctx, src, dst, progress, mnemonic):
             outputs = [dst],
             executable = "cmd.exe",
             arguments = ["/C", bat.path.replace("/", "\\")],
-            mnemonic = mnemonic,
-            progress_message = progress,
+            mnemonic = "IntelliJCopy",
+            progress_message = "Copying file from %s to %s" % (src.basename, dst.basename),
             use_default_shell_env = True,
         )
     else:
         ctx.actions.run(
             inputs = [src],
             outputs = [dst],
-            mnemonic = mnemonic,
-            progress_message = progress,
+            mnemonic = "IntelliJCopy",
+            progress_message = "Copying file from %s to %s" % (src.basename, dst.basename),
             executable = "sh",
             arguments = ["-c", 'cp "$1" "$2"', "--", src.path, dst.path],
             use_default_shell_env = True,
         )
+
+intellij_actions = struct(
+    declare_unique_file = _declare_unique_file,
+    copy = _copy,
+)
