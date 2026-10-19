@@ -61,9 +61,5 @@ fun readXcodeInfoFromFile(file: Path, logErrorMessage: (String?) -> Unit = {}): 
 // keep private: jar_jar does not relocate protobuf types in the Kotlin metadata of public declarations
 @Throws(IOException::class)
 private fun readMessageFromFile(file: Path, builder: Message.Builder) {
-  try {
-    PARSER.merge(file.readBytes().toString(Charsets.UTF_8), builder)
-  } catch (e: TextFormat.ParseException) {
-    throw IOException("invalid textproto message", e)
-  }
+  PARSER.merge(file.readBytes().toString(Charsets.UTF_8), builder)
 }

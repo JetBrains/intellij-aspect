@@ -76,7 +76,8 @@ def _resolve_xcode_info(target, ctx, environment):
     dst = intellij_actions.declare_unique_file(
         ctx,
         name = target.label.name.split("/")[-1],
-        hash_hint = "xcode",
+        # the full label name is part of the hash to avoid collisions between toolchains in the same package
+        hash_hint = "xcode." + target.label.name,
     )
 
     intellij_actions.expand_env(

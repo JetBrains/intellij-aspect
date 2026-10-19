@@ -67,7 +67,7 @@ def _expand_env(ctx, *, dst, content, env, substitutions):
         ctx.actions.write(dst, content)
         return
 
-    template = _declare_unique_file(ctx, name = dst.basename + ".tpl")
+    template = ctx.actions.declare_file(dst.basename + ".tpl", sibling = dst)
     ctx.actions.write(template, content)
 
     script = [
