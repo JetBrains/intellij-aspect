@@ -16,10 +16,10 @@
 package com.intellij.aspect.testing.rules.utils
 
 import com.google.common.truth.Truth.assertThat
+import com.google.devtools.intellij.aspect.Common.ArtifactLocation
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.CIdeInfo
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.PyIdeInfo
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
-import com.google.devtools.intellij.aspect.Common.ArtifactLocation
 import com.google.protobuf.ByteString
 import com.google.protobuf.Message
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
