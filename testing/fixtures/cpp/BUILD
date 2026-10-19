@@ -28,6 +28,7 @@ test_fixture(
         "//testing/fixtures:rules_cc_latest",
         "//testing/fixtures:apple_support_latest",
     ],
+    outputs = "capture",
     rule_sets = ["cc"],
     strip_prefix = "simple",
     target_compatible_with = ["@platforms//os:macos"],

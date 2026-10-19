@@ -18,7 +18,11 @@ package com.intellij.aspect.testing.tests.cpp
 
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.*
+import com.google.protobuf.TextFormat
+import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
+import com.intellij.aspect.testing.rules.utils.assertThatOutputGroup
+import com.intellij.aspect.testing.rules.utils.findGeneratedFile
 import com.intellij.aspect.testing.rules.utils.findToolchain
 import org.junit.Rule
 import org.junit.Test
@@ -42,8 +46,35 @@ class AppleSupportTest {
 
   @Test
   fun testHasXcodeInfo() {
-    assertThat(target.hasXcodeIdeInfo()).isTrue()
-    assertThat(target.xcodeIdeInfo.xcodeVersion).isNotEmpty()
-    assertThat(target.xcodeIdeInfo.macosSdkVersion).isNotEmpty()
+    val info = target.cToolchainIdeInfo
+    assertThat(info.hasXcodeInfo()).isTrue()
+    assertThat(info.xcodeInfo.relativePath).contains("toolchain.intellij-generated-")
+  }
+
+  @Test
+  fun testXcodeInfoInBuildOutputGroup() {
+    val build = aspect.findOutputGroup(OutputGroups.BUILD)
+    assertThatOutputGroup(build).containsFile(target.cToolchainIdeInfo.xcodeInfo.relativePath)
+  }
+
+  @Test
+  fun testXcodeInfoIsResolved() {
+    val file = aspect.findGeneratedFile(target.cToolchainIdeInfo.xcodeInfo)
+    val info = TextFormat.parse(file.toStringUtf8(), CToolchainIdeInfo.XcodeInfo::class.java)
+
+    assertThat(info.developerDir).startsWith("/")
+    assertThat(info.developerDir).doesNotContain("__BAZEL_XCODE_")
+    assertThat(info.sdkRoot).startsWith("/")
+    assertThat(info.sdkRoot).doesNotContain("__BAZEL_XCODE_")
+
+    // the versions are only known if Xcode is installed, the command line tools are not enough
+    assertThat(info.xcodeVersion.isEmpty()).isEqualTo(info.sdkVersion.isEmpty())
+  }
+
+  @Test
+  fun testHasPlaceholdersInOptions() {
+    val info = target.cToolchainIdeInfo
+    assertThat(info.cOptionList.any { it.contains("__BAZEL_XCODE_SDKROOT__") }).isTrue()
+    assertThat(info.cppOptionList.any { it.contains("__BAZEL_XCODE_SDKROOT__") }).isTrue()
   }
 }

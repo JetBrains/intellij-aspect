@@ -18,6 +18,7 @@
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
 load("@rules_cc//cc:defs.bzl", "cc_common")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_TYPE")
+load("//common:actions.bzl", "intellij_actions")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//common:output_groups.bzl", "intellij_output_groups")
@@ -35,6 +36,13 @@ UNSUPPORTED_FEATURES = [
     "fdo_optimize",
 ]
 
+# Placeholders used by apple_support (and the legacy Bazel Apple crosstool) that
+# are replaced with the respective environment variable during action execution.
+XCODE_SUBSTITUTIONS = {
+    "__BAZEL_XCODE_DEVELOPER_DIR__": "DEVELOPER_DIR",
+    "__BAZEL_XCODE_SDKROOT__": "SDKROOT",
+}
+
 def _aspect_guard(target, ctx):
     """Returns true if the aspect should be applied to the current target."""
     if not cc_common.CcToolchainInfo in target:
@@ -45,6 +53,41 @@ def _aspect_guard(target, ctx):
         return False
 
     return True
+
+def _xcode_info(environment):
+    """Creates the Xcode info, if the environment belongs to an Apple toolchain."""
+    if "XCODE_VERSION_OVERRIDE" not in environment and "DEVELOPER_DIR" not in environment:
+        return None
+
+    return intellij_common.struct(
+        xcode_version = environment.get("XCODE_VERSION_OVERRIDE"),
+        sdk_version = environment.get("APPLE_SDK_VERSION_OVERRIDE"),
+        sdk_platform = environment.get("APPLE_SDK_PLATFORM"),
+        developer_dir = "__BAZEL_XCODE_DEVELOPER_DIR__",
+        sdk_root = "__BAZEL_XCODE_SDKROOT__",
+    )
+
+def _resolve_xcode_info(target, ctx, environment):
+    """Writes the Xcode info to a file with all Xcode placeholders resolved."""
+    info = _xcode_info(environment)
+    if not info:
+        return None
+
+    dst = intellij_actions.declare_unique_file(
+        ctx,
+        name = target.label.name.split("/")[-1],
+        hash_hint = "xcode",
+    )
+
+    intellij_actions.expand_env(
+        ctx,
+        dst = dst,
+        content = proto.encode_text(info),
+        env = environment,
+        substitutions = XCODE_SUBSTITUTIONS,
+    )
+
+    return dst
 
 def _implementation(target, ctx, attrs):
     if not _aspect_guard(target, ctx):
@@ -102,6 +145,8 @@ def _implementation(target, ctx, attrs):
         variables = cpp_variables,
     )
 
+    xcode_info_file = _resolve_xcode_info(target, ctx, c_environment)
+
     info = intellij_common.struct(
         built_in_include_directory = [str(it) for it in cc_toolchain.built_in_include_directories],
         c_option = c_options,
@@ -114,11 +159,17 @@ def _implementation(target, ctx, attrs):
         compiler_name = cc_toolchain.compiler,
         sysroot = cc_toolchain.sysroot,
         all_files = artifact_location.from_depset(cc_toolchain.all_files),
+        xcode_info = artifact_location.from_file(xcode_info_file),
     )
+
+    outputs = cc_toolchain.all_files.to_list()
+
+    if xcode_info_file:
+        outputs.append(xcode_info_file)
 
     return intellij_module.result(
         value = info,
-        outputs = intellij_output_groups.from_files(cc_toolchain.all_files.to_list()),
+        outputs = intellij_output_groups.from_files(outputs),
     )
 
 _aspect = intellij_module.aspect(

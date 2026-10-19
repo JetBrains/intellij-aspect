@@ -61,7 +61,43 @@ def _copy(ctx, *, src, dst):
             use_default_shell_env = True,
         )
 
+def _expand_env(ctx, *, dst, content, env, substitutions):
+    # environment expansion not support on windows (also not required atm)
+    if config.os.startswith("windows"):
+        ctx.actions.write(dst, content)
+        return
+
+    template = _declare_unique_file(ctx, name = dst.basename + ".tpl")
+    ctx.actions.write(template, content)
+
+    script = [
+        "set -eu",
+        'content=$(<"$1")',
+    ]
+
+    for placeholder, variable in substitutions.items():
+        # only substitute if the variable is set, otherwise keep the placeholder
+        # quote the replacement, otherwise bash 5.2+ treats & as the matched placeholder
+        script.append('if [ -n "${%s+x}" ]; then content=${content//%s/"$%s"}; fi' % (variable, placeholder, variable))
+
+    script.append('printf "%s\\n" "$content" > "$2"')
+
+    ctx.actions.run_shell(
+        inputs = [template],
+        outputs = [dst],
+        arguments = [template.path, dst.path],
+        command = "\n".join(script),
+        env = env,
+        mnemonic = "IntelliJExpandEnv",
+        progress_message = "Expanding environment of %{output}",
+        execution_requirements = {
+            "no-cache": "",
+            "no-remote": "",
+        },
+    )
+
 intellij_actions = struct(
     declare_unique_file = _declare_unique_file,
     copy = _copy,
+    expand_env = _expand_env,
 )
