@@ -126,6 +126,8 @@ message WorkArguments {
     INFO = 0;
     // Also request the intellij-build output group.
     BUILD = 1;
+    // Like BUILD, and also capture the content of all generated files.
+    CAPTURE = 2;
   }
 
   // Output file encoding the TestFixture (fixture.proto).

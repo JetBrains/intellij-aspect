@@ -16,6 +16,7 @@
 package com.intellij.aspect.testing.rules.worker
 
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
+import com.google.protobuf.ByteString
 import com.google.protobuf.TextFormat
 import com.intellij.aspect.lib.ASPECT_NAME
 import com.intellij.aspect.lib.AspectConfig
@@ -44,6 +45,9 @@ private val ASPECT_PREFIX = mapOf(
   AspectDeployment.MATERIALIZED to "//aspect/default/",
   AspectDeployment.BUILTIN to "//aspect/builtin/",
 )
+
+// suffix of all files declared with `intellij_actions.declare_unique_file`
+private val GENERATED_FILE_REGEX = Regex("""\.intellij-generated-\d+$""")
 
 private val RULES = mapOf(
   RuleSet.CC to Rules.CC,
@@ -104,6 +108,10 @@ fun main(args: Array<String>) {
       files[OutputGroups.INFO.groupName]?.map(::readInfoFile)?.forEach(::addTargets)
       files.entries.map(::createOutputGroup).forEach(::addOutputs)
 
+      if (input.outputs == Outputs.CAPTURE) {
+        putAllGeneratedFiles(captureGeneratedFiles(files.values.flatten().toSet()))
+      }
+
       addAllExtraFlags(input.extraFlagsList)
     }
 
@@ -128,6 +136,13 @@ private fun Sandbox.createOutputGroup(entry: Map.Entry<String, Set<Path>>): Outp
     name = entry.key
     addAllFiles(entry.value.map(::relativeToOutputBase))
   }.build()
+}
+
+@Throws(IOException::class)
+private fun Sandbox.captureGeneratedFiles(files: Set<Path>): Map<String, ByteString> {
+  return files
+    .filter { GENERATED_FILE_REGEX.containsMatchIn(it.fileName.toString()) }
+    .associate { relativeToOutputBase(it) to ByteString.copyFrom(Files.readAllBytes(it)) }
 }
 
 @Throws(IOException::class)

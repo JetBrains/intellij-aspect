@@ -21,6 +21,7 @@ load("module_dep.bzl", "BCRFlagProvider")
 _OUTPUTS = {
     "info": 0,
     "build": 1,
+    "capture": 2,
 }
 
 def _test_fixture_impl(ctx):
@@ -119,6 +120,7 @@ test_fixture = rule(
             doc = """
                 info: only intellij-info
                 build: also intellij-build
+                capture: like build and store the content of all generated files (*.intellij-generated-*)
             """,
         ),
         "use_msys2": attr.bool(

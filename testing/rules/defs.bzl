@@ -86,7 +86,9 @@ def test_fixture(
         rule_sets: List of rule sets for which to use the respective aspects.
         targets: List of targets to build in the test project.
         outputs: Which outputs to collect. "info" (the default) only requests the
-            intellij-info output group and "build" also requests intellij-build.
+            intellij-info output group, "build" also requests intellij-build and
+            "capture" additionally stores the content of all generated files
+            (`*.intellij-generated-*`) in the fixture.
         builtin: If True, also tests the builtin aspect deployment mode.
         bcr: If True (the default) also test the BCR deployment mode.
         strip_prefix: Optional. Prefix to strip from source file paths when creating

@@ -19,6 +19,8 @@ import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.CIdeInfo
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.PyIdeInfo
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
+import com.google.devtools.intellij.aspect.Common.ArtifactLocation
+import com.google.protobuf.ByteString
 import com.google.protobuf.Message
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 
@@ -57,4 +59,9 @@ fun AspectFixture.findToolchain(label: String, fieldNumber: Int): TargetIdeInfo 
 inline fun <reified T : Message> AspectFixture.findToolchainInfo(label: String, fieldNumber: Int): T {
   val descriptor = assertNotNull(TargetIdeInfo.getDescriptor().findFieldByNumber(fieldNumber))
   return assertIsInstance<T>(findToolchain(label, fieldNumber).getField(descriptor))
+}
+
+/** Returns the content of a generated file, requires `outputs = "capture"` on the fixture. */
+fun AspectFixture.findGeneratedFile(location: ArtifactLocation): ByteString {
+  return findGeneratedFile(location.execrootPath())
 }
