@@ -17,14 +17,13 @@
 package com.intellij.aspect.testing.tests.cpp
 
 import com.google.common.truth.Truth.assertThat
-import com.google.common.truth.Truth.assertWithMessage
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.*
-import com.intellij.aspect.private.lib.utils.isMacOS
 import com.intellij.aspect.private.lib.utils.isWindows
 import com.intellij.aspect.private.lib.utils.joinBazelPath
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import com.intellij.aspect.testing.rules.utils.assertThatArtifacts
 import com.intellij.aspect.testing.rules.utils.execrootPath
+import com.intellij.aspect.testing.rules.utils.findToolchain
 import com.intellij.aspect.testing.rules.utils.findToolchainInfo
 import org.junit.Assume.assumeFalse
 import org.junit.Assume.assumeTrue
@@ -52,6 +51,13 @@ class ToolchainTest {
   @Test
   fun testHasCompilerName() {
     assertThat(info.compilerName).isNotEmpty()
+  }
+
+  @Test
+  @Suppress("DEPRECATION")
+  fun testHasNoDeprecatedXcodeInfo() {
+    val toolchain = aspect.findToolchain("//:main", TargetIdeInfo.C_TOOLCHAIN_IDE_INFO_FIELD_NUMBER)
+    assertThat(toolchain.hasXcodeIdeInfo()).isFalse()
   }
 
   @Test
@@ -91,16 +97,5 @@ class ToolchainTest {
       .count { it.startsWith("include/c++") }
 
     assertThat(includes).isGreaterThan(0)
-  }
-
-  @Test
-  fun testHasXcodeInfo() {
-    // requires toolchains aspects
-    assumeTrue(aspect.bazelVersion(min = 9))
-    assumeTrue(isMacOS())
-
-    val info = aspect.findToolchainInfo<XcodeIdeInfo>("//:main", TargetIdeInfo.XCODE_IDE_INFO_FIELD_NUMBER)
-    assertThat(info.xcodeVersion).isNotEmpty()
-    assertThat(info.macosSdkVersion).isNotEmpty()
   }
 }

@@ -29,12 +29,10 @@ load("//modules:python_info.bzl", python_info = "module")
 load("//modules:run_info.bzl", run_info = "module")
 load("//modules:scala_info.bzl", scala_info = "module")
 load("//modules:test_info.bzl", test_info = "module")
-load("//modules:xcode_info.bzl", xcode_info = "module")
 
 MODULES = [
     run_info,
     test_info,
-    xcode_info,
     cc_info,
     foreign_cc,
     cc_toolchain_info,
