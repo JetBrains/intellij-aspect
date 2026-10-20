@@ -18,7 +18,6 @@ package com.intellij.aspect.testing.tests.cpp
 
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.*
-import com.google.protobuf.TextFormat
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import com.intellij.aspect.testing.rules.utils.assertThatOutputGroup
@@ -60,15 +59,16 @@ class AppleSupportTest {
   @Test
   fun testXcodeInfoIsResolved() {
     val file = aspect.findGeneratedFile(target.cToolchainIdeInfo.xcodeInfo)
-    val info = TextFormat.parse(file.toStringUtf8(), CToolchainIdeInfo.XcodeInfo::class.java)
+    val lines = file.toStringUtf8().lines().filter { it.isNotEmpty() }
+    assertThat(lines.all { it.contains('=') }).isTrue()
 
-    assertThat(info.developerDir).startsWith("/")
-    assertThat(info.developerDir).doesNotContain("__BAZEL_XCODE_")
-    assertThat(info.sdkRoot).startsWith("/")
-    assertThat(info.sdkRoot).doesNotContain("__BAZEL_XCODE_")
+    val env = lines.associate { it.substringBefore('=') to it.substringAfter('=') }
+    assertThat(env.values.none { it.contains("__BAZEL_XCODE_") }).isTrue()
+    assertThat(env["DEVELOPER_DIR"]).startsWith("/")
+    assertThat(env["SDKROOT"]).startsWith("/")
 
     // the versions are only known if Xcode is installed, the command line tools are not enough
-    assertThat(info.xcodeVersion.isEmpty()).isEqualTo(info.sdkVersion.isEmpty())
+    assertThat(env.containsKey("XCODE_VERSION_OVERRIDE")).isEqualTo(env.containsKey("APPLE_SDK_VERSION_OVERRIDE"))
   }
 
   @Test

@@ -162,22 +162,11 @@ message CToolchainIdeInfo {
   map<string, string> cpp_environment = 10;
   repeated ArtifactLocation all_files = 11;
 
-  // genreated textproto encoded XcodeInfo, only present for Apple toolchains.
+  // generated file with the resolved Xcode environment, only present for Apple toolchains.
+  // contains a `<name>=<value>` line for every set variable (line breaks are stripped from values):
+  // XCODE_VERSION_OVERRIDE, APPLE_SDK_VERSION_OVERRIDE, APPLE_SDK_PLATFORM (optional),
+  // DEVELOPER_DIR, SDKROOT (required to invoke the compiler)
   ArtifactLocation xcode_info = 12;
-
-  message XcodeInfo {
-    // read from XCODE_VERSION_OVERRIDE, optional
-    string xcode_version = 1;
-    // read from APPLE_SDK_VERSION_OVERRIDE, optional
-    string sdk_version = 2;
-    // read from APPLE_SDK_PLATFORM, optional
-    string sdk_platform = 3;
-    // read from DEVELOPER_DIR, required to invoke the compiler
-    string developer_dir = 4;
-    // read from SDKROOT, required to invoke the compiler
-    string sdk_root = 5;
-  }
-
 }
 
 message KotlincPluginOption {

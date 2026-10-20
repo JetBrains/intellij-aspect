@@ -36,12 +36,15 @@ UNSUPPORTED_FEATURES = [
     "fdo_optimize",
 ]
 
-# Placeholders used by apple_support (and the legacy Bazel Apple crosstool) that
-# are replaced with the respective environment variable during action execution.
-XCODE_SUBSTITUTIONS = {
-    "__BAZEL_XCODE_DEVELOPER_DIR__": "DEVELOPER_DIR",
-    "__BAZEL_XCODE_SDKROOT__": "SDKROOT",
-}
+# Environment variables of the Apple toolchain that are resolved during action
+# execution. DEVELOPER_DIR and SDKROOT are required to invoke the compiler.
+XCODE_VARIABLES = [
+    "XCODE_VERSION_OVERRIDE",
+    "APPLE_SDK_VERSION_OVERRIDE",
+    "APPLE_SDK_PLATFORM",
+    "DEVELOPER_DIR",
+    "SDKROOT",
+]
 
 def _aspect_guard(target, ctx):
     """Returns true if the aspect should be applied to the current target."""
@@ -54,23 +57,9 @@ def _aspect_guard(target, ctx):
 
     return True
 
-def _xcode_info(environment):
-    """Creates the Xcode info, if the environment belongs to an Apple toolchain."""
-    if "XCODE_VERSION_OVERRIDE" not in environment and "DEVELOPER_DIR" not in environment:
-        return None
-
-    return intellij_common.struct(
-        xcode_version = environment.get("XCODE_VERSION_OVERRIDE"),
-        sdk_version = environment.get("APPLE_SDK_VERSION_OVERRIDE"),
-        sdk_platform = environment.get("APPLE_SDK_PLATFORM"),
-        developer_dir = "__BAZEL_XCODE_DEVELOPER_DIR__",
-        sdk_root = "__BAZEL_XCODE_SDKROOT__",
-    )
-
 def _resolve_xcode_info(target, ctx, environment):
-    """Writes the Xcode info to a file with all Xcode placeholders resolved."""
-    info = _xcode_info(environment)
-    if not info:
+    """Writes the resolved Xcode environment to a file, if the environment belongs to an Apple toolchain."""
+    if "XCODE_VERSION_OVERRIDE" not in environment and "DEVELOPER_DIR" not in environment:
         return None
 
     dst = intellij_actions.declare_unique_file(
@@ -83,9 +72,8 @@ def _resolve_xcode_info(target, ctx, environment):
     intellij_actions.expand_env(
         ctx,
         dst = dst,
-        content = proto.encode_text(info),
+        resolve = XCODE_VARIABLES,
         env = environment,
-        substitutions = XCODE_SUBSTITUTIONS,
     )
 
     return dst

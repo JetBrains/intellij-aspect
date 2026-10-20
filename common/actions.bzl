@@ -61,31 +61,26 @@ def _copy(ctx, *, src, dst):
             use_default_shell_env = True,
         )
 
-def _expand_env(ctx, *, dst, content, env, substitutions):
+def _expand_env(ctx, *, dst, resolve, env):
+    """Writes a `<name>=<value>` line for every variable in resolve that is set during action execution."""
+
     # environment expansion not support on windows (also not required atm)
     if config.os.startswith("windows"):
-        ctx.actions.write(dst, content)
+        ctx.actions.write(dst, "")
         return
 
-    template = ctx.actions.declare_file(dst.basename + ".tpl", sibling = dst)
-    ctx.actions.write(template, content)
+    script = ["set -eu", "{"]
 
-    script = [
-        "set -eu",
-        'content=$(<"$1")',
-    ]
+    for name in resolve:
+        # only write the variable if it is set, strip line breaks, otherwise the value could corrupt the file
+        script.append("""if [ -n "${%s+x}" ]; then printf '%s=%%s\n' "${%s//[$'\r\n']/}"; fi""" % (name, name, name))
 
-    for placeholder, variable in substitutions.items():
-        # only substitute if the variable is set, otherwise keep the placeholder
-        # quote the replacement, otherwise bash 5.2+ treats & as the matched placeholder
-        script.append('if [ -n "${%s+x}" ]; then content=${content//%s/"$%s"}; fi' % (variable, placeholder, variable))
-
-    script.append('printf "%s\\n" "$content" > "$2"')
+    script.append('} > "$1"')
 
     ctx.actions.run_shell(
-        inputs = [template],
+        inputs = [],
         outputs = [dst],
-        arguments = [template.path, dst.path],
+        arguments = [dst.path],
         command = "\n".join(script),
         env = env,
         mnemonic = "IntelliJExpandEnv",
