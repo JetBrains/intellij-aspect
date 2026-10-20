@@ -22,9 +22,9 @@ def _declare_unique_file(ctx, *, name, hash_hint = None):
     parts = [name]
     parts.append(hash_hint or "")
 
-    # The tags implicitly enter the action as "execution info" which is also part of the action equality. Therefore, we have to include
-    # them in the hash included in the output path to avoid non-sharable actions with the same output.
-    parts.extend(ctx.rule.attr.tags)
+    # The tags implicitly enter the action as "execution info" which is also part of the action equality. Therefore, we
+    # have to include them in the hash. Hashing every tag seperatly avoid collsions of tags contianing ".".
+    parts.extend([str(hash(tag)) for tag in ctx.rule.attr.tags])
 
     name = "%s.intellij-generated-%s" % (name, str(abs(hash(".".join(parts)))))
 
