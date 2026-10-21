@@ -46,6 +46,10 @@ data class AspectConfig(
    * all Rules mentioned in the repoMapping or useBuiltin.
    */
   val rulesets: Set<Rules>? = null,
+  /**
+   * Attributes the aspect should walk. If null, take the default of walking all attributes.
+   */
+  val attrAspects: List<String>? = null,
 )
 
 /**
