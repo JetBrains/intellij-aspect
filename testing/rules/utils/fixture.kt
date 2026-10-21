@@ -67,8 +67,8 @@ inline fun <reified T : Message> AspectFixture.findToolchainInfo(label: String, 
 @Throws(IOException::class)
 fun AspectFixture.findGeneratedFile(location: ArtifactLocation): Path {
   val path = Files.createTempFile(
-    /* prefix = */ location.relativePath.substringAfterLast("/") + ".",
-    /* suffix = */ null,
+    location.relativePath.substringAfterLast("/"),
+    location.relativePath.substringAfterLast(".", ""),
   )
 
   Files.write(path, findGeneratedFile(location.execrootPath()).toByteArray())
