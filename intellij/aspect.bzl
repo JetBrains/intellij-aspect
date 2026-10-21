@@ -163,7 +163,7 @@ def _unique_flatten(modules, field):
 
     return unique
 
-def intellij_configure_aspect(modules, container):
+def intellij_configure_aspect(modules, container, attr_aspects = None):
     """Creates an aspect running the given module groups."""
     toolchains = _unique_flatten(modules, "toolchains")
     aspect_providers = _unique_flatten(modules, "aspect_providers")
@@ -173,7 +173,7 @@ def intellij_configure_aspect(modules, container):
         implementation = _implemenation,
         fragments = _unique_flatten(modules, "fragments"),
         provides = [intellij_provider.IntelliJInfo],
-        attr_aspects = ["*"],
+        attr_aspects = attr_aspects if attr_aspects != None else ["*"],
         toolchains_aspects = [str(it) for it in toolchains],
         required_aspect_providers = [[it] for it in aspect_providers],
         # TODO: remove this once all modules have been fixed
