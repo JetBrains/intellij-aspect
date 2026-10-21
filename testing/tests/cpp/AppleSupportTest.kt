@@ -19,6 +19,7 @@ package com.intellij.aspect.testing.tests.cpp
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.*
 import com.intellij.aspect.lib.OutputGroups
+import com.intellij.aspect.lib.readEnvFromFile
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import com.intellij.aspect.testing.rules.utils.assertThatOutputGroup
 import com.intellij.aspect.testing.rules.utils.findGeneratedFile
@@ -58,11 +59,7 @@ class AppleSupportTest {
 
   @Test
   fun testXcodeInfoIsResolved() {
-    val file = aspect.findGeneratedFile(target.cToolchainIdeInfo.xcodeInfo)
-    val lines = file.toStringUtf8().lines().filter { it.isNotEmpty() }
-    assertThat(lines.all { it.contains('=') }).isTrue()
-
-    val env = lines.associate { it.substringBefore('=') to it.substringAfter('=') }
+    val env = readEnvFromFile(aspect.findGeneratedFile(target.cToolchainIdeInfo.xcodeInfo))!!
     assertThat(env.values.none { it.contains("__BAZEL_XCODE_") }).isTrue()
     assertThat(env["DEVELOPER_DIR"]).startsWith("/")
     assertThat(env["SDKROOT"]).startsWith("/")

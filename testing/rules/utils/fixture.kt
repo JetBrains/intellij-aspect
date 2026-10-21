@@ -20,9 +20,11 @@ import com.google.devtools.intellij.aspect.Common.ArtifactLocation
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.CIdeInfo
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.PyIdeInfo
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
-import com.google.protobuf.ByteString
 import com.google.protobuf.Message
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
+import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Path
 
 fun AspectFixture.findCIdeInfo(
   label: String,
@@ -61,7 +63,15 @@ inline fun <reified T : Message> AspectFixture.findToolchainInfo(label: String, 
   return assertIsInstance<T>(findToolchain(label, fieldNumber).getField(descriptor))
 }
 
-/** Returns the content of a generated file, requires `outputs = "capture"` on the fixture. */
-fun AspectFixture.findGeneratedFile(location: ArtifactLocation): ByteString {
-  return findGeneratedFile(location.execrootPath())
+/** Writes a generated file to a temporary location, requires `outputs = "capture"` on the fixture. */
+@Throws(IOException::class)
+fun AspectFixture.findGeneratedFile(location: ArtifactLocation): Path {
+  val path = Files.createTempFile(
+    /* prefix = */ location.relativePath.substringAfterLast("/") + ".",
+    /* suffix = */ null,
+  )
+
+  Files.write(path, findGeneratedFile(location.execrootPath()).toByteArray())
+
+  return path
 }

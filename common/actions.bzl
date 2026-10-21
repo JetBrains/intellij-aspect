@@ -73,7 +73,7 @@ def _expand_env(ctx, *, dst, resolve, env):
 
     for name in resolve:
         # only write the variable if it is set, strip line breaks, otherwise the value could corrupt the file
-        script.append("""if [ -n "${%s+x}" ]; then printf '%s=%%s\n' "${%s//[$'\r\n']/}"; fi""" % (name, name, name))
+        script.append("""if [ -n "${%s+x}" ]; then printf '%s=%%s\\0' "${%s}"; fi""" % (name, name, name))
 
     script.append('} > "$1"')
 

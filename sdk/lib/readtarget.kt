@@ -52,7 +52,7 @@ fun readEnvFromFile(file: Path): Map<String, String>? {
     return null
   }
 
-  return text.lineSequence()
+  return text.split(Char(0))
     .filter { it.isNotEmpty() }
     .associate { it.substringBefore('=') to it.substringAfter('=') }
 }
