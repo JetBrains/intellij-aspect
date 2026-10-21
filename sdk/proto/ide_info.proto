@@ -162,10 +162,9 @@ message CToolchainIdeInfo {
   map<string, string> cpp_environment = 10;
   repeated ArtifactLocation all_files = 11;
 
-  // generated file with the resolved Xcode environment, only present for Apple toolchains.
-  // contains a `<name>=<value>` line for every set variable (line breaks are stripped from values):
-  // XCODE_VERSION_OVERRIDE, APPLE_SDK_VERSION_OVERRIDE, APPLE_SDK_PLATFORM (optional),
-  // DEVELOPER_DIR, SDKROOT (required to invoke the compiler)
+  // Generated file with the resolved Xcode environment, only present for Apple
+  // toolchains. Contains a `<name>=<value>` entry for every set variable
+  // separated \0.
   ArtifactLocation xcode_info = 12;
 }
 
