@@ -15,7 +15,7 @@ bazel_dep(name = "rules_foreign_cc", version = "0.16.0")
 bazel_dep(name = "rules_python", version = "2.4.2")
 bazel_dep(name = "rules_java", version = "9.9.0")
 bazel_dep(name = "rules_kotlin", version = "2.4.21")
-bazel_dep(name = "rules_go", version = "0.64.1")
+bazel_dep(name = "rules_go", version = "0.64.2")
 bazel_dep(name = "rules_proto", version = "7.1.0")
 bazel_dep(name = "rules_scala", version = "7.3.0")
 
@@ -53,8 +53,8 @@ use_repo(maven, "maven")
 bazel_registry = use_extension("//private:extension.bzl", "bazel_registry")
 bazel_registry.bazelisk(version = "1.25.0")
 bazel_registry.bcr(
-    commit = "918dfba62c7eda630fa65f21215b65b07f4f41fe",
-    sha256 = "352b41f4b103e11eb6a51d08350025edd48d32faece41c16bb4d2fdb9ec9af90",
+    commit = "e4eb8cc44f4ea0aa5afe7ff4a401fbcf56a0175f",
+    sha256 = "c57a3b2c2dcca063e5c9024d70ba645633053526b47ad188c477a38f6e8f2da8",
 )
 bazel_registry.project(
     name = "intellij_android",
