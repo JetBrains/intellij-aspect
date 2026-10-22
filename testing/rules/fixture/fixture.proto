@@ -61,4 +61,7 @@ message TestFixture {
   repeated TargetIdeInfo targets = 2;
   repeated OutputGroup outputs = 3;
   repeated string extra_flags = 4;
+
+  // contents of the generated files, if requested
+  map<string, bytes> generated_files = 5;
 }

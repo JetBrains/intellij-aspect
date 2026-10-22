@@ -18,6 +18,7 @@
 load("@bazel_tools//tools/build_defs/cc:action_names.bzl", "ACTION_NAMES")
 load("@rules_cc//cc:defs.bzl", "cc_common")
 load("@rules_cc//cc:find_cc_toolchain.bzl", "CC_TOOLCHAIN_TYPE")
+load("//common:actions.bzl", "intellij_actions")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
 load("//common:output_groups.bzl", "intellij_output_groups")
@@ -35,6 +36,16 @@ UNSUPPORTED_FEATURES = [
     "fdo_optimize",
 ]
 
+# Environment variables of the Apple toolchain that are resolved during action
+# execution. DEVELOPER_DIR and SDKROOT are required to invoke the compiler.
+XCODE_VARIABLES = [
+    "XCODE_VERSION_OVERRIDE",
+    "APPLE_SDK_VERSION_OVERRIDE",
+    "APPLE_SDK_PLATFORM",
+    "DEVELOPER_DIR",
+    "SDKROOT",
+]
+
 def _aspect_guard(target, ctx):
     """Returns true if the aspect should be applied to the current target."""
     if not cc_common.CcToolchainInfo in target:
@@ -45,6 +56,27 @@ def _aspect_guard(target, ctx):
         return False
 
     return True
+
+def _resolve_xcode_info(target, ctx, environment):
+    """Writes the resolved Xcode environment to a file, if the environment belongs to an Apple toolchain."""
+    if "XCODE_VERSION_OVERRIDE" not in environment and "DEVELOPER_DIR" not in environment:
+        return None
+
+    dst = intellij_actions.declare_unique_file(
+        ctx,
+        name = target.label.name.split("/")[-1],
+        # the full label name is part of the hash to avoid collisions between toolchains in the same package
+        hash_hint = "xcode." + target.label.name,
+    )
+
+    intellij_actions.expand_env(
+        ctx,
+        dst = dst,
+        resolve = XCODE_VARIABLES,
+        env = environment,
+    )
+
+    return dst
 
 def _implementation(target, ctx, attrs):
     if not _aspect_guard(target, ctx):
@@ -102,6 +134,8 @@ def _implementation(target, ctx, attrs):
         variables = cpp_variables,
     )
 
+    xcode_info_file = _resolve_xcode_info(target, ctx, c_environment)
+
     info = intellij_common.struct(
         built_in_include_directory = [str(it) for it in cc_toolchain.built_in_include_directories],
         c_option = c_options,
@@ -114,11 +148,17 @@ def _implementation(target, ctx, attrs):
         compiler_name = cc_toolchain.compiler,
         sysroot = cc_toolchain.sysroot,
         all_files = artifact_location.from_depset(cc_toolchain.all_files),
+        xcode_info = artifact_location.from_file(xcode_info_file),
     )
+
+    outputs = cc_toolchain.all_files.to_list()
+
+    if xcode_info_file:
+        outputs.append(xcode_info_file)
 
     return intellij_module.result(
         value = info,
-        outputs = intellij_output_groups.from_files(cc_toolchain.all_files.to_list()),
+        outputs = intellij_output_groups.from_files(outputs),
     )
 
 _aspect = intellij_module.aspect(

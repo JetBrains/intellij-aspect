@@ -22,7 +22,10 @@ import "sdk/proto/common.proto";
 option java_package = "com.google.devtools.intellij.ideinfo";
 option java_outer_classname = "IntellijIdeInfo";
 
+// Deprecated: no longer populated, use CToolchainIdeInfo.xcode_info instead.
 message XcodeIdeInfo {
+  option deprecated = true;
+
   string xcode_version = 1;
   string macos_sdk_version = 2;
 }
@@ -158,6 +161,11 @@ message CToolchainIdeInfo {
   map<string, string> c_environment = 9;
   map<string, string> cpp_environment = 10;
   repeated ArtifactLocation all_files = 11;
+
+  // Generated file with the resolved Xcode environment, only present for Apple
+  // toolchains. Contains a `<name>=<value>` entry for every set variable
+  // separated \0.
+  ArtifactLocation xcode_info = 12;
 }
 
 message KotlincPluginOption {
@@ -269,7 +277,7 @@ message TargetIdeInfo {
   CIdeInfo c_ide_info = 120;
   ForeignCcInfo foreign_cc = 123;
   CToolchainIdeInfo c_toolchain_ide_info = 121;
-  XcodeIdeInfo xcode_ide_info = 122;
+  XcodeIdeInfo xcode_ide_info = 122 [deprecated = true];
 
   PyIdeInfo py_ide_info = 130;
   PythonTargetInfo python_target_info = 131;

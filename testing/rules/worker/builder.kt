@@ -16,6 +16,7 @@
 package com.intellij.aspect.testing.rules.worker
 
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
+import com.google.protobuf.ByteString
 import com.google.protobuf.TextFormat
 import com.intellij.aspect.lib.ASPECT_NAME
 import com.intellij.aspect.lib.AspectConfig
@@ -31,6 +32,7 @@ import com.intellij.aspect.testing.rules.fixture.FixtureProto.BazelModule
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.OutputGroup
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.RuleSet
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.TestFixture
+import com.intellij.aspect.testing.rules.worker.WorkerProto.WorkArguments.Outputs
 import java.io.IOException
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
@@ -43,6 +45,9 @@ private val ASPECT_PREFIX = mapOf(
   AspectDeployment.MATERIALIZED to "//aspect/default/",
   AspectDeployment.BUILTIN to "//aspect/builtin/",
 )
+
+// suffix of all files declared with `intellij_actions.declare_unique_file`
+private val GENERATED_FILE_REGEX = Regex("""\.intellij-generated-\d+$""")
 
 private val RULES = mapOf(
   RuleSet.CC to Rules.CC,
@@ -87,7 +92,10 @@ fun main(args: Array<String>) {
     val files = build(
       targets = input.targetsList,
       aspects = listOf(ASPECT_PREFIX.getValue(deployment) + ASPECT_NAME),
-      outputGroups = listOf(OutputGroups.INFO.groupName) + input.outputGroupsList,
+      outputGroups = when (input.outputs) {
+        Outputs.INFO -> listOf(OutputGroups.INFO.groupName)
+        else -> listOf(OutputGroups.INFO.groupName, OutputGroups.BUILD.groupName)
+      },
       profile = Path.of(input.outputProfile),
       execLog = Path.of(input.outputExecLog),
       flags = input.extraFlagsList,
@@ -99,6 +107,10 @@ fun main(args: Array<String>) {
 
       files[OutputGroups.INFO.groupName]?.map(::readInfoFile)?.forEach(::addTargets)
       files.entries.map(::createOutputGroup).forEach(::addOutputs)
+
+      if (input.outputs == Outputs.CAPTURE) {
+        putAllGeneratedFiles(captureGeneratedFiles(files.values.flatten().toSet()))
+      }
 
       addAllExtraFlags(input.extraFlagsList)
     }
@@ -124,6 +136,13 @@ private fun Sandbox.createOutputGroup(entry: Map.Entry<String, Set<Path>>): Outp
     name = entry.key
     addAllFiles(entry.value.map(::relativeToOutputBase))
   }.build()
+}
+
+@Throws(IOException::class)
+private fun Sandbox.captureGeneratedFiles(files: Set<Path>): Map<String, ByteString> {
+  return files
+    .filter { GENERATED_FILE_REGEX.containsMatchIn(it.fileName.toString()) }
+    .associate { relativeToOutputBase(it) to ByteString.copyFrom(Files.readAllBytes(it)) }
 }
 
 @Throws(IOException::class)

@@ -18,7 +18,11 @@ package com.intellij.aspect.testing.tests.cpp
 
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.*
+import com.intellij.aspect.lib.OutputGroups
+import com.intellij.aspect.lib.readEnvFromFile
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
+import com.intellij.aspect.testing.rules.utils.assertThatOutputGroup
+import com.intellij.aspect.testing.rules.utils.findGeneratedFile
 import com.intellij.aspect.testing.rules.utils.findToolchain
 import org.junit.Rule
 import org.junit.Test
@@ -42,8 +46,32 @@ class AppleSupportTest {
 
   @Test
   fun testHasXcodeInfo() {
-    assertThat(target.hasXcodeIdeInfo()).isTrue()
-    assertThat(target.xcodeIdeInfo.xcodeVersion).isNotEmpty()
-    assertThat(target.xcodeIdeInfo.macosSdkVersion).isNotEmpty()
+    val info = target.cToolchainIdeInfo
+    assertThat(info.hasXcodeInfo()).isTrue()
+    assertThat(info.xcodeInfo.relativePath).contains("toolchain.intellij-generated-")
+  }
+
+  @Test
+  fun testXcodeInfoInBuildOutputGroup() {
+    val build = aspect.findOutputGroup(OutputGroups.BUILD)
+    assertThatOutputGroup(build).containsFile(target.cToolchainIdeInfo.xcodeInfo.relativePath)
+  }
+
+  @Test
+  fun testXcodeInfoIsResolved() {
+    val env = readEnvFromFile(aspect.findGeneratedFile(target.cToolchainIdeInfo.xcodeInfo))!!
+    assertThat(env.values.none { it.contains("__BAZEL_XCODE_") }).isTrue()
+    assertThat(env["DEVELOPER_DIR"]).startsWith("/")
+    assertThat(env["SDKROOT"]).startsWith("/")
+
+    // the versions are only known if Xcode is installed, the command line tools are not enough
+    assertThat(env.containsKey("XCODE_VERSION_OVERRIDE")).isEqualTo(env.containsKey("APPLE_SDK_VERSION_OVERRIDE"))
+  }
+
+  @Test
+  fun testHasPlaceholdersInOptions() {
+    val info = target.cToolchainIdeInfo
+    assertThat(info.cOptionList.any { it.contains("__BAZEL_XCODE_SDKROOT__") }).isTrue()
+    assertThat(info.cppOptionList.any { it.contains("__BAZEL_XCODE_SDKROOT__") }).isTrue()
   }
 }
