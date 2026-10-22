@@ -1,4 +1,3 @@
-load("//common:output_groups.bzl", "intellij_output_groups")
 load("//testing/rules:defs.bzl", "test_fixture")
 
 package(

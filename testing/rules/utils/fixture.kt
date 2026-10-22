@@ -16,11 +16,15 @@
 package com.intellij.aspect.testing.rules.utils
 
 import com.google.common.truth.Truth.assertThat
+import com.google.devtools.intellij.aspect.Common.ArtifactLocation
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.CIdeInfo
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.PyIdeInfo
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
 import com.google.protobuf.Message
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
+import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Path
 
 fun AspectFixture.findCIdeInfo(
   label: String,
@@ -57,4 +61,17 @@ fun AspectFixture.findToolchain(label: String, fieldNumber: Int): TargetIdeInfo 
 inline fun <reified T : Message> AspectFixture.findToolchainInfo(label: String, fieldNumber: Int): T {
   val descriptor = assertNotNull(TargetIdeInfo.getDescriptor().findFieldByNumber(fieldNumber))
   return assertIsInstance<T>(findToolchain(label, fieldNumber).getField(descriptor))
+}
+
+/** Writes a generated file to a temporary location, requires `outputs = "capture"` on the fixture. */
+@Throws(IOException::class)
+fun AspectFixture.findGeneratedFile(location: ArtifactLocation): Path {
+  val path = Files.createTempFile(
+    location.relativePath.substringAfterLast("/"),
+    location.relativePath.substringAfterLast(".", ""),
+  )
+
+  Files.write(path, findGeneratedFile(location.execrootPath()).toByteArray())
+
+  return path
 }

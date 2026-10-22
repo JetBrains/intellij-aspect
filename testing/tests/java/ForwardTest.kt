@@ -37,16 +37,14 @@ class ForwardTest {
     assertThat(target.kind).isEqualTo("java_library")
     assertThat(target.javaCommon.jdepsCount).isEqualTo(1)
     assertThat(target.javaCommon.jdepsList[0].relativePath).startsWith("lib")
-    assertThat(target.javaCommon.jdepsList[0].relativePath).contains("materialized")
-    assertThat(target.javaCommon.jdepsList[0].relativePath).endsWith("util.jdeps")
+    assertThat(target.javaCommon.jdepsList[0].relativePath).contains("util.jdeps.intellij-generated-")
 
     val nestedTarget = aspect.findTarget("//lib:nested/util")
     assertThat(nestedTarget.hasJavaProvider()).isTrue()
     assertThat(nestedTarget.kind).isEqualTo("java_library")
     assertThat(nestedTarget.javaCommon.jdepsCount).isEqualTo(1)
     assertThat(nestedTarget.javaCommon.jdepsList[0].relativePath).startsWith("lib")
-    assertThat(nestedTarget.javaCommon.jdepsList[0].relativePath).contains("materialized")
-    assertThat(nestedTarget.javaCommon.jdepsList[0].relativePath).endsWith("util.jdeps")
+    assertThat(nestedTarget.javaCommon.jdepsList[0].relativePath).contains("util.jdeps.intellij-generated-")
 
     assertThat(nestedTarget.javaCommon.jdepsList[0].relativePath).isNotEqualTo(
       target.javaCommon.jdepsList[0].relativePath,
@@ -60,8 +58,7 @@ class ForwardTest {
     assertThat(target.kind).isEqualTo("forward")
     assertThat(target.javaCommon.jdepsCount).isEqualTo(1)
     assertThat(target.javaCommon.jdepsList[0].relativePath).startsWith("forwarded")
-    assertThat(target.javaCommon.jdepsList[0].relativePath).contains("materialized")
-    assertThat(target.javaCommon.jdepsList[0].relativePath).endsWith("util.jdeps")
+    assertThat(target.javaCommon.jdepsList[0].relativePath).contains("util.jdeps.intellij-generated-")
 
     val targetTwo = aspect.findTarget("//forwarded:fwd2")
     assertThat(targetTwo.hasJavaProvider()).isTrue()
@@ -74,16 +71,14 @@ class ForwardTest {
     assertThat(targetTag.kind).isEqualTo("forward")
     assertThat(targetTag.javaCommon.jdepsCount).isEqualTo(1)
     assertThat(targetTag.javaCommon.jdepsList[0].relativePath).startsWith("forwarded")
-    assertThat(targetTag.javaCommon.jdepsList[0].relativePath).contains("materialized")
-    assertThat(targetTag.javaCommon.jdepsList[0].relativePath).endsWith("util.jdeps")
+    assertThat(targetTag.javaCommon.jdepsList[0].relativePath).contains("util.jdeps.intellij-generated-")
 
     val nestedTarget = aspect.findTarget("//forwarded:nested/fwd")
     assertThat(nestedTarget.hasJavaProvider()).isTrue()
     assertThat(nestedTarget.kind).isEqualTo("forward")
     assertThat(nestedTarget.javaCommon.jdepsCount).isEqualTo(1)
     assertThat(nestedTarget.javaCommon.jdepsList[0].relativePath).startsWith("forwarded")
-    assertThat(nestedTarget.javaCommon.jdepsList[0].relativePath).contains("materialized")
-    assertThat(nestedTarget.javaCommon.jdepsList[0].relativePath).endsWith("util.jdeps")
+    assertThat(nestedTarget.javaCommon.jdepsList[0].relativePath).contains("util.jdeps.intellij-generated-")
     assertThat(nestedTarget.javaCommon.jdepsList[0].relativePath).isNotEqualTo(
       target.javaCommon.jdepsList[0].relativePath,
     )

@@ -14,9 +14,9 @@
 
 load("@rules_java//java:defs.bzl", "JavaInfo")
 load("@rules_java//java/common:java_plugin_info.bzl", "JavaPluginInfo")
+load("//common:actions.bzl", "intellij_actions")
 load("//common:artifact_location.bzl", "artifact_location")
 load("//common:common.bzl", "intellij_common")
-load("//common:copy.bzl", "copy")
 load("//common:dependencies.bzl", "intellij_deps")
 load("//common:make_variables.bzl", "expand_make_variables")
 load("//common:output_groups.bzl", "intellij_output_groups")
@@ -137,25 +137,19 @@ def _get_jdeps(target, ctx):
     # --experimental_inmemory_jdeps_files is true by default, which means jdeps won't be stored on disk with remote execution.
     # So we just "materialize" the in-memory file by copying it onto disk.
     materialized_jdeps = []
-
-    # The tags implicitly enter the action as "execution info" which is also part of the action equality. Therefore, we have to include
-    # them in the hash included in the output path to avoid non-sharable actions with the same output.
-    extra_action_key = ""
-    for tag in ctx.rule.attr.tags:
-        extra_action_key += str(abs(hash(tag))) + "_"
-    extra_action_key += "_"
     for raw_jdeps_file in jdeps:
-        materialized_jdeps_file = ctx.actions.declare_file(
-            "materialized_" + str(abs(hash(extra_action_key + raw_jdeps_file.path))) + "_" + raw_jdeps_file.basename,
-        )
-        copy(
+        materialized_jdeps_file = intellij_actions.declare_unique_file(
             ctx,
-            raw_jdeps_file,
-            materialized_jdeps_file,
-            progress = "(IntelliJ Bazel plugin) Materializing jdeps %s" % raw_jdeps_file,
-            mnemonic = "IJBazelPluginMaterializeJdeps",
+            name = raw_jdeps_file.basename,
+            hash_hint = raw_jdeps_file.path,
+        )
+        intellij_actions.copy(
+            ctx,
+            src = raw_jdeps_file,
+            dst = materialized_jdeps_file,
         )
         materialized_jdeps.append(materialized_jdeps_file)
+
     return materialized_jdeps
 
 def _implementation(target, ctx, attr):

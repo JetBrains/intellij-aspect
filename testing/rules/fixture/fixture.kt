@@ -15,10 +15,10 @@
  */
 package com.intellij.aspect.testing.rules.fixture
 
-import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import com.google.devtools.build.runfiles.Runfiles
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.*
+import com.google.protobuf.ByteString
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.testing.rules.fixture.FixtureProto.TestFixture
 import org.junit.AssumptionViolatedException
@@ -83,6 +83,14 @@ class AspectFixture : ExternalResource() {
     assertWithMessage("output group not found: $group").that(groups).isNotEmpty()
 
     return groups.first().filesList
+  }
+
+  /** Returns the content of a generated file, requires `outputs = "capture"` on the fixture. */
+  fun findGeneratedFile(execrootPath: String): ByteString {
+    val files = output.generatedFilesMap.filterKeys { it.endsWith("/$execrootPath") }
+    assertWithMessage("generated file not captured: $execrootPath").that(files).hasSize(1)
+
+    return files.values.first()
   }
 
   fun bazelVersion(min: Int? = null, max: Int? = null): Boolean {

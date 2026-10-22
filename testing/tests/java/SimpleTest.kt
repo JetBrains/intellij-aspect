@@ -138,14 +138,10 @@ class SimpleTest {
 
   @Test
   fun testOutputGroups() {
-    val syncFiles = aspect.findOutputGroup(OutputGroups.SYNC)
-    assertThatOutputGroup(syncFiles).isNotEmpty() // contains at least the test runner
-    assertThatOutputGroup(syncFiles).doesNotContainFile("main.jar")
-
     val buildFiles = aspect.findOutputGroup(OutputGroups.BUILD)
     assertThatOutputGroup(buildFiles).containsFile("main.jar")
-    assertThatOutputGroup(buildFiles).containsFileMatching("materialized_*main.jdeps")
+    assertThatOutputGroup(buildFiles).containsFileMatching("/main.jdeps.intellij-generated-*")
     assertThatOutputGroup(buildFiles).containsFile("lib/libutil.jar")
-    assertThatOutputGroup(buildFiles).containsFileMatching("materialized_*util.jdeps")
+    assertThatOutputGroup(buildFiles).containsFileMatching("/libutil.jdeps.intellij-generated-*")
   }
 }

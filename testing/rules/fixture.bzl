@@ -17,6 +17,13 @@ load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load(":config.bzl", "TestMatrix", "config_hash", "config_name", "merge_matrixes", "serialize_test_config")
 load("module_dep.bzl", "BCRFlagProvider")
 
+# maps the outputs attribute to the Outputs enum of worker.proto
+_OUTPUTS = {
+    "info": 0,
+    "build": 1,
+    "capture": 2,
+}
+
 def _test_fixture_impl(ctx):
     output_protos = []
     profile_files = []
@@ -48,7 +55,7 @@ def _test_fixture_impl(ctx):
             aspect_bcr_archive = ctx.file._aspect_bcr.path,
             config = serialize_test_config(config),
             targets = ctx.attr.targets,
-            output_groups = ctx.attr.output_groups,
+            outputs = _OUTPUTS[ctx.attr.outputs],
             extra_flags = ctx.attr.extra_flags + (ctx.attr._bcr_extra_flags[BCRFlagProvider].flags if config.aspect_deployment == "bcr" else []),
         ))
 
@@ -108,8 +115,14 @@ test_fixture = rule(
             mandatory = True,
             doc = "list of targets to build for the fixture; do not use patterns",
         ),
-        "output_groups": attr.string_list(
-            doc = "list of additional output groups to request",
+        "outputs": attr.string(
+            values = _OUTPUTS.keys(),
+            default = "info",
+            doc = """
+                info: only intellij-info
+                build: also intellij-build
+                capture: like build and store the content of all generated files (*.intellij-generated-*)
+            """,
         ),
         "use_msys2": attr.bool(
             default = False,

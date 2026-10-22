@@ -20,7 +20,6 @@
 /modules/python_info.bzl            @aehlig
 /modules/rules_proto_info.bzl       @aehlig
 /modules/scala_info.bzl             @aehlig
-/modules/xcode_info.bzl             @LeFrosch
 
 # ---------------------------------------------------------------------------
 # Languages specific tests.

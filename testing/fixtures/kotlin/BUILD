@@ -24,16 +24,11 @@ _MODULES_KSP = [
     "//testing/fixtures:toolchains_llvm_latest",
 ]
 
-_OUTPUT_GROUPS = [
-    "intellij-sync",
-    "intellij-build",
-]
-
 test_fixture(
     name = "simple",
     srcs = glob(["simple/**"]),
     modules = _MODULES,
-    output_groups = _OUTPUT_GROUPS,
+    outputs = "build",
     rule_sets = ["kotlin"],
     targets = [
         "//:main",
@@ -68,7 +63,7 @@ test_fixture(
     name = "ksp",
     srcs = glob(["ksp/**"]),
     modules = _MODULES_KSP,
-    output_groups = _OUTPUT_GROUPS,
+    outputs = "build",
     rule_sets = ["kotlin"],
     targets = [
         "//:A",

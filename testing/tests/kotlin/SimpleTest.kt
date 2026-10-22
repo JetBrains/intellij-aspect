@@ -154,10 +154,6 @@ class SimpleTest {
 
   @Test
   fun testOutputs() {
-    val syncFiles = aspect.findOutputGroup(OutputGroups.SYNC)
-    assertThatOutputGroup(syncFiles).containsFile("kotlin-stdlib.jar")
-    assertThatOutputGroup(syncFiles).doesNotContainFile("main.jar")
-
     val buildFiles = aspect.findOutputGroup(OutputGroups.BUILD)
     assertThatOutputGroup(buildFiles).containsFile("main.jar")
     assertThatOutputGroup(buildFiles).containsFile("lib/util.jar")

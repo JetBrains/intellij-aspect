@@ -10,12 +10,12 @@ bazel_dep(name = "buildifier_prebuilt", version = "10.1.0")
 bazel_dep(name = "bazel_jar_jar", version = "0.1.15")
 
 # dependencies to rule sets used by the aspect
-bazel_dep(name = "rules_cc", version = "0.2.25")
+bazel_dep(name = "rules_cc", version = "0.2.26")
 bazel_dep(name = "rules_foreign_cc", version = "0.16.0")
 bazel_dep(name = "rules_python", version = "2.4.2")
 bazel_dep(name = "rules_java", version = "9.9.0")
 bazel_dep(name = "rules_kotlin", version = "2.4.21")
-bazel_dep(name = "rules_go", version = "0.64.1")
+bazel_dep(name = "rules_go", version = "0.64.2")
 bazel_dep(name = "rules_proto", version = "7.1.0")
 bazel_dep(name = "rules_scala", version = "7.4.0")
 
@@ -53,8 +53,8 @@ use_repo(maven, "maven")
 bazel_registry = use_extension("//private:extension.bzl", "bazel_registry")
 bazel_registry.bazelisk(version = "1.25.0")
 bazel_registry.bcr(
-    commit = "8807232390e9547b6246d41c90482a82529275e1",
-    sha256 = "3945c89a3fe584e644bf7db8b195382e755a1efd264d99897dd8082c3166a35b",
+    commit = "e4eb8cc44f4ea0aa5afe7ff4a401fbcf56a0175f",
+    sha256 = "c57a3b2c2dcca063e5c9024d70ba645633053526b47ad188c477a38f6e8f2da8",
 )
 bazel_registry.project(
     name = "intellij_android",

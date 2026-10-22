@@ -1,4 +1,3 @@
-load("//common:output_groups.bzl", "intellij_output_groups")
 load("//testing/rules:defs.bzl", "test_fixture")
 
 package(
@@ -12,16 +11,11 @@ _MODULES = [
     "//testing/fixtures/registry:cc_false_toolchain",
 ]
 
-_OUTPUT_GROUPS = [
-    intellij_output_groups.SYNC,
-    intellij_output_groups.BUILD,
-]
-
 test_fixture(
     name = "simple",
     srcs = glob(["simple/**"]),
     modules = _MODULES,
-    output_groups = _OUTPUT_GROUPS,
+    outputs = "build",
     rule_sets = ["java"],
     targets = [
         "//:main",
@@ -34,7 +28,7 @@ test_fixture(
     name = "top_level_toolchain",
     srcs = glob(["simple/**"]),
     modules = _MODULES,
-    output_groups = _OUTPUT_GROUPS,
+    outputs = "build",
     rule_sets = ["java"],
     strip_prefix = "simple",
     targets = [
@@ -57,7 +51,7 @@ test_fixture(
     name = "plugin",
     srcs = glob(["plugin/**"]),
     modules = _MODULES,
-    output_groups = _OUTPUT_GROUPS,
+    outputs = "build",
     rule_sets = ["java"],
     targets = ["//:java_lib"],
 )
@@ -66,7 +60,7 @@ test_fixture(
     name = "forwardedArtifacts",
     srcs = glob(["forwardedArtifacts/**"]),
     modules = _MODULES,
-    output_groups = _OUTPUT_GROUPS,
+    outputs = "build",
     rule_sets = ["java"],
     targets = ["//..."],
     use_msys2 = True,
@@ -76,7 +70,7 @@ test_fixture(
     name = "resources",
     srcs = glob(["resources/**"]),
     modules = _MODULES,
-    output_groups = _OUTPUT_GROUPS,
+    outputs = "build",
     rule_sets = ["java"],
     targets = ["//:hello"],
     use_msys2 = True,
