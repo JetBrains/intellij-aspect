@@ -73,7 +73,7 @@ test_module_deps(
     module_name = "rules_scala",
     versions = [
         "7.1.6",
-        "7.3.0",
+        "7.4.0",
     ],
 )
 
