@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-load("//intellij:aspect.bzl", "intellij_configure_aspect")
 load("//modules:cc_info.bzl", cc_info = "module")
 load("//modules:cc_toolchain_info.bzl", cc_toolchain_info = "module")
 load("//modules:foreign_cc_info.bzl", foreign_cc = "module")
@@ -48,8 +47,3 @@ MODULES = [
     protobuf_info,
     proto_info,
 ]
-
-intellij_aspect = intellij_configure_aspect(
-    modules = MODULES,
-    container = "//:module_container",
-)

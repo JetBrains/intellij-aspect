@@ -15,6 +15,7 @@
  */
 package com.intellij.aspect.lib
 
+import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
@@ -25,10 +26,14 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.readText
 
 @OptIn(ExperimentalPathApi::class)
+@Throws(IOException::class)
 fun writeFileIfContentDiffers(path: Path, payload: String) {
   if (path.isDirectory()) {
     path.deleteRecursively()
   }
+
+  path.parent?.let(Files::createDirectories)
+
   if (!path.exists() || path.readText() != payload) {
     Files.writeString(
       path,

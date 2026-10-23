@@ -19,16 +19,40 @@ public final class com.intellij.aspect.lib.AspectConfig
   public int hashCode()
   public java.lang.String toString()
 
+public final class com.intellij.aspect.lib.AspectDefinition
+  public final com.google.devtools.intellij.aspect.Aspect$AspectConfiguration getProto()
+  public final com.intellij.aspect.lib.AspectDefinition$Location getLocation()
+  public final java.lang.String generateAspectFile(java.nio.file.Path,java.lang.Iterable<? extends com.intellij.aspect.lib.Rules>)
+  public final java.util.List<com.google.devtools.intellij.aspect.Aspect$Module> getModules()
+  public final java.util.List<com.google.devtools.intellij.aspect.Aspect$Module> modulesFor(java.lang.Iterable<? extends com.intellij.aspect.lib.Rules>)
+  public static final com.intellij.aspect.lib.AspectDefinition$Companion Companion
+
+public static final class com.intellij.aspect.lib.AspectDefinition$Companion
+  public final com.intellij.aspect.lib.AspectDefinition fromResource$sdk_lib_deploy(java.lang.String) throws java.io.IOException
+
+public static final class com.intellij.aspect.lib.AspectDefinition$Location
+  public boolean equals(java.lang.Object)
+  public com.intellij.aspect.lib.AspectDefinition$Location(java.nio.file.Path,java.lang.String)
+  public final com.intellij.aspect.lib.AspectDefinition$Location copy(java.nio.file.Path,java.lang.String)
+  public final java.lang.String component2()
+  public final java.lang.String getName()
+  public final java.nio.file.Path component1()
+  public final java.nio.file.Path getFile()
+  public int hashCode()
+  public java.lang.String toString()
+
+public final class com.intellij.aspect.lib.AspectDefinitionKt
+
 public final class com.intellij.aspect.lib.AspectchoiceKt
+  public static final com.intellij.aspect.lib.AspectDefinition getINTELLIJ_ASPECT()
   public static final java.lang.String getASPECT_NAME()
-  public static final java.util.List<com.intellij.aspect.lib.Modules> modulesForRules(java.lang.Iterable<? extends com.intellij.aspect.lib.Rules>)
   public static final java.util.Map<java.lang.String, java.lang.String> repoMappingForRules(java.util.Map<com.intellij.aspect.lib.Rules, java.lang.String>)
 
 public final class com.intellij.aspect.lib.ConfigKt
   public static final void writeAspectConfig(java.nio.file.Path,java.nio.file.Path,com.intellij.aspect.lib.AspectConfig) throws java.io.IOException
 
 public final class com.intellij.aspect.lib.DeployKt
-  public static final void deployAspectZip(java.nio.file.Path,java.nio.file.Path,com.intellij.aspect.lib.AspectConfig,java.nio.file.Path) throws java.io.IOException
+  public static final void deployAspectZip(java.nio.file.Path,java.nio.file.Path,com.intellij.aspect.lib.AspectConfig,java.nio.file.Path,com.intellij.aspect.lib.AspectDefinition) throws java.io.IOException
 
 public final class com.intellij.aspect.lib.LoadStatement
   public boolean equals(java.lang.Object)
@@ -46,30 +70,6 @@ public final class com.intellij.aspect.lib.LoadStatement
 public final class com.intellij.aspect.lib.LoadsKt
   public static final java.lang.String transformFile(java.io.InputStream,java.util.List<? extends com.intellij.aspect.lib.Transformer>) throws java.io.IOException
   public static final java.util.List<com.intellij.aspect.lib.LoadStatement> parseLoads(java.io.InputStream) throws java.io.IOException
-
-public final enum com.intellij.aspect.lib.Modules extends java.lang.Enum<com.intellij.aspect.lib.Modules>
-  public final java.lang.String getFile()
-  public final java.util.List<com.intellij.aspect.lib.Rules> getRulesets()
-  public static com.intellij.aspect.lib.Modules valueOf(java.lang.String)
-  public static com.intellij.aspect.lib.Modules[] values()
-  public static final com.intellij.aspect.lib.Modules CC_INFO
-  public static final com.intellij.aspect.lib.Modules CC_TOOLCHAIN_INFO
-  public static final com.intellij.aspect.lib.Modules FOREIGN_CC_INFO
-  public static final com.intellij.aspect.lib.Modules GO_INFO
-  public static final com.intellij.aspect.lib.Modules JAVA_COMMON_INFO
-  public static final com.intellij.aspect.lib.Modules JAVA_INFO
-  public static final com.intellij.aspect.lib.Modules JAVA_TOOLCHAIN_INFO
-  public static final com.intellij.aspect.lib.Modules JVM_INFO
-  public static final com.intellij.aspect.lib.Modules KOTLIN_INFO
-  public static final com.intellij.aspect.lib.Modules PROTOBUF_INFO
-  public static final com.intellij.aspect.lib.Modules PROTO_INFO
-  public static final com.intellij.aspect.lib.Modules PYTHON_INFO
-  public static final com.intellij.aspect.lib.Modules PY_INFO
-  public static final com.intellij.aspect.lib.Modules RULES_PROTO_INFO
-  public static final com.intellij.aspect.lib.Modules RUN_INFO
-  public static final com.intellij.aspect.lib.Modules SCALA_INFO
-  public static final com.intellij.aspect.lib.Modules TEST_INFO
-  public static kotlin.enums.EnumEntries<com.intellij.aspect.lib.Modules> getEntries()
 
 public final enum com.intellij.aspect.lib.OutputGroups extends java.lang.Enum<com.intellij.aspect.lib.OutputGroups>
   public final java.lang.String getGroupName()
@@ -152,4 +152,4 @@ public abstract interface com.intellij.aspect.lib.Transformer
 public final class com.intellij.aspect.lib.TransformersKt
 
 public final class com.intellij.aspect.lib.UtilsKt
-  public static final void writeFileIfContentDiffers(java.nio.file.Path,java.lang.String)
+  public static final void writeFileIfContentDiffers(java.nio.file.Path,java.lang.String) throws java.io.IOException

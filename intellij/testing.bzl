@@ -13,7 +13,13 @@
 # limitations under the License.
 
 load("//common:platform.bzl", "platform")
-load("//config:aspect.bzl", "intellij_aspect")
+load(":aspect.bzl", "intellij_configure_aspect")
+load(":modules.bzl", "MODULES")
+
+intellij_aspect = intellij_configure_aspect(
+    modules = MODULES,
+    container = "//:module_container",
+)
 
 # To ensure that targets visited under different aspect configurations created by
 # this rule do not cause write conflicts this transition enforces a unique

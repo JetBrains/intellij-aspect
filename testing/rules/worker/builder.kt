@@ -18,8 +18,8 @@ package com.intellij.aspect.testing.rules.worker
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.TargetIdeInfo
 import com.google.protobuf.ByteString
 import com.google.protobuf.TextFormat
-import com.intellij.aspect.lib.ASPECT_NAME
 import com.intellij.aspect.lib.AspectConfig
+import com.intellij.aspect.lib.INTELLIJ_ASPECT
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.lib.Rules
 import com.intellij.aspect.lib.deployAspectZip
@@ -91,7 +91,7 @@ fun main(args: Array<String>) {
 
     val files = build(
       targets = input.targetsList,
-      aspects = listOf(ASPECT_PREFIX.getValue(deployment) + ASPECT_NAME),
+      aspects = listOf(ASPECT_PREFIX.getValue(deployment) + INTELLIJ_ASPECT.location),
       outputGroups = when (input.outputs) {
         Outputs.INFO -> listOf(OutputGroups.INFO.groupName)
         else -> listOf(OutputGroups.INFO.groupName, OutputGroups.BUILD.groupName)

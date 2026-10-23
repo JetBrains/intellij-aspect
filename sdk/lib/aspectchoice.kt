@@ -16,33 +16,22 @@
 
 package com.intellij.aspect.lib
 
-enum class Rules(val rulesetName: String) {
-  CC("@rules_cc"),
-  FOREIGN_CC("@rules_foreign_cc"),
-  PYTHON("@rules_python"),
-  JAVA("@rules_java"),
-  KOTLIN("@rules_kotlin"),
-  SCALA("@rules_scala"),
-  GO("@rules_go"),
-  PROTO("@protobuf"),
-  LEGACY_RULES_PROTO("@rules_proto"),
-}
-
-enum class OutputGroups(val groupName: String) {
-  INFO("intellij-info"),
-  SYNC("intellij-sync"),
-  BUILD("intellij-build"),
-}
-
-fun modulesForRules(rules: Iterable<Rules>): List<Modules> {
-  val rulesets = rules.toSet()
-  return Modules.entries.filter { module -> module.rulesets.isEmpty() || module.rulesets.any { it in rulesets } }
-}
-
 // If the repository names of the rules for certain languages are known, provide the appropriate
 // repo-mapping to be used in the aspect configuration.
 fun repoMappingForRules(mapping: Map<Rules, String>): Map<String, String> {
   return mapping.mapKeys { (language, _) -> language.rulesetName }
 }
 
-val ASPECT_NAME: String = "config:aspect.bzl%intellij_aspect"
+/**
+ * The default aspect run during the sync.
+ */
+val INTELLIJ_ASPECT: AspectDefinition by lazy { AspectDefinition.fromResource("/intellij_aspect.textproto") }
+
+/**
+ * Location of the deployed aspect, e.g. `config:aspect.bzl%intellij_aspect`.
+ */
+@Deprecated(
+  message = "use the location of the bundled aspect definition",
+  replaceWith = ReplaceWith("INTELLIJ_ASPECT.location.toString()"),
+)
+val ASPECT_NAME: String = INTELLIJ_ASPECT.location.toString()

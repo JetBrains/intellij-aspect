@@ -6,6 +6,7 @@ java_library(
     exports = [
         "//sdk/lib:deploy",
         "//sdk/lib:read",
+        "//sdk/proto:aspect_java_proto",
         "//sdk/proto:common_java_proto",
         "//sdk/proto:ide_info_java_proto",
     ],
