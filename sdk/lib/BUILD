@@ -22,7 +22,10 @@ genrule(
 kt_jvm_library(
     name = "deploy",
     srcs = [
+        "AspectConfig.kt",
         "AspectDefinition.kt",
+        "OutputGroups.kt",
+        "Rules.kt",
         "aspectchoice.kt",
         "config.kt",
         "deploy.kt",
