@@ -17,6 +17,7 @@ load(":common.bzl", "intellij_common")
 _INFO = "intellij-info"
 _SYNC = "intellij-sync"
 _BUILD = "intellij-build"
+_DEBUG = "intellij-debug"
 
 def _source_depset(direct = None):
     """Return a depset with direct files filtered to sources only"""
@@ -41,5 +42,6 @@ intellij_output_groups = struct(
     INFO = _INFO,
     SYNC = _SYNC,
     BUILD = _BUILD,
+    DEBUG = _DEBUG,
     from_files = _from_files,
 )

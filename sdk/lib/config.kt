@@ -48,7 +48,7 @@ data class AspectConfig(
 
 /**
  * Creates the config directory and writes the config file as well as the
- * required BUILD file.
+ * required BUILD file and the files of all bundled aspects.
  */
 @Throws(IOException::class)
 internal fun writeAspectConfig(destination: Path, relativeDestination: Path, config: AspectConfig) {
@@ -63,10 +63,12 @@ internal fun writeAspectConfig(destination: Path, relativeDestination: Path, con
 
   val rulesets = config.rulesets ?: (config.useBuiltin + config.repoMapping.keys)
 
-  writeFileIfContentDiffers(
-    path = destination.resolve(INTELLIJ_ASPECT.location.file),
-    payload = INTELLIJ_ASPECT.generateAspectFile(relativeDestination, rulesets, config.attrAspects),
-  )
+  for (aspect in listOf(INTELLIJ_ASPECT, INTELLIJ_CC_DEBUG_ASPECT)) {
+    writeFileIfContentDiffers(
+      path = destination.resolve(aspect.location.file),
+      payload = aspect.generateAspectFile(relativeDestination, rulesets, config.attrAspects),
+    )
+  }
 }
 
 private fun generateBuildFile(relativeDestination: Path): String {

@@ -14,6 +14,7 @@
 
 load("//modules:cc_info.bzl", cc_info = "module")
 load("//modules:cc_toolchain_info.bzl", cc_toolchain_info = "module")
+load("//modules:extra_rules_info.bzl", extra_rules_info = "module")
 load("//modules:foreign_cc_info.bzl", foreign_cc = "module")
 load("//modules:go_info.bzl", go_info = "module")
 load("//modules:java_common_info.bzl", java_common_info = "module")
@@ -29,9 +30,11 @@ load("//modules:run_info.bzl", run_info = "module")
 load("//modules:scala_info.bzl", scala_info = "module")
 load("//modules:test_info.bzl", test_info = "module")
 
+# modules bundled in the IntelliJ aspect
 MODULES = [
     run_info,
     test_info,
+    extra_rules_info,
     cc_info,
     foreign_cc,
     cc_toolchain_info,

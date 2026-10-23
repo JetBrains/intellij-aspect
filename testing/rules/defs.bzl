@@ -88,7 +88,8 @@ def test_fixture(
         outputs: Which outputs to collect. "info" (the default) only requests the
             intellij-info output group, "build" also requests intellij-build and
             "capture" additionally stores the content of all generated files
-            (`*.intellij-generated-*`) in the fixture.
+            (`*.intellij-generated-*`) in the fixture. "debug" runs the cc debug
+            aspect instead and requests intellij-info and intellij-debug.
         builtin: If True, also tests the builtin aspect deployment mode.
         bcr: If True (the default) also test the BCR deployment mode.
         strip_prefix: Optional. Prefix to strip from source file paths when creating

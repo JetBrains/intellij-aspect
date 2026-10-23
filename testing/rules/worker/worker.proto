@@ -132,6 +132,8 @@ message WorkArguments {
     BUILD = 1;
     // Like BUILD, and also capture the content of all generated files.
     CAPTURE = 2;
+    // Run the cc debug aspect and request the intellij-info and intellij-debug output groups.
+    DEBUG = 3;
   }
 
   // Output file encoding the TestFixture (fixture.proto).
