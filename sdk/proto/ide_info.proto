@@ -53,6 +53,8 @@ message CIdeInfo {
     repeated string includes = 3;
     repeated string quote_includes = 4;
     repeated string system_includes = 5;
+
+    repeated ArtifactLocation direct_headers = 6;
   }
 
   RuleContext rule_context = 1;

@@ -49,7 +49,7 @@ def _collect_rule_context(ctx):
         strip_include_prefix = intellij_common.attr_as_str(ctx, "strip_include_prefix"),
     )
 
-def _collect_compilation_context(ctx, target):
+def _collect_compilation_context(ctx, target, direct_headers):
     """Collect information from the compilation context provided by the CcInfo provider."""
     compilation_context = target[CcInfo].compilation_context
 
@@ -69,6 +69,7 @@ def _collect_compilation_context(ctx, target):
 
     return intellij_common.struct(
         headers = artifact_location.from_files(compilation_context.headers.to_list()),
+        direct_headers = artifact_location.from_files(direct_headers),
         defines = compilation_context.defines.to_list() + local_defines,
         includes = compilation_context.includes.to_list(),
         quote_includes = compilation_context.quote_includes.to_list(),
@@ -108,7 +109,7 @@ def _implementation(target, ctx, attr):
         outputs = intellij_output_groups.from_files(headers),
         value = intellij_common.struct(
             rule_context = _collect_rule_context(ctx),
-            compilation_context = _collect_compilation_context(ctx, target),
+            compilation_context = _collect_compilation_context(ctx, target, headers),
         ),
         dependencies = {
             intellij_deps.COMPILE_TIME: intellij_deps.collect(ctx, COMPILE_TIME_DEPS),
