@@ -71,6 +71,15 @@ The repository contains two Bazel modules:
 When building `archive_bcr`, `MODULE.bazel.bcr` is renamed to `MODULE.bazel` inside the
 archive, so consumers see a clean `intellij_aspect` module.
 
+The public API of the SDK is tracked in [`testing/tests/sdk/api.txt`](testing/tests/sdk/api.txt).
+The test `//testing/tests/sdk:api_test` fails whenever the symbols of `//sdk` differ from that
+file, so every API change has to be made explicit by updating the fixture:
+
+```sh
+bazel build //testing/tests/sdk:api_dump
+install -m 644 bazel-bin/testing/tests/sdk/api_dump.txt testing/tests/sdk/api.txt
+```
+
 ## Modules
 
 Each language or toolchain gets its own aspect in `modules/` that
