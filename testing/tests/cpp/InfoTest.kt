@@ -45,6 +45,18 @@ class InfoTest {
   }
 
   @Test
+  fun testDirectHeadersList() {
+    val info = aspect.findCIdeInfo("//lib:lib")
+    assertThatArtifacts(info.compilationContext.directHeadersList).relativePaths().contains("lib/header.h")
+  }
+
+  @Test
+  fun testDirectHeadersNotPropagated() {
+    val info = aspect.findCIdeInfo("//:main")
+    assertThatArtifacts(info.compilationContext.directHeadersList).relativePaths().doesNotContain("lib/header.h")
+  }
+
+  @Test
   fun testCoptsList() {
     val info = aspect.findCIdeInfo("//lib:lib")
     assertThat(info.ruleContext.coptsList).contains("-DLIB_COPT")
