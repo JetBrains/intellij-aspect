@@ -20,4 +20,5 @@ enum class OutputGroups(val groupName: String) {
   INFO("intellij-info"),
   SYNC("intellij-sync"),
   BUILD("intellij-build"),
+  DEBUG("intellij-debug"),
 }

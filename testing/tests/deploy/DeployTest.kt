@@ -76,6 +76,28 @@ class DeployTest {
       LoadStatement(Repository.Absolute, "aspect/location/intellij:aspect.bzl", "\"intellij_configure_aspect\""),
     )
     assertThat(aspectLoads.map { it.path }).contains("aspect/location/modules:cc_info.bzl")
+    assertThat(aspectLoads.map { it.path }).doesNotContain("aspect/location/modules:cc_debug_info.bzl")
+
+    val debugAspectLoads = readLoads(path, "config/cc_debug_aspect.bzl")
+    assertThat(debugAspectLoads.map { it.path }).contains("aspect/location/modules:cc_debug_info.bzl")
+    assertThat(debugAspectLoads.map { it.path }).doesNotContain("aspect/location/modules:cc_info.bzl")
+  }
+
+  @Test
+  fun testDeployDebugAspectWithoutCc() {
+    val path = deployArchive(
+      AspectConfig(
+        bazelVersion = "8.5.0",
+        repoMapping = emptyMap(),
+        useBuiltin = emptySet(),
+        rulesets = setOf(Rules.JAVA),
+      ),
+    )
+
+    // the debug aspect is always deployed, even if it has no modules
+    val content = Files.readString(path.resolve("config/cc_debug_aspect.bzl"))
+    assertThat(content).contains("intellij_cc_debug_aspect = intellij_configure_aspect(")
+    assertThat(content).doesNotContain("cc_debug_info")
   }
 
   @Test

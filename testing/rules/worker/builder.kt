@@ -20,6 +20,7 @@ import com.google.protobuf.ByteString
 import com.google.protobuf.TextFormat
 import com.intellij.aspect.lib.AspectConfig
 import com.intellij.aspect.lib.INTELLIJ_ASPECT
+import com.intellij.aspect.lib.INTELLIJ_CC_DEBUG_ASPECT
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.lib.Rules
 import com.intellij.aspect.lib.deployAspectZip
@@ -89,11 +90,17 @@ fun main(args: Array<String>) {
       else -> throw IllegalArgumentException("unknown aspect deployment: $deployment")
     }
 
+    val aspect = when (input.outputs) {
+      Outputs.DEBUG -> INTELLIJ_CC_DEBUG_ASPECT
+      else -> INTELLIJ_ASPECT
+    }
+
     val files = build(
       targets = input.targetsList,
-      aspects = listOf(ASPECT_PREFIX.getValue(deployment) + INTELLIJ_ASPECT.location),
+      aspects = listOf(ASPECT_PREFIX.getValue(deployment) + aspect.location),
       outputGroups = when (input.outputs) {
         Outputs.INFO -> listOf(OutputGroups.INFO.groupName)
+        Outputs.DEBUG -> listOf(OutputGroups.INFO.groupName, OutputGroups.DEBUG.groupName)
         else -> listOf(OutputGroups.INFO.groupName, OutputGroups.BUILD.groupName)
       },
       profile = Path.of(input.outputProfile),

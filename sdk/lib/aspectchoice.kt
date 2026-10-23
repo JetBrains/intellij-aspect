@@ -25,11 +25,15 @@ fun repoMappingForRules(mapping: Map<Rules, String>): Map<String, String> {
 /**
  * The default aspect run during the sync.
  */
-val INTELLIJ_ASPECT: AspectDefinition by lazy { AspectDefinition.fromResource("/intellij_aspect.textproto") }
+val INTELLIJ_ASPECT: AspectDefinition by lazy { AspectDefinition.fromResource("/config/aspect_ide.textproto") }
 
 /**
- * Location of the deployed aspect, e.g. `config:aspect.bzl%intellij_aspect`.
+ * The debug aspect for C and C++ targets. Reports the compile and link command lines and collects
+ * the files the debugger reads in the `intellij-debug` output group. One build must not run this
+ * aspect together with [INTELLIJ_ASPECT].
  */
+val INTELLIJ_CC_DEBUG_ASPECT: AspectDefinition by lazy { AspectDefinition.fromResource("/config/cc_debug_aspect.textproto") }
+
 @Deprecated(
   message = "use the location of the bundled aspect definition",
   replaceWith = ReplaceWith("INTELLIJ_ASPECT.location.toString()"),

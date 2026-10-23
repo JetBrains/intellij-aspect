@@ -191,6 +191,7 @@ intellij_common = struct(
     attr_as_dict = _attr_as_dict,
     attr_as_string_dict = _attr_as_string_dict,
     is_exec_configuration = _is_exec_configuration,
+    is_intellij_aspect_id = _is_intellij_aspect_id,
     target_key = _target_key,
     target_keys_from = _target_keys_from,
 )

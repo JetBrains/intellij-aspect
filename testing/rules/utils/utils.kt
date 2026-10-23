@@ -28,6 +28,19 @@ internal fun <A, E> IterableSubject.comparing(
   return comparingElementsUsing(Correspondence.transforming(correspondence, description))
 }
 
+internal fun <A, E> IterableSubject.comparing(
+  description: String,
+  correspondence: (A, E) -> Boolean,
+): UsingCorrespondence<A, E> {
+  return comparingElementsUsing(Correspondence.from(correspondence, description))
+}
+
+fun IterableSubject.startsWith(): UsingCorrespondence<String, String> {
+  return comparing("startsWith") { actual, expected ->
+    actual.startsWith(expected)
+  }
+}
+
 fun Common.ArtifactLocation.execrootPath(): String {
   return joinBazelPath(rootPath, relativePath)
 }

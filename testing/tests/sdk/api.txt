@@ -45,6 +45,7 @@ public final class com.intellij.aspect.lib.AspectDefinitionKt
 
 public final class com.intellij.aspect.lib.AspectchoiceKt
   public static final com.intellij.aspect.lib.AspectDefinition getINTELLIJ_ASPECT()
+  public static final com.intellij.aspect.lib.AspectDefinition getINTELLIJ_CC_DEBUG_ASPECT()
   public static final java.lang.String getASPECT_NAME()
   public static final java.util.Map<java.lang.String, java.lang.String> repoMappingForRules(java.util.Map<com.intellij.aspect.lib.Rules, java.lang.String>)
 
@@ -52,7 +53,7 @@ public final class com.intellij.aspect.lib.ConfigKt
   public static final void writeAspectConfig(java.nio.file.Path,java.nio.file.Path,com.intellij.aspect.lib.AspectConfig) throws java.io.IOException
 
 public final class com.intellij.aspect.lib.DeployKt
-  public static final void deployAspectZip(java.nio.file.Path,java.nio.file.Path,com.intellij.aspect.lib.AspectConfig,java.nio.file.Path,com.intellij.aspect.lib.AspectDefinition) throws java.io.IOException
+  public static final void deployAspectZip(java.nio.file.Path,java.nio.file.Path,com.intellij.aspect.lib.AspectConfig,java.nio.file.Path) throws java.io.IOException
 
 public final class com.intellij.aspect.lib.LoadStatement
   public boolean equals(java.lang.Object)
@@ -76,6 +77,7 @@ public final enum com.intellij.aspect.lib.OutputGroups extends java.lang.Enum<co
   public static com.intellij.aspect.lib.OutputGroups valueOf(java.lang.String)
   public static com.intellij.aspect.lib.OutputGroups[] values()
   public static final com.intellij.aspect.lib.OutputGroups BUILD
+  public static final com.intellij.aspect.lib.OutputGroups DEBUG
   public static final com.intellij.aspect.lib.OutputGroups INFO
   public static final com.intellij.aspect.lib.OutputGroups SYNC
   public static kotlin.enums.EnumEntries<com.intellij.aspect.lib.OutputGroups> getEntries()

@@ -16,10 +16,15 @@ load(":artifact_location.bzl", "artifact_location")
 load(":common.bzl", "intellij_common")
 load(":make_variables.bzl", "expand_make_variables")
 
-def _target_hash(key):
-    """Creates a unique hash for the target based on its key."""
-    parts = [key.label, getattr(key, "configuration", "")] + key.aspect_ids
-    return abs(hash(".".join(["%s" % (hash(part),) for part in parts])))
+def _target_hash(key, ctx):
+    """
+    Creates a unique hash for the target based on its key. Intellij aspect ids are not part of the key,
+    they are added to avoid conflicting files when the same target is visited by different intellij aspects.
+    """
+
+    intellij_aspect_ids = [id for id in ctx.aspect_ids if intellij_common.is_intellij_aspect_id(id)]
+    parts = [key.label, getattr(key, "configuration", "")] + key.aspect_ids + intellij_aspect_ids
+    return abs(hash(".".join([str(hash(part)) for part in parts])))
 
 def _write_info(target, ctx, key, fields):
     """
@@ -58,7 +63,7 @@ def _write_info(target, ctx, key, fields):
     # human debuggability, we include the "file name" part of the label (or the first up to 200 characters thereof,
     # to keep within file-length limit on all supported OSes).
     short_file_name = target.label.name.split("/")[-1][:200]
-    file_name = "%s.%s.intellij-info.txt" % (_target_hash(key), short_file_name)
+    file_name = "%s.%s.intellij-info.txt" % (_target_hash(key, ctx), short_file_name)
 
     file = ctx.actions.declare_file(file_name)
     ctx.actions.write(file, proto.encode_text(struct(**info)))

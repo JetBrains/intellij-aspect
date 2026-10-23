@@ -23,7 +23,7 @@ import java.util.Locale
 
 /**
  * Creates the config directory and writes the config file as well as the
- * required BUILD file.
+ * required BUILD file and the files of all bundled aspects.
  */
 @Throws(IOException::class)
 fun writeAspectConfig(destination: Path, relativeDestination: Path, config: AspectConfig) {
@@ -38,10 +38,12 @@ fun writeAspectConfig(destination: Path, relativeDestination: Path, config: Aspe
 
   val rulesets = config.rulesets ?: (config.useBuiltin + config.repoMapping.keys)
 
-  writeFileIfContentDiffers(
-    path = destination.resolve(INTELLIJ_ASPECT.location.file),
-    payload = INTELLIJ_ASPECT.generateAspectFile(relativeDestination, rulesets)
-  )
+  for (aspect in listOf(INTELLIJ_ASPECT, INTELLIJ_CC_DEBUG_ASPECT)) {
+    writeFileIfContentDiffers(
+      path = destination.resolve(aspect.location.file),
+      payload = aspect.generateAspectFile(relativeDestination, rulesets),
+    )
+  }
 }
 
 private fun generateBuildFile(relativeDestination: Path): String {

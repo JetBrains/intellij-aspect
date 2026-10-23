@@ -22,6 +22,7 @@ _OUTPUTS = {
     "info": 0,
     "build": 1,
     "capture": 2,
+    "debug": 3,
 }
 
 def _test_fixture_impl(ctx):
@@ -122,6 +123,7 @@ test_fixture = rule(
                 info: only intellij-info
                 build: also intellij-build
                 capture: like build and store the content of all generated files (*.intellij-generated-*)
+                debug: run the cc debug aspect and request intellij-info and intellij-debug
             """,
         ),
         "use_msys2": attr.bool(
