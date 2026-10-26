@@ -65,7 +65,7 @@ internal fun writeAspectConfig(destination: Path, relativeDestination: Path, con
 
   writeFileIfContentDiffers(
     path = destination.resolve(INTELLIJ_ASPECT.location.file),
-    payload = INTELLIJ_ASPECT.generateAspectFile(relativeDestination, rulesets, config.attrAspects)
+    payload = INTELLIJ_ASPECT.generateAspectFile(relativeDestination, rulesets, config.attrAspects),
   )
 }
 
@@ -98,7 +98,11 @@ config = struct(
  * inside a workspace, enabling only the modules required for the given rule sets. If
  * [attrAspects] is null, the aspect walks all attributes.
  */
-internal fun AspectDefinition.generateAspectFile(relativeDestination: Path, rulesets: Iterable<Rules>, attrAspects: List<String>? = null): String {
+internal fun AspectDefinition.generateAspectFile(
+  relativeDestination: Path,
+  rulesets: Iterable<Rules>,
+  attrAspects: List<String>? = null,
+): String {
   val modules = modulesFor(rulesets)
   val prefix = asBazelPath(relativeDestination)
 
