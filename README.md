@@ -23,7 +23,7 @@ design also enables publishing to the **Bazel Central Registry (BCR)**.
 intellij/       Main aggregator aspect (intellij_info_aspect)
 modules/        Language & toolchain module aspects (cc, java, python, ...)
 common/         Shared utilities (dependencies, artifact locations, IDE info serialization)
-config/         Configuration system (Bazel version detection via repository rule)
+config/         Configuration system (Bazel version detection via repository rule, module list and generated aspect configuration)
 sdk/            Public API: Kotlin deploy helpers and protobuf definitions
 testing/        Test infrastructure (fixtures, rules, workers)
 tools/          CLI utilities (deploy, measure, format)

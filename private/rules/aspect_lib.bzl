@@ -16,11 +16,15 @@ load("@rules_pkg//pkg:providers.bzl", "PackageFilesInfo")
 load("//common:artifact_location.bzl", "artifact_location")
 
 def _aspect_lib_impl(ctx):
-    map = {
-        artifact_location.from_file(file).relative_path: file
-        for dep in ctx.attr.files
-        for file in dep[DefaultInfo].files.to_list()
-    }
+    map = {}
+    for dep in ctx.attr.files:
+        if PackageFilesInfo in dep:
+            # the dependency knows where its files should be deployed to
+            map |= dep[PackageFilesInfo].dest_src_map
+            continue
+
+        for file in dep[DefaultInfo].files.to_list():
+            map[artifact_location.from_file(file).relative_path] = file
 
     # generate an empty build file
     build_file = ctx.actions.declare_file("BUILD.bazel")

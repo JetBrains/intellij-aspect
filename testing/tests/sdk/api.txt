@@ -21,8 +21,27 @@ public final class com.intellij.aspect.lib.AspectConfig
   public int hashCode()
   public java.lang.String toString()
 
+public final class com.intellij.aspect.lib.AspectDefinition
+  public final com.google.devtools.intellij.aspect.Aspect$AspectConfiguration getProto()
+  public final com.intellij.aspect.lib.AspectDefinition$Location getLocation()
+  public final java.util.List<com.google.devtools.intellij.aspect.Aspect$Module> getModules()
+
+public static final class com.intellij.aspect.lib.AspectDefinition$Location
+  public boolean equals(java.lang.Object)
+  public com.intellij.aspect.lib.AspectDefinition$Location(java.nio.file.Path,java.lang.String)
+  public final com.intellij.aspect.lib.AspectDefinition$Location copy(java.nio.file.Path,java.lang.String)
+  public final java.lang.String component2()
+  public final java.lang.String getName()
+  public final java.nio.file.Path component1()
+  public final java.nio.file.Path getFile()
+  public int hashCode()
+  public java.lang.String toString()
+
 public final class com.intellij.aspect.lib.AspectchoiceKt
   public static final java.lang.String getASPECT_NAME()
+
+public final class com.intellij.aspect.lib.DefinitionKt
+  public static final com.intellij.aspect.lib.AspectDefinition getINTELLIJ_ASPECT()
 
 public final class com.intellij.aspect.lib.DeployKt
   public static final void deployAspectZip(java.nio.file.Path,java.nio.file.Path,com.intellij.aspect.lib.AspectConfig,java.nio.file.Path) throws java.io.IOException

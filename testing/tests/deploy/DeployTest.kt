@@ -70,6 +70,12 @@ class DeployTest {
     val repos = readLoads(path, "modules/cc_info.bzl").map { it.repository }
     assertThat(repos).contains(Repository.External("@rules_cc"))
     assertThat(repos).contains(Repository.Absolute)
+
+    val aspectLoads = readLoads(path, "config/aspect.bzl")
+    assertThat(aspectLoads).contains(
+      LoadStatement(Repository.Absolute, "aspect/location/intellij:aspect.bzl", "\"intellij_configure_aspect\""),
+    )
+    assertThat(aspectLoads.map { it.path }).contains("aspect/location/modules:cc_info.bzl")
   }
 
   @Test
