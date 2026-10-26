@@ -37,7 +37,7 @@ inline fun <reified T : Any> assertIsInstance(value: Any?): T {
 
 class ArtifactLocationsSubject(
   metadata: FailureMetadata,
-  private val actual: Iterable<ArtifactLocation>?,
+  actual: Iterable<ArtifactLocation>?,
 ) : IterableSubject(metadata, actual) {
 
   fun relativePaths(): UsingCorrespondence<ArtifactLocation, String> {
