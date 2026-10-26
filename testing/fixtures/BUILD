@@ -122,7 +122,7 @@ test_module_deps(
 
 test_module_deps(
     module_name = "apple_support",
-    versions = ["2.9.0"],
+    versions = ["2.10.1"],
 )
 
 _TOOLCHAINS_LLVM_CONFIG = """
