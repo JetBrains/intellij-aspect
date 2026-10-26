@@ -23,14 +23,14 @@ private val LOAD_STATEMENT_RX = Regex("""^load\("([^"]+)",([^)]+)\)$""")
 private val REPO_NAME_RX = Regex("""^(@[^/]+)//(.+)$""")
 
 @Throws(IOException::class)
-fun parseLoads(input: InputStream): List<LoadStatement> {
+internal fun parseLoads(input: InputStream): List<LoadStatement> {
   return input.reader().useLines { lines ->
     lines.mapNotNull(::loadStatementParse).toList()
   }
 }
 
 @Throws(IOException::class)
-fun transformFile(input: InputStream, transformers: List<Transformer>): String {
+internal fun transformFile(input: InputStream, transformers: List<Transformer>): String {
   val loads = mutableListOf<LoadStatement>()
   val lines = mutableListOf<String>()
 
@@ -52,17 +52,17 @@ fun transformFile(input: InputStream, transformers: List<Transformer>): String {
   }
 }
 
-interface Transformer {
+internal interface Transformer {
   fun apply(loads: MutableList<LoadStatement>, lines: MutableList<String>)
 }
 
-data class LoadStatement(
+internal data class LoadStatement(
   val repository: Repository,
   val path: String,
   val arguments: String,
 )
 
-sealed interface Repository {
+internal sealed interface Repository {
   object Relative : Repository
 
   object Absolute : Repository

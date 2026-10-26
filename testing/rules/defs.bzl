@@ -224,7 +224,7 @@ def test_runner(test, fixture, deps = None, env = None, test_name = None, **kwar
         **kwargs
     )
 
-def junit_test(test, deps = None, **kwargs):
+def junit_test(test, deps = None, associates = None, **kwargs):
     """Creates a JUnit4 test. All JUnit dependencies are provided."""
     name = test.removesuffix(".kt")
 
@@ -235,6 +235,7 @@ def junit_test(test, deps = None, **kwargs):
             "@maven//:junit_junit",
             "@maven//:com_google_truth_truth",
         ],
+        associates = associates or [],
         visibility = ["//visibility:private"],
         testonly = 1,
     )

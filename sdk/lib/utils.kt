@@ -25,7 +25,7 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.readText
 
 @OptIn(ExperimentalPathApi::class)
-fun writeFileIfContentDiffers(path: Path, payload: String) {
+internal fun writeFileIfContentDiffers(path: Path, payload: String) {
   if (path.isDirectory()) {
     path.deleteRecursively()
   }

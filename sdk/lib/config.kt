@@ -26,7 +26,7 @@ import java.util.Locale
  * required BUILD file.
  */
 @Throws(IOException::class)
-fun writeAspectConfig(destination: Path, relativeDestination: Path, config: AspectConfig) {
+internal fun writeAspectConfig(destination: Path, relativeDestination: Path, config: AspectConfig) {
   val directory = destination.resolve("config")
   Files.createDirectories(directory)
 
