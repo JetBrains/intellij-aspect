@@ -10,6 +10,7 @@
     "com.google.truth:truth": 1696781452,
     "com.pinterest.ktlint:ktlint-cli": 423561227,
     "junit:junit": -744267592,
+    "org.jetbrains.kotlin:kotlin-metadata-jvm": -111854255,
     "org.jetbrains.kotlinx:kotlinx-cli-jvm": 315588256,
     "org.jetbrains.kotlinx:kotlinx-coroutines-core": 1181209059,
     "repositories": -1949687017
@@ -61,6 +62,7 @@
     "org.hamcrest:hamcrest-core": 649657847,
     "org.jetbrains.kotlin:kotlin-compiler-embeddable": -1791668223,
     "org.jetbrains.kotlin:kotlin-daemon-embeddable": 855912274,
+    "org.jetbrains.kotlin:kotlin-metadata-jvm": -1212956102,
     "org.jetbrains.kotlin:kotlin-reflect": 1459798757,
     "org.jetbrains.kotlin:kotlin-script-runtime": -913409915,
     "org.jetbrains.kotlin:kotlin-stdlib": 58909863,
@@ -357,6 +359,12 @@
       },
       "version": "2.2.21"
     },
+    "org.jetbrains.kotlin:kotlin-metadata-jvm": {
+      "shasums": {
+        "jar": "e181f32a21a3cdf195f974004a42f0067c2bd9deaa2a883636748d83fdefd99d"
+      },
+      "version": "2.2.21"
+    },
     "org.jetbrains.kotlin:kotlin-reflect": {
       "shasums": {
         "jar": "3277ac102ae17aad10a55abec75ff5696c8d109790396434b496e75087854203"
@@ -626,6 +634,9 @@
       "org.jetbrains.kotlin:kotlin-script-runtime",
       "org.jetbrains.kotlin:kotlin-stdlib",
       "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm"
+    ],
+    "org.jetbrains.kotlin:kotlin-metadata-jvm": [
+      "org.jetbrains.kotlin:kotlin-stdlib"
     ],
     "org.jetbrains.kotlin:kotlin-stdlib": [
       "org.jetbrains:annotations"
@@ -1873,6 +1884,22 @@
       "org.jetbrains.kotlin.daemon.common",
       "org.jetbrains.kotlin.daemon.report"
     ],
+    "org.jetbrains.kotlin:kotlin-metadata-jvm": [
+      "kotlin.metadata",
+      "kotlin.metadata.internal",
+      "kotlin.metadata.internal.common",
+      "kotlin.metadata.internal.extensions",
+      "kotlin.metadata.internal.metadata",
+      "kotlin.metadata.internal.metadata.builtins",
+      "kotlin.metadata.internal.metadata.deserialization",
+      "kotlin.metadata.internal.metadata.jvm",
+      "kotlin.metadata.internal.metadata.jvm.deserialization",
+      "kotlin.metadata.internal.metadata.jvm.serialization",
+      "kotlin.metadata.internal.metadata.serialization",
+      "kotlin.metadata.internal.protobuf",
+      "kotlin.metadata.jvm",
+      "kotlin.metadata.jvm.internal"
+    ],
     "org.jetbrains.kotlin:kotlin-reflect": [
       "kotlin.reflect.full",
       "kotlin.reflect.jvm",
@@ -2090,6 +2117,7 @@
       "org.hamcrest:hamcrest-core",
       "org.jetbrains.kotlin:kotlin-compiler-embeddable",
       "org.jetbrains.kotlin:kotlin-daemon-embeddable",
+      "org.jetbrains.kotlin:kotlin-metadata-jvm",
       "org.jetbrains.kotlin:kotlin-reflect",
       "org.jetbrains.kotlin:kotlin-script-runtime",
       "org.jetbrains.kotlin:kotlin-stdlib",
@@ -2212,6 +2240,11 @@
       ],
       "org/jline/terminal/provider/jni": [
         "class=org.jline.terminal.impl.jni.JniTerminalProvider"
+      ]
+    },
+    "org.jetbrains.kotlin:kotlin-metadata-jvm": {
+      "kotlin.metadata.internal.extensions.MetadataExtensions": [
+        "kotlin.metadata.jvm.internal.JvmMetadataExtensions"
       ]
     },
     "org.jetbrains.kotlin:kotlin-reflect": {

@@ -37,6 +37,7 @@ maven.install(
         "com.google.errorprone:error_prone_annotations:2.51.0",
         "com.google.guava:guava:33.7.2-jre",
         "com.fasterxml.jackson.core:jackson-databind:2.22.4",
+        "org.jetbrains.kotlin:kotlin-metadata-jvm:2.2.21",
         "org.jetbrains.kotlinx:kotlinx-cli-jvm:0.3.6",
         "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0",
         "com.pinterest.ktlint:ktlint-cli:1.8.0",
