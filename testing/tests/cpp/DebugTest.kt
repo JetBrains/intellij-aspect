@@ -16,9 +16,12 @@
 package com.intellij.aspect.testing.tests.cpp
 
 import com.google.common.truth.Truth.assertThat
+import com.intellij.aspect.lib.OutputGroups
+import com.intellij.aspect.private.lib.utils.isLinux
 import com.intellij.aspect.private.lib.utils.isMacOS
 import com.intellij.aspect.testing.rules.fixture.AspectFixture
 import com.intellij.aspect.testing.rules.utils.assertThatArtifacts
+import com.intellij.aspect.testing.rules.utils.endsWith
 import com.intellij.aspect.testing.rules.utils.startsWith
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
@@ -62,5 +65,55 @@ class DebugTest {
     assertThat(compileAction.argumentsList).contains("-fdebug-prefix-map=__BAZEL_EXECUTION_ROOT__=.")
     assertThatArtifacts(compileAction.outputsList).relativePaths().contains("lib/_objs/lib/source.o")
     assertThatArtifacts(compileAction.outputsList).relativePaths().contains("lib/_objs/lib/source.d")
+  }
+
+  @Test
+  fun testOutputGroupLinux() {
+    assumeTrue(isLinux())
+
+    assertThat(aspect.findOutputGroup(OutputGroups.DEBUG)).endsWith().containsExactly(
+      "_objs/test/test.pic.o",
+      "test.dwp",
+      "_objs/main/main.pic.o",
+      "main.dwp",
+      "lib/_objs/lib/source.pic.o",
+      "lib/liblib.a",
+    )
+  }
+
+  @Test
+  fun testMainDebugInfoLinux() {
+    assumeTrue(isLinux())
+
+    val target = aspect.findTarget("//:main")
+
+    val linkAction = target.ccDebugInfo.linkActionsList.single()
+    assertThatArtifacts(linkAction.outputsList).relativePaths().contains("main")
+
+    val compileAction = target.ccDebugInfo.compileActionsList.single()
+    assertThat(compileAction.argumentsList).contains("-g")
+    assertThatArtifacts(compileAction.outputsList).relativePaths().contains("_objs/main/main.pic.o")
+    assertThatArtifacts(compileAction.outputsList).relativePaths().contains("_objs/main/main.pic.d")
+
+    // build when fission=yes
+    assertThatArtifacts(compileAction.outputsList).relativePaths().contains("_objs/main/main.pic.dwo")
+  }
+
+  @Test
+  fun testLibDebugInfoLinux() {
+    assumeTrue(isLinux())
+
+    val target = aspect.findTarget("//lib:lib")
+
+    val linkAction = target.ccDebugInfo.linkActionsList.single()
+    assertThatArtifacts(linkAction.outputsList).relativePaths().contains("lib/liblib.so")
+
+    val compileAction = target.ccDebugInfo.compileActionsList.single()
+    assertThat(compileAction.argumentsList).contains("-g")
+    assertThatArtifacts(compileAction.outputsList).relativePaths().contains("lib/_objs/lib/source.pic.o")
+    assertThatArtifacts(compileAction.outputsList).relativePaths().contains("lib/_objs/lib/source.pic.d")
+
+    // build when fission=yes
+    assertThatArtifacts(compileAction.outputsList).relativePaths().contains("lib/_objs/lib/source.pic.dwo")
   }
 }

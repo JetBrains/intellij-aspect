@@ -41,6 +41,12 @@ fun IterableSubject.startsWith(): UsingCorrespondence<String, String> {
   }
 }
 
+fun IterableSubject.endsWith(): UsingCorrespondence<String, String> {
+  return comparing("endsWith") { actual, expected ->
+    actual.endsWith(expected)
+  }
+}
+
 fun Common.ArtifactLocation.execrootPath(): String {
   return joinBazelPath(rootPath, relativePath)
 }
