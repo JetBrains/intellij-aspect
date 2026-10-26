@@ -33,8 +33,8 @@ maven.install(
     artifacts = [
         "junit:junit:4.13.2",
         "com.google.truth:truth:1.4.5",
-        "com.google.code.gson:gson:2.14.0",
-        "com.google.errorprone:error_prone_annotations:2.50.0",
+        "com.google.code.gson:gson:2.15.0",
+        "com.google.errorprone:error_prone_annotations:2.51.0",
         "com.google.guava:guava:33.7.2-jre",
         "com.fasterxml.jackson.core:jackson-databind:2.22.4",
         "org.jetbrains.kotlinx:kotlinx-cli-jvm:0.3.6",

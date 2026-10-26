@@ -3,8 +3,8 @@
   "__INPUT_ARTIFACTS_HASH": {
     "com.fasterxml.jackson.core:jackson-databind": -1774975712,
     "com.google.code.findbugs:jsr305": 495355163,
-    "com.google.code.gson:gson": 2063056812,
-    "com.google.errorprone:error_prone_annotations": 911823543,
+    "com.google.code.gson:gson": 266105453,
+    "com.google.errorprone:error_prone_annotations": -885127816,
     "com.google.guava:guava": 671676083,
     "com.google.j2objc:j2objc-annotations": 2003271689,
     "com.google.truth:truth": 1696781452,
@@ -30,13 +30,13 @@
     "com.github.ajalt.mordant:mordant-jvm-jna-jvm": -1031949100,
     "com.google.auto.value:auto-value-annotations": 641018093,
     "com.google.code.findbugs:jsr305": 870839855,
-    "com.google.code.gson:gson": -1663769307,
-    "com.google.errorprone:error_prone_annotations": 652227016,
+    "com.google.code.gson:gson": 2019875040,
+    "com.google.errorprone:error_prone_annotations": 295418660,
     "com.google.guava:failureaccess": 1715931538,
-    "com.google.guava:guava": 713545847,
+    "com.google.guava:guava": -221578555,
     "com.google.guava:listenablefuture": 1079558157,
     "com.google.j2objc:j2objc-annotations": -1008747351,
-    "com.google.truth:truth": 1950906127,
+    "com.google.truth:truth": -986629558,
     "com.pinterest.ktlint:ktlint-cli": -185164476,
     "com.pinterest.ktlint:ktlint-cli-reporter-baseline": -1392370743,
     "com.pinterest.ktlint:ktlint-cli-reporter-checkstyle": -1570476793,
@@ -173,15 +173,15 @@
     },
     "com.google.code.gson:gson": {
       "shasums": {
-        "jar": "2cbd119bf1961c28788310963dc80ba65f58cdeec1dd139c8bdb1240faa2c36f"
+        "jar": "96d3dd843dc2911de01cdabcd50064cb9e860353102a0a78c96fd833d396fc7d"
       },
-      "version": "2.14.0"
+      "version": "2.15.0"
     },
     "com.google.errorprone:error_prone_annotations": {
       "shasums": {
-        "jar": "4667724877f1d37a689202da191e23efa7657c62eef93ccdac406eccfe5cdd0a"
+        "jar": "51a6d8348c7e307e47183859c07597dc8a2899c5d1b6f18a471bccaa3203d5cf"
       },
-      "version": "2.50.0"
+      "version": "2.51.0"
     },
     "com.google.guava:failureaccess": {
       "shasums": {
