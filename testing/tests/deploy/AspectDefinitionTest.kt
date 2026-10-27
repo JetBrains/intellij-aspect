@@ -69,7 +69,9 @@ class AspectDefinitionTest {
   fun testBundledDebugLocation() {
     val location = INTELLIJ_CC_DEBUG_ASPECT.location
 
-    assertThat(location).isEqualTo(AspectDefinition.Location(Path.of("config", "cc_debug_aspect.bzl"), "intellij_cc_debug_aspect"))
+    assertThat(location).isEqualTo(
+      AspectDefinition.Location(Path.of("config", "cc_debug_aspect.bzl"), "intellij_cc_debug_aspect"),
+    )
     assertThat(location.toString()).isEqualTo("config:cc_debug_aspect.bzl%intellij_cc_debug_aspect")
   }
 
