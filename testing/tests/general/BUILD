@@ -29,3 +29,13 @@ test_runner(
     fixture = "//testing/fixtures/general:custom_rules",
     test = "CustomRuleTest.kt",
 )
+
+test_runner(
+    fixture = "//testing/fixtures/general:noidedeps",
+    test = "NoIdeDefault.kt",
+)
+
+test_runner(
+    fixture = "//testing/fixtures/general:noidedeps-drop",
+    test = "NoIdeDrop.kt",
+)
