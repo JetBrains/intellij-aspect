@@ -5,6 +5,7 @@ kt_jvm_library(
     name = "apidump_lib",
     srcs = ["main.kt"],
     visibility = ["//testing/tests/sdk:__pkg__"],
+    deps = ["@maven//:org_jetbrains_kotlinx_kotlinx_cli_jvm"],
 )
 
 java_binary(

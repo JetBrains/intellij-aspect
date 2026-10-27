@@ -27,10 +27,10 @@ def _java_api_dump_impl(ctx):
     output = ctx.actions.declare_file("%s.txt" % ctx.label.name)
 
     args = ctx.actions.args()
-    args.add(output, format = "--output=%s")
-    args.add_all(jars, format_each = "--jar=%s")
-    args.add_all(classpath, format_each = "--classpath=%s")
-    args.add_all(ctx.attr.exclude_packages, format_each = "--exclude=%s")
+    args.add("--output", output)
+    args.add_all(jars, before_each = "--jar")
+    args.add_all(classpath, before_each = "--classpath")
+    args.add_all(ctx.attr.exclude_packages, before_each = "--exclude")
 
     ctx.actions.run(
         executable = ctx.executable._tool,
