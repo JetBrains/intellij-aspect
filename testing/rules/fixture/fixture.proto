@@ -49,6 +49,7 @@ message TestConfig {
   repeated RuleSet rule_sets = 2;
   AspectDeployment aspect_deployment = 3;
   string bazel_version = 4;
+  bool drop_no_ide = 5;
 }
 
 message OutputGroup {

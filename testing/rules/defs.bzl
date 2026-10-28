@@ -69,6 +69,7 @@ def test_fixture(
         bcr = True,
         strip_prefix = "",
         use_msys2 = False,
+        drop_no_ide = False,
         extra_flags = [],
         **kwargs):
     """Creates a test fixture with the result of the IntelliJ aspect applied to the project.
@@ -96,6 +97,7 @@ def test_fixture(
             the project archive. Defaults to the fixture name if not specified.
         use_msys2: If True, the BAZEL_SH environment variable is forwarded from the host
             to the nested Bazel invocations.
+        drop_no_ide: If True, define the aspect to drop no-ide targets; disables BCR deployment.
         extra_flags: Additional flags passed to the Bazel build.
 
     Example:
@@ -110,6 +112,7 @@ def test_fixture(
             targets = ["//:main"],
         )
     """
+    bcr = bcr and (not drop_no_ide)
     bazel_versions = _resolve_bazel_spec(bazel)
     matrix_name = name + "_matrix"
     configs = []
@@ -121,6 +124,7 @@ def test_fixture(
             bazel = bazel_versions,
             modules = modules,
             aspect_deployment = "materialized",
+            drop_no_ide = drop_no_ide,
             visibility = ["//visibility:private"],
             testonly = 1,
         )
@@ -133,6 +137,7 @@ def test_fixture(
             bazel = bazel_versions,
             modules = modules,
             aspect_deployment = "bcr",
+            drop_no_ide = drop_no_ide,
             visibility = ["//visibility:private"],
             testonly = 1,
         )
@@ -145,6 +150,7 @@ def test_fixture(
             bazel = bazel_versions,
             modules = modules,
             aspect_deployment = "builtin",
+            drop_no_ide = drop_no_ide,
             visibility = ["//visibility:private"],
             testonly = 1,
         )

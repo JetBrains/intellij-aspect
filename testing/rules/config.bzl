@@ -21,6 +21,7 @@ TestConfig = provider(
         "modules": "list[TestModuleDep] - List of BCR modules the fixture depends upon.",
         "rule_sets": "list[str] - rule sets (cc, python, java, kotlin, scala, go, proto, legacy_rules_proto) for which the aspects should be used when building the fixture.",
         "aspect_deployment": "str - Aspect deployment option (bcr, materialized, builtin).",
+        "drop_no_ide": "bool - Wheter to pass drop_no_ide to the asepct defintion.",
     },
 )
 
@@ -39,6 +40,7 @@ def config_hash(config):
     parts = [config.bazel]
     parts.extend(["%s:%s" % (m.name, m.version) for m in config.modules])
     parts.append(config.aspect_deployment)
+    parts.append(str(config.drop_no_ide))
     parts.extend(config.rule_sets)
 
     return hash(".".join(parts))
@@ -48,7 +50,9 @@ def config_name(config):
     A user friendly name for the configuration, including bazel and module
     versions.
     """
-    parts = ["bazel:%s" % config.bazel, "deploy:%s" % config.aspect_deployment] + [
+    parts = ["bazel:%s" % config.bazel, "deploy:%s" % config.aspect_deployment] + (
+        ["drop no-ide"] if config.drop_no_ide else []
+    ) + [
         "%s:%s" % (m.name, m.version)
         for m in config.modules
     ]
@@ -82,6 +86,7 @@ def serialize_test_config(config):
         ],
         rule_sets = [rule_set_map[r] for r in config.rule_sets],
         aspect_deployment = aspect_deployment_map[config.aspect_deployment],
+        drop_no_ide = config.drop_no_ide,
     )
 
 def merge_matrixes(matrixes):
@@ -119,6 +124,7 @@ def _test_matrix_impl(ctx):
             modules = modules,
             rule_sets = ctx.attr.rule_sets,
             aspect_deployment = ctx.attr.aspect_deployment,
+            drop_no_ide = ctx.attr.drop_no_ide,
         )
         for version in ctx.attr.bazel
         for modules in module_combinations
@@ -147,6 +153,10 @@ test_matrix = rule(
             default = "bcr",
             values = ["bcr", "materialized", "builtin"],
             doc = "aspect deployment option: bcr (default), materialized, or builtin",
+        ),
+        "drop_no_ide": attr.bool(
+            default = False,
+            doc = "Whether the aspect should be instructed to reduce no-ide targets to tomb-stone entries.",
         ),
     },
     provides = [TestMatrix],
