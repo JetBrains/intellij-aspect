@@ -1,0 +1,8 @@
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
+
+# the copts exceed the command line limit and force a params file for the compile action
+cc_library(
+    name = "params",
+    srcs = ["params.cc"],
+    copts = ["-DPARAMS_%d" % i for i in range(1000, 4000)],
+)

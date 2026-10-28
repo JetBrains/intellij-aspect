@@ -51,6 +51,7 @@ test_fixture(
     targets = [
         "//:main",
         "//:test",
+        "//params",
     ],
     use_msys2 = True,
 )
