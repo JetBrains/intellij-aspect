@@ -20,7 +20,7 @@ message Module {
   // the file that defines the module
   string file = 1;
 
-  // the rulesets that need to be present to enable the module
+  // rulesets the module can be applied to; if any of them is present, the module will be used
   repeated string rulesets = 2;
 }
 
