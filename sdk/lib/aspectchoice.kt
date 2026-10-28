@@ -34,15 +34,8 @@ enum class OutputGroups(val groupName: String) {
   BUILD("intellij-build"),
 }
 
-internal fun modulesForRules(rules: Iterable<Rules>): List<Modules> {
-  val rulesets = rules.toSet()
-  return Modules.entries.filter { module -> module.rulesets.isEmpty() || module.rulesets.any { it in rulesets } }
-}
-
-// If the repository names of the rules for certain languages are known, provide the appropriate
-// repo-mapping to be used in the aspect configuration.
-internal fun repoMappingForRules(mapping: Map<Rules, String>): Map<String, String> {
-  return mapping.mapKeys { (language, _) -> language.rulesetName }
-}
-
-val ASPECT_NAME: String = "config:aspect.bzl%intellij_aspect"
+@Deprecated(
+  message = "use the location of the bundled aspect definition",
+  replaceWith = ReplaceWith("INTELLIJ_ASPECT.location.toString()"),
+)
+val ASPECT_NAME: String = INTELLIJ_ASPECT.location.toString()

@@ -28,30 +28,6 @@ import kotlin.io.path.extension
  */
 private const val BUNDLED_ASPECT = "/archive_ide.zip"
 
-data class AspectConfig(
-  /**
-   * The Bazel version written into the config file.
-   */
-  val bazelVersion: String,
-  /**
-   * A mapping from default repo names to a specific replacement e.g., canonical repo name.
-   */
-  val repoMapping: Map<Rules, String>,
-  /**
-   * Languages for which to use the builtin rule, i.e., for which to strip rule set loads.
-   */
-  val useBuiltin: Set<Rules>,
-  /**
-   * Rule sets for which information will be requested when running the aspect. If null, take
-   * all Rules mentioned in the repoMapping or useBuiltin.
-   */
-  val rulesets: Set<Rules>? = null,
-  /**
-   * Attributes the aspect should walk. If null, take the default of walking all attributes.
-   */
-  val attrAspects: List<String>? = null,
-)
-
 /**
  * Deploy an aspect archive to a workspace directory.
  *

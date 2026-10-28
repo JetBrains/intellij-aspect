@@ -23,3 +23,13 @@ java_proto_library(
     name = "ide_info_java_proto",
     deps = [":ide_info_proto"],
 )
+
+proto_library(
+    name = "aspect_proto",
+    srcs = ["aspect.proto"],
+)
+
+java_proto_library(
+    name = "aspect_java_proto",
+    deps = [":aspect_proto"],
+)
