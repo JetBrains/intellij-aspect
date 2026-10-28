@@ -21,7 +21,7 @@ import java.nio.file.Path
 /**
  * Rewrites repo-absolute load paths by prepending the deploy directory prefix.
  */
-class TransformRelativePaths(private val prefix: Path) : Transformer {
+internal class TransformRelativePaths(private val prefix: Path) : Transformer {
 
   override fun apply(loads: MutableList<LoadStatement>, lines: MutableList<String>) {
     loads.replaceAll { stmt ->
@@ -37,7 +37,7 @@ class TransformRelativePaths(private val prefix: Path) : Transformer {
 /**
  *  Remaps external repository names according to the provided mapping.
  */
-class TransformExternalRepositories(mapping: Map<Rules, String>) : Transformer {
+internal class TransformExternalRepositories(mapping: Map<Rules, String>) : Transformer {
 
   val nameMapping = mapping.mapKeys { (language, _) -> language.rulesetName }
 
@@ -56,7 +56,7 @@ class TransformExternalRepositories(mapping: Map<Rules, String>) : Transformer {
  * Removes load statements from external repositories not in the allowed list. Used for removing
  * loads when the user's project uses the builtin rules.
  */
-class TransformBuiltinRules(useBuiltin: Set<Rules>) : Transformer {
+internal class TransformBuiltinRules(useBuiltin: Set<Rules>) : Transformer {
 
   val repoNamesToRemove = useBuiltin.map { it.rulesetName }
 
@@ -70,7 +70,10 @@ class TransformBuiltinRules(useBuiltin: Set<Rules>) : Transformer {
 /**
  * Replaces a loaded field with a top-level variable for builtin deployment.
  */
-abstract class TransformFieldLoad(private val fieldName: String, private val replacement: String) : Transformer {
+internal abstract class TransformFieldLoad(
+  private val fieldName: String,
+  private val replacement: String,
+) : Transformer {
 
   override fun apply(loads: MutableList<LoadStatement>, lines: MutableList<String>) {
     val needsField = loads.removeAll { stmt ->
@@ -83,22 +86,22 @@ abstract class TransformFieldLoad(private val fieldName: String, private val rep
   }
 }
 
-object TransformCcToolchainType : TransformFieldLoad(
+internal object TransformCcToolchainType : TransformFieldLoad(
   fieldName = "CC_TOOLCHAIN_TYPE",
   replacement = label("@bazel_tools//tools/cpp:toolchain_type"),
 )
 
-object TransformPythonToolchainType : TransformFieldLoad(
+internal object TransformPythonToolchainType : TransformFieldLoad(
   fieldName = "PYTHON_TOOLCHAIN_TYPE",
   replacement = label("@bazel_tools//tools/python:toolchain_type"),
 )
 
-object TransformJavaSemantics : TransformFieldLoad(
+internal object TransformJavaSemantics : TransformFieldLoad(
   fieldName = "JAVA_SEMANTICS",
   replacement = "struct(JAVA_TOOLCHAIN_TYPE = ${label("@bazel_tools//tools/jdk:toolchain_type")})",
 )
 
-class TransformScalaToolchainType(scalaRepositoryName: String) : TransformFieldLoad(
+internal class TransformScalaToolchainType(scalaRepositoryName: String) : TransformFieldLoad(
   fieldName = "SCALA_TOOLCHAIN_TYPE",
   replacement = label("$scalaRepositoryName//scala:toolchain_type"),
 )

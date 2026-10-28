@@ -19,7 +19,7 @@ package %s
 
 import com.intellij.aspect.lib.Rules
 
-enum class Modules(
+internal enum class Modules(
   val file: String,
   val rulesets: List<Rules>,
 ) {
