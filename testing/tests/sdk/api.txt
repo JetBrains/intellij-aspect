@@ -42,6 +42,7 @@ public final class com.intellij.aspect.lib.AspectchoiceKt
 
 public final class com.intellij.aspect.lib.DefinitionKt
   public static final com.intellij.aspect.lib.AspectDefinition getINTELLIJ_ASPECT()
+  public static final com.intellij.aspect.lib.AspectDefinition getINTELLIJ_CC_DEBUG_ASPECT()
 
 public final class com.intellij.aspect.lib.DeployKt
   public static final void deployAspectZip(java.nio.file.Path,java.nio.file.Path,com.intellij.aspect.lib.AspectConfig,java.nio.file.Path) throws java.io.IOException
@@ -51,6 +52,7 @@ public final enum com.intellij.aspect.lib.OutputGroups extends java.lang.Enum<co
   public static com.intellij.aspect.lib.OutputGroups valueOf(java.lang.String)
   public static com.intellij.aspect.lib.OutputGroups[] values()
   public static final com.intellij.aspect.lib.OutputGroups BUILD
+  public static final com.intellij.aspect.lib.OutputGroups DEBUG
   public static final com.intellij.aspect.lib.OutputGroups INFO
   public static final com.intellij.aspect.lib.OutputGroups SYNC
   public static kotlin.enums.EnumEntries<com.intellij.aspect.lib.OutputGroups> getEntries()

@@ -36,6 +36,27 @@ test_fixture(
 )
 
 test_fixture(
+    name = "debug",
+    srcs = glob(["simple/**"]),
+    bazel = ">=8",
+    extra_flags = [
+        "--compilation_mode=dbg",
+        "--fission=yes",
+    ],
+    # order matters: apple support needs to be listed first
+    modules = ["//testing/fixtures:apple_support_latest"] + _MODULES,
+    outputs = "debug",
+    rule_sets = ["cc"],
+    strip_prefix = "simple",
+    targets = [
+        "//:main",
+        "//:test",
+        "//params",
+    ],
+    use_msys2 = True,
+)
+
+test_fixture(
     name = "transition",
     srcs = glob(["transition/**"]),
     modules = _MODULES + ["//testing/fixtures/registry:cc_false_toolchain"],

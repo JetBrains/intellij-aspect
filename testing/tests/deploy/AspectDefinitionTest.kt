@@ -18,7 +18,9 @@ package com.intellij.aspect.testing.tests.deploy
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import com.google.devtools.build.runfiles.Runfiles
+import com.intellij.aspect.lib.AspectDefinition
 import com.intellij.aspect.lib.INTELLIJ_ASPECT
+import com.intellij.aspect.lib.INTELLIJ_CC_DEBUG_ASPECT
 import com.intellij.aspect.lib.Rules
 import com.intellij.aspect.lib.generateAspectFile
 import org.junit.Test
@@ -26,6 +28,9 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import java.nio.file.Path
 import java.util.zip.ZipFile
+
+// all aspects bundled with the SDK
+private val BUNDLED_ASPECTS = listOf(INTELLIJ_ASPECT, INTELLIJ_CC_DEBUG_ASPECT)
 
 @RunWith(JUnit4::class)
 class AspectDefinitionTest {
@@ -39,14 +44,51 @@ class AspectDefinitionTest {
       zip.entries().asSequence().map { it.name }.toSet()
     }
 
-    val modules = INTELLIJ_ASPECT.modules
-    assertThat(modules).isNotEmpty()
+    BUNDLED_ASPECTS.forEach { aspect ->
+      assertThat(aspect.modules).isNotEmpty()
 
-    modules.forEach { module ->
-      assertWithMessage("module declares missing file: %s", module.file)
-        .that(entries)
-        .contains("modules/${module.file}.bzl")
+      aspect.modules.forEach { module ->
+        assertWithMessage("module of %s declares missing file: %s", aspect.location, module.file)
+          .that(entries)
+          .contains("modules/${module.file}.bzl")
+      }
     }
+  }
+
+  @Test
+  fun testBundledAspectNames() {
+    // must match is_intellij_aspect_id in common/common.bzl
+    BUNDLED_ASPECTS.forEach { aspect ->
+      assertWithMessage("aspect name of %s", aspect.location)
+        .that(aspect.location.name.removePrefix("_"))
+        .startsWith("intellij_")
+    }
+  }
+
+  @Test
+  fun testBundledDebugLocation() {
+    val location = INTELLIJ_CC_DEBUG_ASPECT.location
+
+    assertThat(location).isEqualTo(
+      AspectDefinition.Location(Path.of("config", "cc_debug_aspect.bzl"), "intellij_cc_debug_aspect"),
+    )
+    assertThat(location.toString()).isEqualTo("config:cc_debug_aspect.bzl%intellij_cc_debug_aspect")
+  }
+
+  @Test
+  fun testAspectModules() {
+    val sync = INTELLIJ_ASPECT.modules.map { it.file }
+    assertThat(sync).contains("extra_rules_info")
+    assertThat(sync).doesNotContain("cc_debug_info")
+
+    val debug = INTELLIJ_CC_DEBUG_ASPECT.modules.map { it.file }
+    assertThat(debug).containsExactly("cc_debug_info")
+  }
+
+  @Test
+  fun testDebugModulesForRules() {
+    assertThat(INTELLIJ_CC_DEBUG_ASPECT.modulesFor(setOf(Rules.CC)).map { it.file }).containsExactly("cc_debug_info")
+    assertThat(INTELLIJ_CC_DEBUG_ASPECT.modulesFor(setOf(Rules.JAVA))).isEmpty()
   }
 
   @Test

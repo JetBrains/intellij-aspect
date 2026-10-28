@@ -28,7 +28,17 @@ private const val DEFAULT_ASPECT_NAME = "intellij_aspect"
 /**
  * The default aspect run during the sync.
  */
-val INTELLIJ_ASPECT: AspectDefinition by lazy { AspectDefinition.fromResource("/intellij_aspect.textproto") }
+val INTELLIJ_ASPECT: AspectDefinition by lazy {
+  AspectDefinition.fromResource("/config/aspect_ide.textproto")
+}
+
+/**
+ * The debug aspect for CC targets. Reports the compile and link command lines and collects the
+ * files the debugger reads in the `intellij-debug` output group.
+ */
+val INTELLIJ_CC_DEBUG_ASPECT: AspectDefinition by lazy {
+  AspectDefinition.fromResource("/config/cc_debug_aspect.textproto")
+}
 
 /**
  * Describes how an aspect can be configured, derived from an [AspectConfiguration] message as
