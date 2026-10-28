@@ -44,6 +44,11 @@ data class AspectConfig(
    * Attributes the aspect should walk. If null, take the default of walking all attributes.
    */
   val attrAspects: List<String>? = null,
+  /**
+   * Whether the aspect should reduce no-ide targets to tomb stones (and, in particular, not provide
+   * any information for targets only reachable through no-ide targets).
+   */
+  val dropNoIde: Boolean = false,
 )
 
 /**
@@ -66,7 +71,7 @@ internal fun writeAspectConfig(destination: Path, relativeDestination: Path, con
   for (aspect in listOf(INTELLIJ_ASPECT, INTELLIJ_CC_DEBUG_ASPECT)) {
     writeFileIfContentDiffers(
       path = destination.resolve(aspect.location.file),
-      payload = aspect.generateAspectFile(relativeDestination, rulesets, config.attrAspects),
+      payload = aspect.generateAspectFile(relativeDestination, rulesets, config.attrAspects, config.dropNoIde),
     )
   }
 }
@@ -104,6 +109,7 @@ internal fun AspectDefinition.generateAspectFile(
   relativeDestination: Path,
   rulesets: Iterable<Rules>,
   attrAspects: List<String>? = null,
+  dropNoIde: Boolean = false,
 ): String {
   val modules = modulesFor(rulesets)
   val prefix = asBazelPath(relativeDestination)
@@ -116,6 +122,9 @@ internal fun AspectDefinition.generateAspectFile(
 
   if (attrAspects != null) {
     attrs["attr_aspects"] = encodeList(attrAspects.map(::encodeString))
+  }
+  if (dropNoIde) {
+    attrs["drop_no_ide"] = "True"
   }
 
   return """
