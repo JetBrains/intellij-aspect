@@ -68,6 +68,12 @@ message ForeignCcInfo {
 // Debug information for a CC target, reported only by the debug aspect.
 message CcDebugInfo {
 
+  enum CompilationMode {
+    FASTBUILD = 0;
+    DBG = 1;
+    OPT = 2;
+  }
+
   message Action {
     // The action mnemonic, e.g. CppCompile or CppLink.
     string mnemonic = 1;
@@ -85,6 +91,8 @@ message CcDebugInfo {
 
   // The link actions of the target. Empty for a cc_library that only creates an archive.
   repeated Action link_actions = 2;
+
+  CompilationMode compilation_mode = 3;
 }
 
 message ExtraRule {

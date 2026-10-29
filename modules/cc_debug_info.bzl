@@ -25,6 +25,17 @@ LINK_MNEMONICS = ["CppLink"]
 # output groups of the cc rules that hold files the debugger reads
 DEBUG_OUTPUT_GROUPS = ["compilation_outputs", "archive", "dsyms", "pdb_file"]
 
+# CompilationMode enum; must match CcDebugInfo.CompilationMode
+COMPILATION_MODE_FASTBUILD = 0
+COMPILATION_MODE_DBG = 1
+COMPILATION_MODE_OPT = 2
+
+COMPILATION_MODE_MAPPING = {
+    "fastbuild": COMPILATION_MODE_FASTBUILD,
+    "dbg": COMPILATION_MODE_DBG,
+    "opt": COMPILATION_MODE_OPT,
+}
+
 def _aspect_guard(target, ctx):
     """Returns true if the aspect should be applied to the current target."""
     if CcInfo not in target:
@@ -85,11 +96,15 @@ def _implementation(target, ctx, attr):
     if not _aspect_guard(target, ctx):
         return None
 
+    compilation_mode = COMPILATION_MODE_MAPPING.get(ctx.var["COMPILATION_MODE"], COMPILATION_MODE_FASTBUILD)
+
     return intellij_module.result(
         outputs = {intellij_output_groups.DEBUG: intellij_common.depset(_collect_debug_files(target))},
         value = intellij_common.struct(
             compile_actions = _collect_actions(target, COMPILE_MNEMONICS),
             link_actions = _collect_actions(target, LINK_MNEMONICS),
+            # proto3 enum default values don't need to be encoded
+            compilation_mode = None if compilation_mode == 0 else compilation_mode,
         ),
     )
 

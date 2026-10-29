@@ -55,11 +55,11 @@ def _merge_dependencies(builder, ctx):
 def _serialize_dependencies(builder):
     """Serializes all dependencies currently tracked by the builder."""
 
-    # COMPILE_TIME is the proto3 default, so omitting it preserves the parsed value.
     return depset([
         intellij_common.struct(
             target = dep.key,
-            dependency_type = None if key == intellij_deps.COMPILE_TIME else key,
+            # proto3 enum default values don't need to be encoded
+            dependency_type = None if key == 0 else key,
         )
         for key, list_of_sets in builder.dependencies.items()
         for set in list_of_sets

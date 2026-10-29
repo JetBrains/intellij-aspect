@@ -16,6 +16,8 @@
 package com.intellij.aspect.testing.tests.cpp
 
 import com.google.common.truth.Truth.assertThat
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.CcDebugInfo.CompilationMode
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.private.lib.utils.isLinux
 import com.intellij.aspect.private.lib.utils.isMacOS
@@ -36,6 +38,13 @@ class DebugTest {
   @Rule
   @JvmField
   val aspect = AspectFixture()
+
+  @Test
+  fun testCompilationMode() {
+    // the fixture builds with --compilation_mode=dbg
+    assertThat(aspect.findTarget("//:main").ccDebugInfo.compilationMode).isEqualTo(CompilationMode.DBG)
+    assertThat(aspect.findTarget("//lib:lib").ccDebugInfo.compilationMode).isEqualTo(CompilationMode.DBG)
+  }
 
   @Test
   fun testOutputGroupMacOS() {
