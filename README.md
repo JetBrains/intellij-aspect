@@ -95,8 +95,9 @@ The SDK bundles both as `INTELLIJ_ASPECT` and `INTELLIJ_CC_DEBUG_ASPECT`.
 
 - **`config:aspect.bzl%intellij_aspect`** -- The sync aspect, running all language modules.
 - **`config:cc_debug_aspect.bzl%intellij_cc_debug_aspect`** -- The debug aspect for C and C++
-  targets. It only runs `cc_debug_info`, which reports the compile and link command lines of
-  each target and fills the `intellij-debug` output group.
+  targets. It runs `cc_debug_info`, which reports the compile and link command lines of
+  each target and fills the `intellij-debug` output group, and `platform_info`, which reports
+  the OS and CPU architecture of the target platform.
 
 Both aspects provide `IntelliJInfo`, so one build must only run one of them.
 

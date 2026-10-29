@@ -152,4 +152,56 @@ class DeployTest {
     assertThat(repos).contains(Repository.External("@my_rules_cc"))
     assertThat(repos).doesNotContain(Repository.External("@rules_cc"))
   }
+
+  @Test
+  fun testDeployPlatformsDefault() {
+    val path = deployArchive(
+      AspectConfig(
+        bazelVersion = "8.5.0",
+        repoMapping = emptyMap(),
+        useBuiltin = emptySet(),
+        rulesets = setOf(Rules.CC, Rules.PLATFORMS),
+      ),
+    )
+
+    val content = Files.readString(path.resolve("modules/platform_info.bzl"))
+    assertThat(content).contains("@platforms//os:linux")
+    assertThat(content).contains("@platforms//cpu:x86_64")
+
+    val debugAspectLoads = readLoads(path, "config/cc_debug_aspect.bzl")
+    assertThat(debugAspectLoads.map { it.path }).contains("aspect/location/modules:platform_info.bzl")
+  }
+
+  @Test
+  fun testDeployPlatformsRepoMapping() {
+    val path = deployArchive(
+      AspectConfig(
+        bazelVersion = "8.5.0",
+        repoMapping = mapOf(Rules.PLATFORMS to "@@platforms+"),
+        useBuiltin = emptySet(),
+        rulesets = setOf(Rules.PLATFORMS),
+      ),
+    )
+
+    val content = Files.readString(path.resolve("modules/platform_info.bzl"))
+    assertThat(content).contains("@@platforms+//os:macos")
+    assertThat(content).contains("@@platforms+//cpu:aarch64")
+    assertThat(content).doesNotContain("\"@platforms//")
+  }
+
+  @Test
+  fun testDeployPlatformsBuiltin() {
+    val path = deployArchive(
+      AspectConfig(
+        bazelVersion = "8.5.0",
+        repoMapping = emptyMap(),
+        useBuiltin = setOf(Rules.PLATFORMS),
+        rulesets = setOf(Rules.PLATFORMS),
+      ),
+    )
+
+    val content = Files.readString(path.resolve("modules/platform_info.bzl"))
+    assertThat(content).contains("@@platforms//os:linux")
+    assertThat(content).doesNotContain("\"@platforms//")
+  }
 }

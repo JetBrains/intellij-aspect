@@ -121,6 +121,11 @@ test_module_deps(
 )
 
 test_module_deps(
+    module_name = "platforms",
+    versions = ["1.1.0"],
+)
+
+test_module_deps(
     module_name = "apple_support",
     versions = ["2.10.1"],
 )

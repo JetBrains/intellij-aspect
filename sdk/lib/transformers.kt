@@ -68,6 +68,18 @@ internal class TransformBuiltinRules(useBuiltin: Set<Rules>) : Transformer {
 }
 
 /**
+ * Rewrites the repository of all `@platforms` label strings for the platform module.
+ */
+internal class TransformPlatformsRepository(private val repositoryName: String) : Transformer {
+
+  private val prefix = "\"@platforms//"
+
+  override fun apply(loads: MutableList<LoadStatement>, lines: MutableList<String>) {
+    lines.replaceAll { line -> line.replace(prefix, "\"$repositoryName//") }
+  }
+}
+
+/**
  * Replaces a loaded field with a top-level variable for builtin deployment.
  */
 internal abstract class TransformFieldLoad(

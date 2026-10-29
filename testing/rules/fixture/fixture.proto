@@ -42,6 +42,7 @@ enum RuleSet {
     GO = 5;
     PROTO = 6;
     LEGACY_RULES_PROTO = 7;
+    PLATFORMS = 9;
 }
 
 message TestConfig {

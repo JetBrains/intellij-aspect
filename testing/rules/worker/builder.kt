@@ -60,6 +60,7 @@ private val RULES = mapOf(
   RuleSet.GO to Rules.GO,
   RuleSet.PROTO to Rules.PROTO,
   RuleSet.LEGACY_RULES_PROTO to Rules.LEGACY_RULES_PROTO,
+  RuleSet.PLATFORMS to Rules.PLATFORMS,
 )
 
 fun main(args: Array<String>) {

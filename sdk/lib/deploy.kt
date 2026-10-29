@@ -29,6 +29,11 @@ import kotlin.io.path.extension
 private const val BUNDLED_ASPECT = "/archive_ide.zip"
 
 /**
+ * Canonical name of the platforms module repository, Bazel does not add a version suffix.
+ */
+private const val PLATFORMS_CANONICAL_NAME = "@@platforms"
+
+/**
  * Deploy an aspect archive to a workspace directory.
  *
  * Extracts all files from the archive, rewrites their load statements using the
@@ -66,6 +71,13 @@ fun deployAspectZip(
   }
   if (Rules.SCALA in config.repoMapping) {
     transformers.add(TransformScalaToolchainType(config.repoMapping.getValue(Rules.SCALA)))
+  }
+
+  if (Rules.PLATFORMS in config.repoMapping) {
+    transformers.add(TransformPlatformsRepository(config.repoMapping.getValue(Rules.PLATFORMS)))
+  } else if (Rules.PLATFORMS in config.useBuiltin) {
+    // the platforms module is always part of the dependency graph and has a fixed canonical name
+    transformers.add(TransformPlatformsRepository(PLATFORMS_CANONICAL_NAME))
   }
 
   transformers.add(TransformBuiltinRules(config.useBuiltin))

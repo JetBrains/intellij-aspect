@@ -1,5 +1,6 @@
 load("//intellij:modules.bzl", "MODULES")
 load("//modules:cc_debug_info.bzl", cc_debug_info = "module")
+load("//modules:platform_info.bzl", platform_info = "module")
 load("//modules:rules_proto_info.bzl", rules_proto_info = "module")
 load("//private/rules:aspect_config.bzl", "aspect_config")
 load("//private/rules:aspect_lib.bzl", "aspect_lib")
@@ -35,6 +36,9 @@ aspect_config(
 aspect_config(
     name = "cc_debug_aspect",
     location = "cc_debug_aspect.bzl%intellij_cc_debug_aspect",
-    modules = [cc_debug_info],
+    modules = [
+        cc_debug_info,
+        platform_info,
+    ],
     visibility = ["//sdk/lib:__pkg__"],
 )
