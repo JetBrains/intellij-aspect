@@ -131,6 +131,9 @@ class SimpleTest {
     assertThatDeps(target.depsList).withType(DependencyType.COMPILE_TIME).labels().contains("//lib:util")
     assertThatDeps(target.depsList).labels().doesNotContain("//lib:moreutils")
 
+    // JVM-info is reported correctly
+    assertThat(target.jvmTargetInfo.testClass).isEqualTo("UtilTest")
+
     // Test environment is reported correctly
     assertThat(target.envInheritList).isEqualTo(listOf("PROPERTIES"))
     assertThat(target.envMap).isEqualTo(mapOf("PATH" to "/opt/test/bin:/bin:/usr/bin"))
