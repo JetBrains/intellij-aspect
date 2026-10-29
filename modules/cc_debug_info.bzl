@@ -103,8 +103,7 @@ def _implementation(target, ctx, attr):
         value = intellij_common.struct(
             compile_actions = _collect_actions(target, COMPILE_MNEMONICS),
             link_actions = _collect_actions(target, LINK_MNEMONICS),
-            # proto3 enum default values don't need to be encoded
-            compilation_mode = None if compilation_mode == 0 else compilation_mode,
+            compilation_mode = intellij_common.encode_enum(compilation_mode),
         ),
     )
 

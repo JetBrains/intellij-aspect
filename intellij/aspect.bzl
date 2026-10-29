@@ -58,8 +58,7 @@ def _serialize_dependencies(builder):
     return depset([
         intellij_common.struct(
             target = dep.key,
-            # proto3 enum default values don't need to be encoded
-            dependency_type = None if key == 0 else key,
+            dependency_type = intellij_common.encode_enum(key),
         )
         for key, list_of_sets in builder.dependencies.items()
         for set in list_of_sets
