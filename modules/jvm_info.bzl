@@ -43,6 +43,7 @@ def _get_jvm_info(ctx):
     return intellij_common.struct(
         args = intellij_common.attr_as_list(ctx, "args"),
         main_class = getattr(ctx.rule.attr, "main_class", None),
+        test_class = getattr(ctx.rule.attr, "test_class", None),
         jvm_flags = expand_make_variables(ctx, True, intellij_common.attr_as_list(ctx, "jvm_flags")),
         resource_strip_prefix = _get_reosource_strip_prefix(ctx),
         resources = artifact_location.from_files(_get_resources(ctx)),

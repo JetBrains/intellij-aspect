@@ -161,6 +161,7 @@ message JvmTargetInfo {
   string main_class = 8;
   repeated string args = 9;
   string resource_strip_prefix = 13;
+  string test_class = 14;
   repeated ArtifactLocation resources = 60;
 }
 
