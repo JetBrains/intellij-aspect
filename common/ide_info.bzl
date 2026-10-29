@@ -57,7 +57,9 @@ def _write_info(target, ctx, key, fields):
         "env": env,
         "srcs": artifact_location.from_attr(ctx, "srcs"),
     }
+    return _write_info_file(target, ctx, key, info)
 
+def _write_info_file(target, ctx, key, info):
     # Labels, e.g., of filegroups, may overlap with files. So we cannot use the label name as it might start
     # with a conflicting directory. Instead we purely rely on the  the hash to discrimate output files. To improve
     # human debuggability, we include the "file name" part of the label (or the first up to 200 characters thereof,
@@ -70,6 +72,10 @@ def _write_info(target, ctx, key, fields):
 
     return file
 
+def _write_tombstone_info(target, ctx, key):
+    info = {"key": key, "tags": ctx.rule.attr.tags}
+    return _write_info_file(target, ctx, key, info)
+
 def _write_toolchain_info(target, ctx, name, info):
     """Convenience wrapper around write ide info for toolchains."""
 
@@ -80,5 +86,6 @@ def _write_toolchain_info(target, ctx, name, info):
 
 ide_info = struct(
     write = _write_info,
+    write_tombstone = _write_tombstone_info,
     write_toolchain = _write_toolchain_info,
 )

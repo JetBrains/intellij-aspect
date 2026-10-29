@@ -130,6 +130,14 @@ def _merge_target_info(builder, target, ctx, results):
 def _implemenation(target, ctx):
     builder = intellij_info_builder.create()
 
+    # early return on no-ide targets, if requested; still keep a
+    # minimal record allowing to identify the target as adropped no-ide target.
+    if ctx.attr._drop_no_ide and ("no-ide" in ctx.rule.attr.tags):
+        key = intellij_info_builder.build_target_key(builder, target, ctx)
+        intellij_info_builder.append_ide_infos(builder, [ide_info.write_tombstone(target, ctx, key)])
+        intellij_info = intellij_info_builder.build(builder, target, ctx, {})
+        return [intellij_info, OutputGroupInfo(**intellij_info.outputs)]
+
     intellij_info_builder.append_dependencies(
         builder,
         intellij_deps.COMPILE_TIME,
@@ -160,7 +168,7 @@ def _unique_flatten(modules, field):
 
     return unique
 
-def intellij_configure_aspect(modules, container, attr_aspects = None):
+def intellij_configure_aspect(modules, container, attr_aspects = None, drop_no_ide = False):
     """Creates an aspect running the given module groups."""
     toolchains = _unique_flatten(modules, "toolchains")
     aspect_providers = _unique_flatten(modules, "aspect_providers")
@@ -182,6 +190,9 @@ def intellij_configure_aspect(modules, container, attr_aspects = None):
             ),
             "_toolchains": attr.label_list(
                 default = toolchains,
+            ),
+            "_drop_no_ide": attr.bool(
+                default = drop_no_ide,
             ),
         },
     )

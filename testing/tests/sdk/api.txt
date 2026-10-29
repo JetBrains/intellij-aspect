@@ -6,8 +6,10 @@
 
 public final class com.intellij.aspect.lib.AspectConfig
   public boolean equals(java.lang.Object)
-  public com.intellij.aspect.lib.AspectConfig(java.lang.String,java.util.Map<com.intellij.aspect.lib.Rules, java.lang.String>,java.util.Set<? extends com.intellij.aspect.lib.Rules>,java.util.Set<? extends com.intellij.aspect.lib.Rules>,java.util.List<java.lang.String>)
-  public final com.intellij.aspect.lib.AspectConfig copy(java.lang.String,java.util.Map<com.intellij.aspect.lib.Rules, java.lang.String>,java.util.Set<? extends com.intellij.aspect.lib.Rules>,java.util.Set<? extends com.intellij.aspect.lib.Rules>,java.util.List<java.lang.String>)
+  public com.intellij.aspect.lib.AspectConfig(java.lang.String,java.util.Map<com.intellij.aspect.lib.Rules, java.lang.String>,java.util.Set<? extends com.intellij.aspect.lib.Rules>,java.util.Set<? extends com.intellij.aspect.lib.Rules>,java.util.List<java.lang.String>,boolean)
+  public final boolean component6()
+  public final boolean getDropNoIde()
+  public final com.intellij.aspect.lib.AspectConfig copy(java.lang.String,java.util.Map<com.intellij.aspect.lib.Rules, java.lang.String>,java.util.Set<? extends com.intellij.aspect.lib.Rules>,java.util.Set<? extends com.intellij.aspect.lib.Rules>,java.util.List<java.lang.String>,boolean)
   public final java.lang.String component1()
   public final java.lang.String getBazelVersion()
   public final java.util.List<java.lang.String> component5()

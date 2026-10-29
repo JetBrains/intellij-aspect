@@ -32,3 +32,23 @@ test_fixture(
     targets = ["//..."],
     use_msys2 = True,
 )
+
+test_fixture(
+    name = "noidedeps",
+    srcs = glob(["noidedeps/**"]),
+    modules = ["//testing/fixtures:rules_java_latest"],
+    outputs = "build",
+    rule_sets = ["java"],
+    targets = ["//:main"],
+)
+
+test_fixture(
+    name = "noidedeps-drop",
+    srcs = glob(["noidedeps/**"]),
+    drop_no_ide = True,
+    modules = ["//testing/fixtures:rules_java_latest"],
+    outputs = "build",
+    rule_sets = ["java"],
+    strip_prefix = "noidedeps",
+    targets = ["//:main"],
+)
