@@ -68,14 +68,17 @@ internal class TransformBuiltinRules(useBuiltin: Set<Rules>) : Transformer {
 }
 
 /**
- * Rewrites the repository of all `@platforms` label strings for the platform module.
+ * Rewrites the repository of all top-level `PLATFORM_*` label constants for the platform module.
  */
 internal class TransformPlatformsRepository(private val repositoryName: String) : Transformer {
 
-  private val prefix = "\"@platforms//"
+  private val regex = Regex("""^PLATFORM_\w+ = "(@platforms)//[^"]+"""")
 
   override fun apply(loads: MutableList<LoadStatement>, lines: MutableList<String>) {
-    lines.replaceAll { line -> line.replace(prefix, "\"$repositoryName//") }
+    lines.replaceAll { line ->
+      val group = regex.find(line)?.groups?.get(1) ?: return@replaceAll line
+      line.replaceRange(group.range, repositoryName)
+    }
   }
 }
 

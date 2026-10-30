@@ -16,13 +16,13 @@ load("//common:common.bzl", "intellij_common")
 load("//common:provider.bzl", "intellij_provider")
 load(":module.bzl", "intellij_module")
 
-# all constraint labels are rewritten on deployment, see TransformPlatformsRepository
-LINUX_CONSTRAINT = "@platforms//os:linux"
-MACOS_CONSTRAINT = "@platforms//os:macos"
-WINDOWS_CONSTRAINT = "@platforms//os:windows"
+# all PLATFORM_* labels are rewritten on deployment, see TransformPlatformsRepository
+PLATFORM_LINUX = "@platforms//os:linux"
+PLATFORM_MACOS = "@platforms//os:macos"
+PLATFORM_WINDOWS = "@platforms//os:windows"
 
-AMD_CONSTRAINT = "@platforms//cpu:x86_64"
-ARM_CONSTRAINT = "@platforms//cpu:aarch64"
+PLATFORM_AMD = "@platforms//cpu:x86_64"
+PLATFORM_ARM = "@platforms//cpu:aarch64"
 
 # OS enum; must match PlatformInfo.OS
 OS_UNKNOWN = 0
@@ -71,11 +71,11 @@ _aspect = intellij_module.aspect(
     implementation = _implementation,
     field = "platform_info",
     attrs = {
-        "_os_linux": attr.label(default = Label(LINUX_CONSTRAINT)),
-        "_os_macos": attr.label(default = Label(MACOS_CONSTRAINT)),
-        "_os_windows": attr.label(default = Label(WINDOWS_CONSTRAINT)),
-        "_arch_amd": attr.label(default = Label(AMD_CONSTRAINT)),
-        "_arch_arm": attr.label(default = Label(ARM_CONSTRAINT)),
+        "_os_linux": attr.label(default = Label(PLATFORM_LINUX)),
+        "_os_macos": attr.label(default = Label(PLATFORM_MACOS)),
+        "_os_windows": attr.label(default = Label(PLATFORM_WINDOWS)),
+        "_arch_amd": attr.label(default = Label(PLATFORM_AMD)),
+        "_arch_arm": attr.label(default = Label(PLATFORM_ARM)),
     },
 )
 
