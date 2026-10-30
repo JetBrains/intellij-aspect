@@ -82,12 +82,16 @@ class AspectDefinitionTest {
     assertThat(sync).doesNotContain("cc_debug_info")
 
     val debug = INTELLIJ_CC_DEBUG_ASPECT.modules.map { it.file }
-    assertThat(debug).containsExactly("cc_debug_info")
+    assertThat(debug).containsExactly("cc_debug_info", "platform_info")
   }
 
   @Test
   fun testDebugModulesForRules() {
-    assertThat(INTELLIJ_CC_DEBUG_ASPECT.modulesFor(setOf(Rules.CC)).map { it.file }).containsExactly("cc_debug_info")
+    assertThat(INTELLIJ_CC_DEBUG_ASPECT.modulesFor(setOf(Rules.CC)).map { it.file })
+      .containsExactly("cc_debug_info")
+    assertThat(INTELLIJ_CC_DEBUG_ASPECT.modulesFor(setOf(Rules.CC, Rules.PLATFORMS)).map { it.file })
+      .containsExactly("cc_debug_info", "platform_info")
+
     assertThat(INTELLIJ_CC_DEBUG_ASPECT.modulesFor(setOf(Rules.JAVA))).isEmpty()
   }
 

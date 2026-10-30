@@ -44,9 +44,15 @@ test_fixture(
         "--fission=yes",
     ],
     # order matters: apple support needs to be listed first
-    modules = ["//testing/fixtures:apple_support_latest"] + _MODULES,
+    modules = [
+        "//testing/fixtures:apple_support_latest",
+        "//testing/fixtures:platforms_latest",
+    ] + _MODULES,
     outputs = "debug",
-    rule_sets = ["cc"],
+    rule_sets = [
+        "cc",
+        "platforms",
+    ],
     strip_prefix = "simple",
     targets = [
         "//:main",

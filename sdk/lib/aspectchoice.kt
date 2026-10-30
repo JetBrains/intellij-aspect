@@ -26,6 +26,7 @@ enum class Rules(internal val rulesetName: String) {
   GO("@rules_go"),
   PROTO("@protobuf"),
   LEGACY_RULES_PROTO("@rules_proto"),
+  PLATFORMS("@platforms"),
 }
 
 enum class OutputGroups(val groupName: String) {

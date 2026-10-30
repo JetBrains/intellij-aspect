@@ -68,6 +68,21 @@ internal class TransformBuiltinRules(useBuiltin: Set<Rules>) : Transformer {
 }
 
 /**
+ * Rewrites the repository of all top-level `PLATFORM_*` label constants for the platform module.
+ */
+internal class TransformPlatformsRepository(private val repositoryName: String) : Transformer {
+
+  private val regex = Regex("""^PLATFORM_\w+ = "(@platforms)//[^"]+"""")
+
+  override fun apply(loads: MutableList<LoadStatement>, lines: MutableList<String>) {
+    lines.replaceAll { line ->
+      val group = regex.find(line)?.groups?.get(1) ?: return@replaceAll line
+      line.replaceRange(group.range, repositoryName)
+    }
+  }
+}
+
+/**
  * Replaces a loaded field with a top-level variable for builtin deployment.
  */
 internal abstract class TransformFieldLoad(

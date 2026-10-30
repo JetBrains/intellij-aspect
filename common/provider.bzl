@@ -50,6 +50,7 @@ _IntelliJPythonInfo = _create_module_provider()  # used by the JB plugin
 _IntelliJLegacyRulesProtoInfo = _create_module_provider()  # used for legacy rules_proto
 _IntelliJProtobufInfo = _create_module_provider()  # used for the current protobuf rules
 _IntelliJProtoInfo = _create_module_provider()  # used to consolidated protobuf information
+_IntelliJPlatformInfo = _create_module_provider()
 
 # all providers in the order they should be executed, i.e. dependencies need to be listed before dependeants
 _ORDERED = [
@@ -72,6 +73,7 @@ _ORDERED = [
     _IntelliJLegacyRulesProtoInfo,
     _IntelliJProtobufInfo,
     _IntelliJProtoInfo,
+    _IntelliJPlatformInfo,
 ]
 
 # Modules implying that jvm_info should run on the respective targets to obtain
@@ -104,6 +106,7 @@ intellij_provider = struct(
     LegacyRulesProtoInfo = _IntelliJLegacyRulesProtoInfo,
     ProtobufInfo = _IntelliJProtobufInfo,
     ProtoInfo = _IntelliJProtoInfo,
+    PlatformInfo = _IntelliJPlatformInfo,
     ORDERED = _ORDERED,
     JVM = _JVM,
 )

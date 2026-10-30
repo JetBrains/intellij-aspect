@@ -18,6 +18,7 @@ package com.intellij.aspect.testing.tests.cpp
 import com.google.common.truth.Truth.assertThat
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.CcDebugInfo.CompilationMode
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.PlatformInfo
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.private.lib.utils.isLinux
 import com.intellij.aspect.private.lib.utils.isMacOS
@@ -44,6 +45,29 @@ class DebugTest {
     // the fixture builds with --compilation_mode=dbg
     assertThat(aspect.findTarget("//:main").ccDebugInfo.compilationMode).isEqualTo(CompilationMode.DBG)
     assertThat(aspect.findTarget("//lib:lib").ccDebugInfo.compilationMode).isEqualTo(CompilationMode.DBG)
+  }
+
+  @Test
+  fun testPlatformInfo() {
+    val os = when {
+      isLinux() -> PlatformInfo.OS.LINUX
+      isMacOS() -> PlatformInfo.OS.MACOS
+      isWindows() -> PlatformInfo.OS.WINDOWS
+      else -> PlatformInfo.OS.OS_UNKNOWN
+    }
+
+    val arch = when (System.getProperty("os.arch")) {
+      "amd64", "x86_64" -> PlatformInfo.ARCH.AMD
+      "aarch64", "arm64" -> PlatformInfo.ARCH.ARM
+      else -> PlatformInfo.ARCH.ARCH_UNKNOWN
+    }
+
+    // the fixture builds for the host platform
+    for (label in listOf("//:main", "//:test", "//lib:lib", "//params:params")) {
+      val target = aspect.findTarget(label)
+      assertThat(target.platformInfo.os).isEqualTo(os)
+      assertThat(target.platformInfo.arch).isEqualTo(arch)
+    }
   }
 
   @Test

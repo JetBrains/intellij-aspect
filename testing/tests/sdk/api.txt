@@ -72,6 +72,7 @@ public final enum com.intellij.aspect.lib.Rules extends java.lang.Enum<com.intel
   public static final com.intellij.aspect.lib.Rules JAVA
   public static final com.intellij.aspect.lib.Rules KOTLIN
   public static final com.intellij.aspect.lib.Rules LEGACY_RULES_PROTO
+  public static final com.intellij.aspect.lib.Rules PLATFORMS
   public static final com.intellij.aspect.lib.Rules PROTO
   public static final com.intellij.aspect.lib.Rules PYTHON
   public static final com.intellij.aspect.lib.Rules SCALA
