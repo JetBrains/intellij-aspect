@@ -29,6 +29,7 @@ import org.junit.runners.JUnit4
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.readLines
 
 private val RUNFILES = Runfiles.preload()
 
@@ -54,6 +55,10 @@ class DeployTest {
 
   private fun readLoads(root: Path, file: String): List<LoadStatement> {
     return Files.newInputStream(root.resolve(file)).use(::parseLoads)
+  }
+
+  private fun readLines(root: Path, file: String): List<String> {
+    return root.resolve(file).readLines()
   }
 
   @Test
@@ -203,5 +208,23 @@ class DeployTest {
     val content = Files.readString(path.resolve("modules/platform_info.bzl"))
     assertThat(content).contains("@@platforms//os:linux")
     assertThat(content).doesNotContain("\"@platforms//")
+  }
+
+  @Test
+  fun testScalaToolchainRewrite() {
+    val path = deployArchive(
+      AspectConfig(
+        bazelVersion = "8.5.0",
+        repoMapping = mapOf(Rules.SCALA to "@io_bazel_rules_scala"),
+        useBuiltin = emptySet(),
+        rulesets = setOf(Rules.CC),
+      ),
+    )
+    val lines = readLines(path, "modules/scala_info.bzl")
+    val toolchainDeclarations = lines.filter { it.startsWith("SCALA_TOOLCHAIN") }
+    assertThat(toolchainDeclarations.size).isEqualTo(1)
+    val declaration = toolchainDeclarations.first()
+    assertThat(declaration).contains("@io_bazel_rules_scala")
+    assertThat(declaration).doesNotContain("@rules_scala")
   }
 }
