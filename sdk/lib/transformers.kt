@@ -18,6 +18,9 @@ package com.intellij.aspect.lib
 import com.intellij.aspect.private.lib.utils.asBazelPath
 import java.nio.file.Path
 
+private const val SCALA_TOOLCHAIN_CONSTANT = "SCALA_TOOLCHAIN_TYPE"
+private const val SCALA_TOOLCHAIN_VALUE = "//scala:toolchain_type"
+
 /**
  * Rewrites repo-absolute load paths by prepending the deploy directory prefix.
  */
@@ -116,9 +119,14 @@ internal object TransformJavaSemantics : TransformFieldLoad(
   replacement = "struct(JAVA_TOOLCHAIN_TYPE = ${label("@bazel_tools//tools/jdk:toolchain_type")})",
 )
 
-internal class TransformScalaToolchainType(scalaRepositoryName: String) : TransformFieldLoad(
-  fieldName = "SCALA_TOOLCHAIN_TYPE",
-  replacement = label("$scalaRepositoryName//scala:toolchain_type"),
-)
+internal class TransformScalaToolchainType(val scalaRepositoryName: String) : Transformer {
+
+  override fun apply(loads: MutableList<LoadStatement>, lines: MutableList<String>) {
+    val needsToolchain = lines.removeAll { line -> line.startsWith("$SCALA_TOOLCHAIN_CONSTANT = ") }
+    if (needsToolchain) {
+      lines.add(0, "$SCALA_TOOLCHAIN_CONSTANT = \"${scalaRepositoryName}$SCALA_TOOLCHAIN_VALUE\"")
+    }
+  }
+}
 
 private fun label(value: String): String = "Label(\"$value\")"
