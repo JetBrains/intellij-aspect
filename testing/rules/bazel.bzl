@@ -14,9 +14,9 @@
 
 # Manually maintained list of latest supported Bazel versions per major release.
 _VERSIONS = {
-    7: "7.7.1",
-    8: "8.8.0",
-    9: "9.2.0",
+    7: "7.7.2",
+    8: "8.8.2",
+    9: "9.3.1",
     10: "10.0.0rc2",
 }
 
