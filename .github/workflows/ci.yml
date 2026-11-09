@@ -19,7 +19,10 @@ jobs:
       with:
         bazelisk-cache: true
         disk-cache: ${{ github.workflow }}-linux
-        repository-cache: true
+        repository-cache: |
+          - MODULE.bazel
+          - testing/fixtures/BUILD
+          - testing/rules/bazel.bzl
         bazelrc: common --repo_contents_cache= --//testing/rules:max_servers=2 --//testing/rules:repo_cache=~/.cache/bazel-repo
         cache-save: ${{ github.ref == 'refs/heads/main' }}
 
@@ -62,7 +65,10 @@ jobs:
       with:
         bazelisk-cache: true
         disk-cache: ${{ github.workflow }}-macos
-        repository-cache: true
+        repository-cache: |
+          - MODULE.bazel
+          - testing/fixtures/BUILD
+          - testing/rules/bazel.bzl
         bazelrc: common --repo_contents_cache= --//testing/rules:max_servers=2 --//testing/rules:repo_cache=~/.cache/bazel-repo
         cache-save: ${{ github.ref == 'refs/heads/main' }}
 
@@ -100,8 +106,13 @@ jobs:
       with:
         bazelisk-cache: true
         disk-cache: ${{ github.workflow }}-windows
-        repository-cache: true
-        bazelrc: common --repo_contents_cache= --//testing/rules:max_servers=2 --//testing/rules:repo_cache=~/.cache/bazel-repo
+        # pin the output base, setup-bazel derives the repository cache location from it (<output-base>-repo)
+        output-base: C:/_bazel
+        repository-cache: |
+          - MODULE.bazel
+          - testing/fixtures/BUILD
+          - testing/rules/bazel.bzl
+        bazelrc: common --repo_contents_cache= --//testing/rules:max_servers=2 --//testing/rules:repo_cache=C:/_bazel-repo
         cache-save: ${{ github.ref == 'refs/heads/main' }}
 
     - name: Build all targets
