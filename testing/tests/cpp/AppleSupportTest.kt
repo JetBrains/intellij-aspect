@@ -17,6 +17,7 @@
 package com.intellij.aspect.testing.tests.cpp
 
 import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.assertWithMessage
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.*
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.lib.readEnvFromFile
@@ -41,7 +42,12 @@ class AppleSupportTest {
 
   @Test
   fun testUsesRulesBasedToolchain() {
-    assertThat(target.key.label).endsWith("//toolchain:toolchain")
+    when {
+      aspect.bazelVersion(min = 9) -> assertThat(target.key.label).startsWith("@@apple_support+//")
+      aspect.bazelVersion(min = 8, max = 8) -> assertThat(target.key.label).startsWith("@@rules_cc+//")
+      aspect.bazelVersion(min = 7, max = 7) -> assertThat(target.key.label).startsWith("@@bazel_tools//")
+      else -> assertWithMessage("unexpected Bazel version").fail()
+    }
   }
 
   @Test

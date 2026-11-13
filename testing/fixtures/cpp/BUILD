@@ -23,10 +23,10 @@ test_fixture(
 test_fixture(
     name = "apple_support",
     srcs = glob(["simple/**"]),
-    bazel = ">=9",
+    bazel = ">=7",
     modules = [
-        "//testing/fixtures:rules_cc_latest",
         "//testing/fixtures:apple_support_latest",
+        "//testing/fixtures:rules_cc_latest",
     ],
     outputs = "capture",
     rule_sets = ["cc"],
