@@ -26,7 +26,7 @@ common/         Shared utilities (dependencies, artifact locations, IDE info ser
 config/         Configuration system (Bazel version detection via repository rule, module list and generated aspect configuration)
 sdk/            Public API: Kotlin deploy helpers and protobuf definitions
 testing/        Test infrastructure (fixtures, rules, workers)
-tools/          CLI utilities (deploy, measure, format)
+tools/          CLI utilities (deploy, measure, proto2json, format)
 private/        Internal build rules and extensions (registry, bazelisk)
 ```
 
@@ -253,3 +253,16 @@ consumed by the benchmark chart.
 
 See [`tools/measure/README.md`](tools/measure/README.md) for the full description of the
 metrics, the report format and the `heap_analysis` rule.
+
+### //tools/proto2json
+
+Converts a textproto or binary proto into JSON, e.g. to inspect the aspect output with `jq`. The
+proto is read from stdin (or `-i <file>`) and the JSON is written to stdout (or `-o <file>`):
+
+```sh
+bazel run //tools/proto2json -- -i bazel-bin/pkg/<hash>.lib.intellij-info.txt | jq '.deps[].target.label'
+```
+
+The message type defaults to `TestFixture` for `*.intellij-aspect-fixture` files and to
+`TargetIdeInfo` otherwise, `-t/--type` selects any other message of the sdk or fixture protos.
+The encoding is detected automatically, `-f/--format text|binary` forces one.
