@@ -30,7 +30,7 @@ EXTRA_RULES = [
 def _get_deps(ctx):
     if ctx.rule.kind == "genrule":
         return {
-            intellij_deps.TOOL: intellij_deps.collect(ctx, "tools"),
+            intellij_deps.TOOL: intellij_deps.collect(ctx, ["tools"]),
         }
     return None
 

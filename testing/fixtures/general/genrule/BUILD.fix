@@ -1,0 +1,14 @@
+load("@rules_java//java:java_binary.bzl", "java_binary")
+
+java_binary(
+    name = "main_java",
+    srcs = ["Main.java"],
+    main_class = "com.intellij.aspect.testing.fixtures.general.simple.Main",
+)
+
+genrule(
+    name = "sample_output",
+    outs = ["hello.txt"],
+    tools = [":main_java"],
+    cmd = "$(location :main_java) > $@",
+)
