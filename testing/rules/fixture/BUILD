@@ -7,6 +7,7 @@ package(default_testonly = True)
 
 proto_library(
     name = "fixture_proto",
+    testonly = False,
     srcs = ["fixture.proto"],
     visibility = ["//testing/rules:__subpackages__"],
     deps = ["//sdk/proto:ide_info_proto"],
@@ -14,7 +15,11 @@ proto_library(
 
 java_proto_library(
     name = "fixture_java_proto",
-    visibility = ["//testing/rules:__subpackages__"],
+    testonly = False,
+    visibility = [
+        "//testing/rules:__subpackages__",
+        "//tools/proto2json:__pkg__",
+    ],
     deps = [":fixture_proto"],
 )
 
