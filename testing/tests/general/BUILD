@@ -26,6 +26,11 @@ test_runner(
 )
 
 test_runner(
+    fixture = "//testing/fixtures/general:genrule",
+    test = "GenruleTest.kt",
+)
+
+test_runner(
     fixture = "//testing/fixtures/general:custom_rules",
     test = "CustomRuleTest.kt",
 )

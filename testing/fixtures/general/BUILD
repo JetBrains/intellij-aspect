@@ -25,6 +25,14 @@ test_fixture(
 )
 
 test_fixture(
+    name = "genrule",
+    srcs = glob(["genrule/**"]),
+    modules = ["//testing/fixtures:rules_java_latest"],
+    rule_sets = ["java"],
+    targets = ["//:sample_output"],
+)
+
+test_fixture(
     name = "custom_rules",
     srcs = glob(["custom_rules/**"]),
     modules = [],

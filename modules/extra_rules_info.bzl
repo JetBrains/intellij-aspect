@@ -13,6 +13,7 @@
 # limitations under the License.
 
 load("//common:common.bzl", "intellij_common")
+load("//common:dependencies.bzl", "intellij_deps")
 load("//common:provider.bzl", "intellij_provider")
 load(":module.bzl", "intellij_module")
 
@@ -26,11 +27,21 @@ EXTRA_RULES = [
     "intellij_plugin_zip",
 ]
 
+def _get_deps(ctx):
+    if ctx.rule.kind == "genrule":
+        return {
+            intellij_deps.TOOL: intellij_deps.collect(ctx, ["tools"]),
+        }
+    return None
+
 def _implementation(target, ctx, attr):
     if not ctx.rule.kind in EXTRA_RULES:
         return None
 
-    return intellij_module.result(intellij_common.struct(is_extra = True))
+    return intellij_module.result(
+        value = intellij_common.struct(is_extra = True),
+        dependencies = _get_deps(ctx),
+    )
 
 _aspect = intellij_module.aspect(
     provider = intellij_provider.ExtraRulesInfo,
