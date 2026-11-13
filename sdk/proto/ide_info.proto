@@ -297,6 +297,7 @@ message Dependency {
     COMPILE_TIME = 0;
     EXPORTED_COMPILE_TIME = 3;
     RUNTIME = 1;
+    TOOL = 4;
     TOOLCHAIN = 2;
   }
 

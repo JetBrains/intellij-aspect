@@ -19,6 +19,7 @@ load(":provider.bzl", "intellij_provider")
 _COMPILE_TIME = 0
 _EXPORTED_COPILE_TIME = 3
 _RUNTIME = 1
+_TOOL = 4
 _TOOLCHAIN = 2
 
 def _collect(ctx, attributes):
@@ -58,6 +59,7 @@ intellij_deps = struct(
     EXPORTED_COMPILE_TIME = _EXPORTED_COPILE_TIME,
     RUNTIME = _RUNTIME,
     TOOLCHAIN = _TOOLCHAIN,
+    TOOL = _TOOL,
     collect = _collect,
     collect_toolchains = _collect_toolchains,
 )
