@@ -90,10 +90,6 @@ def _aspect_guard(target, ctx):
     if ctx.rule.kind.startswith("go_"):
         return False
 
-    # targets built under exec configuration are most likely used as local tool
-    if intellij_common.is_exec_configuration(ctx):
-        return False
-
     return True
 
 def _implementation(target, ctx, attr):
