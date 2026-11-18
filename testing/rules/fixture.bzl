@@ -23,6 +23,7 @@ _OUTPUTS = {
     "build": 1,
     "capture": 2,
     "debug": 3,
+    "cc_tools": 4,
 }
 
 def _test_fixture_impl(ctx):
@@ -123,6 +124,7 @@ test_fixture = rule(
                 info: only intellij-info
                 build: also intellij-build
                 capture: like build and store the content of all generated files (*.intellij-generated-*)
+                cc_tools: intellij-info and intellij-cc-tools
                 debug: run the cc debug aspect and request intellij-info and intellij-debug
             """,
         ),
