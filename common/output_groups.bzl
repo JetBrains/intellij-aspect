@@ -18,6 +18,7 @@ _INFO = "intellij-info"
 _SYNC = "intellij-sync"
 _BUILD = "intellij-build"
 _DEBUG = "intellij-debug"
+_CC_TOOLS = "intellij-cc-tools"
 
 def _source_depset(direct = None):
     """Return a depset with direct files filtered to sources only"""
@@ -38,10 +39,17 @@ def _from_files(files = None, *, build_transitive = None, include_sync = True):
         _BUILD: _build_depset(files, transitive = build_transitive),
     }
 
+def _tools(group, files = None):
+    return _from_files(files) | {
+        group: _build_depset(files),
+    }
+
 intellij_output_groups = struct(
     INFO = _INFO,
     SYNC = _SYNC,
     BUILD = _BUILD,
     DEBUG = _DEBUG,
+    CC_TOOLS = _CC_TOOLS,
     from_files = _from_files,
+    tools = _tools,
 )

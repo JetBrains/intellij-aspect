@@ -34,6 +34,7 @@ enum class OutputGroups(val groupName: String) {
   SYNC("intellij-sync"),
   BUILD("intellij-build"),
   DEBUG("intellij-debug"),
+  CC_TOOLS("intellij-cc-tools"),
 }
 
 @Deprecated(
