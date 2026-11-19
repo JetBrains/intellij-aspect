@@ -54,7 +54,6 @@ jobs:
         sudo rm -rf /Library/Developer/CoreSimulator/Profiles/Runtimes
         sudo rm -rf /Users/runner/hostedtoolcache
         sudo rm -rf /Users/runner/Library/Developer/CoreSimulator
-        sudo rm -rf /Applications/Xcode_*.app
         df -h /                                                                                                         
 
     - name: Checkout code
