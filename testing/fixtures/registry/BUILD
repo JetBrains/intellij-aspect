@@ -17,10 +17,17 @@ registry_module(
     config = "register_toolchains('@false_launcher//:toolchain')",
 )
 
+registry_module(
+    name = "cc_generated_toolchain",
+    srcs = glob(["cc_generated_toolchain/**"]),
+    config = "register_toolchains('@cc_generated_toolchain//:toolchain')",
+)
+
 registry(
     name = "registry",
     modules = [
         ":cc_false_toolchain",
         ":false_launcher",
+        ":cc_generated_toolchain",
     ],
 )

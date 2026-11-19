@@ -21,6 +21,17 @@ test_fixture(
 )
 
 test_fixture(
+    name = "generated_toolchain",
+    srcs = glob(["simple/**"]),
+    modules = _MODULES + ["//testing/fixtures/registry:cc_generated_toolchain"],
+    outputs = "cc_tools",
+    rule_sets = ["cc"],
+    strip_prefix = "simple",
+    targets = ["//:all"],
+    use_msys2 = True,
+)
+
+test_fixture(
     name = "apple_support",
     srcs = glob(["simple/**"]),
     bazel = ">=9",

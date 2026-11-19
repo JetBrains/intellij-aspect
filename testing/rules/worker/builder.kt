@@ -102,6 +102,7 @@ fun main(args: Array<String>) {
       outputGroups = when (input.outputs) {
         Outputs.INFO -> listOf(OutputGroups.INFO.groupName)
         Outputs.DEBUG -> listOf(OutputGroups.INFO.groupName, OutputGroups.DEBUG.groupName)
+        Outputs.CC_TOOLS -> listOf(OutputGroups.INFO.groupName, OutputGroups.CC_TOOLS.groupName)
         else -> listOf(OutputGroups.INFO.groupName, OutputGroups.BUILD.groupName)
       },
       profile = Path.of(input.outputProfile),

@@ -54,6 +54,7 @@ public final enum com.intellij.aspect.lib.OutputGroups extends java.lang.Enum<co
   public static com.intellij.aspect.lib.OutputGroups valueOf(java.lang.String)
   public static com.intellij.aspect.lib.OutputGroups[] values()
   public static final com.intellij.aspect.lib.OutputGroups BUILD
+  public static final com.intellij.aspect.lib.OutputGroups CC_TOOLS
   public static final com.intellij.aspect.lib.OutputGroups DEBUG
   public static final com.intellij.aspect.lib.OutputGroups INFO
   public static final com.intellij.aspect.lib.OutputGroups SYNC

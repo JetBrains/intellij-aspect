@@ -22,6 +22,11 @@ test_runner(
 )
 
 test_runner(
+    fixture = "//testing/fixtures/cpp:generated_toolchain",
+    test = "GeneratedToolchainTest.kt",
+)
+
+test_runner(
     fixture = "//testing/fixtures/cpp:apple_support",
     target_compatible_with = ["@platforms//os:macos"],
     test = "AppleSupportTest.kt",

@@ -134,6 +134,8 @@ message WorkArguments {
     CAPTURE = 2;
     // Run the cc debug aspect and request the intellij-info and intellij-debug output groups.
     DEBUG = 3;
+    // Request intellij-info and intellij-cc-tools output groups.
+    CC_TOOLS = 4;
   }
 
   // Output file encoding the TestFixture (fixture.proto).

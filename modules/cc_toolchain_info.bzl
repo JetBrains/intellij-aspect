@@ -158,7 +158,7 @@ def _implementation(target, ctx, attrs):
 
     return intellij_module.result(
         value = info,
-        outputs = intellij_output_groups.from_files(outputs),
+        outputs = intellij_output_groups.tools(intellij_output_groups.CC_TOOLS, outputs),
     )
 
 _aspect = intellij_module.aspect(
