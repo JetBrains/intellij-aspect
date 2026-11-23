@@ -4,7 +4,7 @@
     "com.fasterxml.jackson.core:jackson-databind": -637076515,
     "com.google.code.findbugs:jsr305": 495355163,
     "com.google.code.gson:gson": 266105453,
-    "com.google.errorprone:error_prone_annotations": 1612888121,
+    "com.google.errorprone:error_prone_annotations": -184063238,
     "com.google.guava:guava": -1528933390,
     "com.google.j2objc:j2objc-annotations": 2003271689,
     "com.google.truth:truth": 1696781452,
@@ -31,13 +31,13 @@
     "com.github.ajalt.mordant:mordant-jvm-jna-jvm": -880766219,
     "com.google.auto.value:auto-value-annotations": 641018093,
     "com.google.code.findbugs:jsr305": 870839855,
-    "com.google.code.gson:gson": -714283260,
-    "com.google.errorprone:error_prone_annotations": 1692443710,
+    "com.google.code.gson:gson": -1712708694,
+    "com.google.errorprone:error_prone_annotations": 88463668,
     "com.google.guava:failureaccess": 1715931538,
-    "com.google.guava:guava": 1905058914,
+    "com.google.guava:guava": 606859196,
     "com.google.guava:listenablefuture": 1079558157,
     "com.google.j2objc:j2objc-annotations": -1008747351,
-    "com.google.truth:truth": -741336283,
+    "com.google.truth:truth": -2057826071,
     "com.pinterest.ktlint:ktlint-cli": 717642121,
     "com.pinterest.ktlint:ktlint-cli-reporter-baseline": -852778531,
     "com.pinterest.ktlint:ktlint-cli-reporter-checkstyle": -408047661,
@@ -181,9 +181,9 @@
     },
     "com.google.errorprone:error_prone_annotations": {
       "shasums": {
-        "jar": "24822b246a2da324006fc5a1c940b1d2cf9cd716e530155c39fea695d5ab01c4"
+        "jar": "cd2d6921538eaa749a38b026c7a2bebad8c4d461add3177ddc07187755fac644"
       },
-      "version": "2.52.0"
+      "version": "2.53.0"
     },
     "com.google.guava:failureaccess": {
       "shasums": {
