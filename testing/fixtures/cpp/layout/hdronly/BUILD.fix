@@ -1,0 +1,16 @@
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+genrule(
+    name = "generate",
+    outs = ["generated_hdr.h"],
+    cmd = "echo '#define GENERATED_HDR_VALUE 1' > $@",
+)
+
+cc_library(
+    name = "hdronly",
+    hdrs = [
+        "generated_hdr.h",
+        "hdr.h",
+    ],
+    visibility = ["//visibility:public"],
+)

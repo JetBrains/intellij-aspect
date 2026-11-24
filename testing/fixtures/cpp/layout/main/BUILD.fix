@@ -6,6 +6,7 @@ cc_binary(
     deps = [
         "//lib:lib",
         "//textual:textual",
+        "//hdronly:hdronly",
         "@external_module//srcs:lib",
     ],
 )
