@@ -68,7 +68,7 @@ jobs:
           - MODULE.bazel
           - testing/fixtures/BUILD
           - testing/rules/bazel.bzl
-        bazelrc: common --repo_contents_cache= --//testing/rules:max_servers=2 --//testing/rules:repo_cache=~/.cache/bazel-repo
+        bazelrc: common --repo_contents_cache= --//testing/rules:max_servers=1 --//testing/rules:repo_cache=~/.cache/bazel-repo
         cache-save: ${{ github.ref == 'refs/heads/main' }}
 
     - name: Build all targets
