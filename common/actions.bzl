@@ -63,7 +63,7 @@ def _copy(ctx, *, src, dst):
         )
 
 def _expand_env(ctx, *, dst, resolve, env):
-    """Writes a `<name>=<value>` line for every variable in resolve that is set during action execution."""
+    """Writes a `<name>=<value>`, followed by a null character, for every variable in resolve that is set during action execution."""
 
     # environment expansion not support on windows (also not required atm)
     if config.os.startswith("windows"):
