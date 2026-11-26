@@ -65,32 +65,41 @@ message ForeignCcInfo {
   bool is_foreign = 1;
 }
 
+enum CompilationMode {
+  FASTBUILD = 0;
+  DBG = 1;
+  OPT = 2;
+}
+
+message ActionInfo {
+  // The action mnemonic, e.g. CppCompile or CppLink.
+  string mnemonic = 1;
+
+  // The full command line. A params file shows as one `@<path>` argument, and its content is not
+  // expanded.
+  repeated string arguments = 2;
+
+  // All outputs of the action, e.g. the object file, the .d file, the binary or the .pdb file.
+  repeated ArtifactLocation outputs = 3;
+}
+
 // Debug information for a CC target, reported only by the debug aspect.
 message CcDebugInfo {
-
-  enum CompilationMode {
-    FASTBUILD = 0;
-    DBG = 1;
-    OPT = 2;
-  }
-
-  message Action {
-    // The action mnemonic, e.g. CppCompile or CppLink.
-    string mnemonic = 1;
-
-    // The full command line. A params file shows as one `@<path>` argument, and its content is not
-    // expanded.
-    repeated string arguments = 2;
-
-    // All outputs of the action, e.g. the object file, the .d file, the binary or the .pdb file.
-    repeated ArtifactLocation outputs = 3;
-  }
-
   // One entry for each compile action of the target, in the order of target.actions.
-  repeated Action compile_actions = 1;
+  repeated ActionInfo compile_actions = 1;
 
   // The link actions of the target. Empty for a cc_library that only creates an archive.
-  repeated Action link_actions = 2;
+  repeated ActionInfo link_actions = 2;
+
+  CompilationMode compilation_mode = 3;
+}
+
+// Reported only by the debug aspect.
+message GoDebugInfo {
+  repeated ActionInfo compile_actions = 1;
+
+  // Empty for a go_library.
+  repeated ActionInfo link_actions = 2;
 
   CompilationMode compilation_mode = 3;
 }
@@ -355,6 +364,7 @@ message TargetIdeInfo {
 
   ProtobufTargetInfo protobuf_target_info = 200;
   GoTargetInfo go_target_info = 210;
+  GoDebugInfo go_debug_info = 211;
 
   ExtraRule extra_rule = 220;
 }

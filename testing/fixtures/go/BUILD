@@ -52,3 +52,18 @@ test_fixture(
         "//:generated_lib",
     ],
 )
+
+test_fixture(
+    name = "debug",
+    srcs = glob(["debug/**"]),
+    extra_flags = ["--compilation_mode=dbg"],
+    modules = _MODULES,
+    outputs = "debug",
+    rule_sets = ["go"],
+    strip_prefix = "debug",
+    targets = [
+        "//:main",
+        "//:test",
+    ],
+    use_msys2 = True,
+)

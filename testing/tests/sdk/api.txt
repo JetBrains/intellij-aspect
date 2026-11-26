@@ -44,7 +44,7 @@ public final class com.intellij.aspect.lib.AspectchoiceKt
 
 public final class com.intellij.aspect.lib.DefinitionKt
   public static final com.intellij.aspect.lib.AspectDefinition getINTELLIJ_ASPECT()
-  public static final com.intellij.aspect.lib.AspectDefinition getINTELLIJ_CC_DEBUG_ASPECT()
+  public static final com.intellij.aspect.lib.AspectDefinition getINTELLIJ_DEBUG_ASPECT()
 
 public final class com.intellij.aspect.lib.DeployKt
   public static final void deployAspectZip(java.nio.file.Path,java.nio.file.Path,com.intellij.aspect.lib.AspectConfig,java.nio.file.Path) throws java.io.IOException

@@ -15,3 +15,8 @@ test_runner(
     fixture = "//testing/fixtures/go:custom_rule",
     test = "CustomRule.kt",
 )
+
+test_runner(
+    fixture = "//testing/fixtures/go:debug",
+    test = "DebugTest.kt",
+)

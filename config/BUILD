@@ -1,5 +1,6 @@
 load("//intellij:modules.bzl", "MODULES")
 load("//modules:cc_debug_info.bzl", cc_debug_info = "module")
+load("//modules:go_debug_info.bzl", go_debug_info = "module")
 load("//modules:platform_info.bzl", platform_info = "module")
 load("//modules:rules_proto_info.bzl", rules_proto_info = "module")
 load("//private/rules:aspect_config.bzl", "aspect_config")
@@ -12,7 +13,7 @@ aspect_lib(
         "config.tpl",
         "extension.bzl",
         ":aspect_bcr",
-        ":cc_debug_aspect",
+        ":debug_aspect",
     ],
     visibility = ["//:__pkg__"],
 )
@@ -32,12 +33,13 @@ aspect_config(
     visibility = ["//sdk/lib:__pkg__"],
 )
 
-# debug aspect for CC targets, shipped in the BCR archive and bundled into the SDK jar
+# debug aspect for CC and Go targets, shipped in the BCR archive and bundled into the SDK jar
 aspect_config(
-    name = "cc_debug_aspect",
-    location = "cc_debug_aspect.bzl%intellij_cc_debug_aspect",
+    name = "debug_aspect",
+    location = "debug_aspect.bzl%intellij_debug_aspect",
     modules = [
         cc_debug_info,
+        go_debug_info,
         platform_info,
     ],
     visibility = ["//sdk/lib:__pkg__"],

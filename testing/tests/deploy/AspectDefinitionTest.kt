@@ -20,7 +20,7 @@ import com.google.common.truth.Truth.assertWithMessage
 import com.google.devtools.build.runfiles.Runfiles
 import com.intellij.aspect.lib.AspectDefinition
 import com.intellij.aspect.lib.INTELLIJ_ASPECT
-import com.intellij.aspect.lib.INTELLIJ_CC_DEBUG_ASPECT
+import com.intellij.aspect.lib.INTELLIJ_DEBUG_ASPECT
 import com.intellij.aspect.lib.Rules
 import com.intellij.aspect.lib.generateAspectFile
 import org.junit.Test
@@ -30,7 +30,7 @@ import java.nio.file.Path
 import java.util.zip.ZipFile
 
 // all aspects bundled with the SDK
-private val BUNDLED_ASPECTS = listOf(INTELLIJ_ASPECT, INTELLIJ_CC_DEBUG_ASPECT)
+private val BUNDLED_ASPECTS = listOf(INTELLIJ_ASPECT, INTELLIJ_DEBUG_ASPECT)
 
 @RunWith(JUnit4::class)
 class AspectDefinitionTest {
@@ -67,12 +67,12 @@ class AspectDefinitionTest {
 
   @Test
   fun testBundledDebugLocation() {
-    val location = INTELLIJ_CC_DEBUG_ASPECT.location
+    val location = INTELLIJ_DEBUG_ASPECT.location
 
     assertThat(location).isEqualTo(
-      AspectDefinition.Location(Path.of("config", "cc_debug_aspect.bzl"), "intellij_cc_debug_aspect"),
+      AspectDefinition.Location(Path.of("config", "debug_aspect.bzl"), "intellij_debug_aspect"),
     )
-    assertThat(location.toString()).isEqualTo("config:cc_debug_aspect.bzl%intellij_cc_debug_aspect")
+    assertThat(location.toString()).isEqualTo("config:debug_aspect.bzl%intellij_debug_aspect")
   }
 
   @Test
@@ -81,18 +81,18 @@ class AspectDefinitionTest {
     assertThat(sync).contains("extra_rules_info")
     assertThat(sync).doesNotContain("cc_debug_info")
 
-    val debug = INTELLIJ_CC_DEBUG_ASPECT.modules.map { it.file }
-    assertThat(debug).containsExactly("cc_debug_info", "platform_info")
+    val debug = INTELLIJ_DEBUG_ASPECT.modules.map { it.file }
+    assertThat(debug).containsExactly("cc_debug_info", "go_debug_info", "platform_info")
   }
 
   @Test
   fun testDebugModulesForRules() {
-    assertThat(INTELLIJ_CC_DEBUG_ASPECT.modulesFor(setOf(Rules.CC)).map { it.file })
+    assertThat(INTELLIJ_DEBUG_ASPECT.modulesFor(setOf(Rules.CC)).map { it.file })
       .containsExactly("cc_debug_info")
-    assertThat(INTELLIJ_CC_DEBUG_ASPECT.modulesFor(setOf(Rules.CC, Rules.PLATFORMS)).map { it.file })
+    assertThat(INTELLIJ_DEBUG_ASPECT.modulesFor(setOf(Rules.CC, Rules.PLATFORMS)).map { it.file })
       .containsExactly("cc_debug_info", "platform_info")
 
-    assertThat(INTELLIJ_CC_DEBUG_ASPECT.modulesFor(setOf(Rules.JAVA))).isEmpty()
+    assertThat(INTELLIJ_DEBUG_ASPECT.modulesFor(setOf(Rules.JAVA))).isEmpty()
   }
 
   @Test

@@ -33,11 +33,11 @@ val INTELLIJ_ASPECT: AspectDefinition by lazy {
 }
 
 /**
- * The debug aspect for CC targets. Reports the compile and link command lines and collects the
+ * The debug aspect for CC and Go targets. Reports the compile and link command lines and collects the
  * files the debugger reads in the `intellij-debug` output group.
  */
-val INTELLIJ_CC_DEBUG_ASPECT: AspectDefinition by lazy {
-  AspectDefinition.fromResource("/config/cc_debug_aspect.textproto")
+val INTELLIJ_DEBUG_ASPECT: AspectDefinition by lazy {
+  AspectDefinition.fromResource("/config/debug_aspect.textproto")
 }
 
 /**

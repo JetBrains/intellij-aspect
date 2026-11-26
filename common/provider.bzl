@@ -45,6 +45,7 @@ _IntelliJJvmInfo = _create_module_provider()
 _IntelliJKotlinInfo = _create_module_provider()
 _IntelliJScalaInfo = _create_module_provider()
 _IntelliJGoInfo = _create_module_provider()
+_IntelliJGoDebugInfo = _create_module_provider()
 _IntelliJPyInfo = _create_module_provider()  # used by CLwB
 _IntelliJPythonInfo = _create_module_provider()  # used by the JB plugin
 _IntelliJLegacyRulesProtoInfo = _create_module_provider()  # used for legacy rules_proto
@@ -68,6 +69,7 @@ _ORDERED = [
     _IntelliJJavaCommonInfo,
     _IntelliJJvmInfo,
     _IntelliJGoInfo,
+    _IntelliJGoDebugInfo,
     _IntelliJPyInfo,
     _IntelliJPythonInfo,
     _IntelliJLegacyRulesProtoInfo,
@@ -101,6 +103,7 @@ intellij_provider = struct(
     KotlinInfo = _IntelliJKotlinInfo,
     ScalaInfo = _IntelliJScalaInfo,
     GoInfo = _IntelliJGoInfo,
+    GoDebugInfo = _IntelliJGoDebugInfo,
     PyInfo = _IntelliJPyInfo,
     PythonInfo = _IntelliJPythonInfo,
     LegacyRulesProtoInfo = _IntelliJLegacyRulesProtoInfo,

@@ -7,7 +7,7 @@ java_resource_jar(
     srcs = [
         "//:archive_ide",
         "//config:aspect_ide.textproto",
-        "//config:cc_debug_aspect.textproto",
+        "//config:debug_aspect.textproto",
     ],
 )
 
