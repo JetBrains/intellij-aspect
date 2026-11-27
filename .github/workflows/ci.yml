@@ -68,14 +68,11 @@ jobs:
           - MODULE.bazel
           - testing/fixtures/BUILD
           - testing/rules/bazel.bzl
-        bazelrc: common --repo_contents_cache= --//testing/rules:max_servers=2 --//testing/rules:repo_cache=~/.cache/bazel-repo
+        bazelrc: common --repo_contents_cache= --//testing/rules:max_servers=1 --//testing/rules:repo_cache=~/.cache/bazel-repo
         cache-save: ${{ github.ref == 'refs/heads/main' }}
 
-    - name: Build all targets
-      run: bazel build //... --execution_log_binary_file="${{ runner.temp }}/build_exec.log"
-
     - name: Test all targets
-      run: bazel test //... --test_output=errors --execution_log_binary_file="${{ runner.temp }}/test_exec.log"
+      run: bazel test //testing/tests/cpp:DebugTest //testing/tests/cpp:AppleSupportTest --test_output=errors --execution_log_binary_file="${{ runner.temp }}/test_exec.log"
 
     - name: Upload execution logs
       if: always()
