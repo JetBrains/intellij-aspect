@@ -20,7 +20,7 @@ import com.google.protobuf.ByteString
 import com.google.protobuf.TextFormat
 import com.intellij.aspect.lib.AspectConfig
 import com.intellij.aspect.lib.INTELLIJ_ASPECT
-import com.intellij.aspect.lib.INTELLIJ_CC_DEBUG_ASPECT
+import com.intellij.aspect.lib.INTELLIJ_DEBUG_ASPECT
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.lib.Rules
 import com.intellij.aspect.lib.deployAspectZip
@@ -92,7 +92,7 @@ fun main(args: Array<String>) {
     }
 
     val aspect = when (input.outputs) {
-      Outputs.DEBUG -> INTELLIJ_CC_DEBUG_ASPECT
+      Outputs.DEBUG -> INTELLIJ_DEBUG_ASPECT
       else -> INTELLIJ_ASPECT
     }
 

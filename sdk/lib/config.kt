@@ -68,7 +68,7 @@ internal fun writeAspectConfig(destination: Path, relativeDestination: Path, con
 
   val rulesets = config.rulesets ?: (config.useBuiltin + config.repoMapping.keys)
 
-  for (aspect in listOf(INTELLIJ_ASPECT, INTELLIJ_CC_DEBUG_ASPECT)) {
+  for (aspect in listOf(INTELLIJ_ASPECT, INTELLIJ_DEBUG_ASPECT)) {
     writeFileIfContentDiffers(
       path = destination.resolve(aspect.location.file),
       payload = aspect.generateAspectFile(relativeDestination, rulesets, config.attrAspects, config.dropNoIde),

@@ -83,7 +83,7 @@ class DeployTest {
     assertThat(aspectLoads.map { it.path }).contains("aspect/location/modules:cc_info.bzl")
     assertThat(aspectLoads.map { it.path }).doesNotContain("aspect/location/modules:cc_debug_info.bzl")
 
-    val debugAspectLoads = readLoads(path, "config/cc_debug_aspect.bzl")
+    val debugAspectLoads = readLoads(path, "config/debug_aspect.bzl")
     assertThat(debugAspectLoads.map { it.path }).contains("aspect/location/modules:cc_debug_info.bzl")
     assertThat(debugAspectLoads.map { it.path }).doesNotContain("aspect/location/modules:cc_info.bzl")
   }
@@ -100,8 +100,8 @@ class DeployTest {
     )
 
     // the debug aspect is always deployed, even if it has no modules
-    val content = Files.readString(path.resolve("config/cc_debug_aspect.bzl"))
-    assertThat(content).contains("intellij_cc_debug_aspect = intellij_configure_aspect(")
+    val content = Files.readString(path.resolve("config/debug_aspect.bzl"))
+    assertThat(content).contains("intellij_debug_aspect = intellij_configure_aspect(")
     assertThat(content).doesNotContain("cc_debug_info")
   }
 
@@ -173,7 +173,7 @@ class DeployTest {
     assertThat(content).contains("@platforms//os:linux")
     assertThat(content).contains("@platforms//cpu:x86_64")
 
-    val debugAspectLoads = readLoads(path, "config/cc_debug_aspect.bzl")
+    val debugAspectLoads = readLoads(path, "config/debug_aspect.bzl")
     assertThat(debugAspectLoads.map { it.path }).contains("aspect/location/modules:platform_info.bzl")
   }
 

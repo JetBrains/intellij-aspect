@@ -16,8 +16,7 @@
 package com.intellij.aspect.testing.tests.cpp
 
 import com.google.common.truth.Truth.assertThat
-import com.google.devtools.intellij.ideinfo.IntellijIdeInfo
-import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.CcDebugInfo.CompilationMode
+import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.CompilationMode
 import com.google.devtools.intellij.ideinfo.IntellijIdeInfo.PlatformInfo
 import com.intellij.aspect.lib.OutputGroups
 import com.intellij.aspect.private.lib.utils.isLinux
