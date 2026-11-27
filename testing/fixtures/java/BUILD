@@ -8,6 +8,9 @@ package(
 _MODULES = [
     "//testing/fixtures:rules_java_8_16_1",
     "//testing/fixtures:rules_java_latest",
+]
+
+_MODULES_FAKE_CC = _MODULES + [
     "//testing/fixtures/registry:cc_false_toolchain",
 ]
 
@@ -42,7 +45,7 @@ test_fixture(
 test_fixture(
     name = "macro",
     srcs = glob(["macro/**"]),
-    modules = _MODULES,
+    modules = _MODULES_FAKE_CC,
     rule_sets = ["java"],
     targets = ["//..."],
 )

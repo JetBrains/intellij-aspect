@@ -18,10 +18,6 @@ load("//common:provider.bzl", "intellij_provider")
 load(":module.bzl", "intellij_module")
 
 def _implementation(target, ctx, attr):
-    # targets built under exec configuration are most likely used as local tool
-    if intellij_common.is_exec_configuration(ctx):
-        return None
-
     files_to_run = target[DefaultInfo].files_to_run
 
     # files_to_run.executable is None for non-executable targets
